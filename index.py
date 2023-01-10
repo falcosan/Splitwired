@@ -1,3 +1,4 @@
 from data import expenses
 
-expenses(False, 1, 2022)
+for year in range(3):
+    expenses(False, None, int(f"202{year}"))

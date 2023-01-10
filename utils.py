@@ -10,7 +10,7 @@ def csv_generator(expenses: list, filepath: str):
         filepath = f"{filepath}.csv"
     df = []
     df_t = 0
-    for i, expense in enumerate(expenses):
+    for i, expense in enumerate(reversed(expenses)):
         if (
             not expense.getDeletedBy()
             and expense.getCost().replace(".", "", 1).isdigit()
