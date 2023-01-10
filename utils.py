@@ -1,14 +1,7 @@
-import json
 from re import sub
 import pandas as pd
+from decimal import Decimal
 from datetime import datetime
-
-
-def serializer(obj):
-    def convert_to_dict(obj):
-        return obj.__dict__
-
-    return json.dumps(obj, default=convert_to_dict)
 
 
 def csv_generator(expenses, filepath):
@@ -16,8 +9,15 @@ def csv_generator(expenses, filepath):
     if not ".csv" in filepath:
         filepath = f"{filepath}.csv"
     df = []
-    for expense in expenses:
+    df_t = 0
+    for i, expense in enumerate(expenses):
+        if (
+            not expense.getDeletedBy()
+            and expense.getCost().replace(".", "", 1).isdigit()
+        ):
+            df_t = df_t + Decimal(expense.getCost()).quantize(Decimal("0.00"))
         df_d = {
+            "Number": i + 1,
             "Description": expense.getDescription(),
             "Date": datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ").strftime(
                 "%d %B %Y"
@@ -25,8 +25,8 @@ def csv_generator(expenses, filepath):
             "Category": expense.getCategory().getName(),
             "Details": expense.getDetails(),
             "Cost": expense.getCost(),
+            "Total": df_t,
             "Currency": expense.getCurrencyCode(),
-            "Receipt": str(expense.getReceipt().getOriginal()),
             "Deleted": expense.getDeletedBy(),
         }
         df.append(df_d)

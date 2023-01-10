@@ -1,3 +1,3 @@
-from data import groups, friends, expenses
+from data import expenses
 
 expenses()
