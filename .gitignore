@@ -48,3 +48,6 @@ __pypackages__/
 env/
 venv/
 ENV/
+
+# MacOS
+.DS_Store

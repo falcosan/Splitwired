@@ -1,6 +1,6 @@
 from splitwise import Splitwise
 from settings import config as cf
-from utils import serializer
+from utils import serializer, csv_generator
 
 instance = Splitwise(cf.consumer_key, cf.consumer_secret, api_key=cf.api_key)
 
@@ -19,8 +19,32 @@ def friends():
                 print(serializer(balance))
 
 
-def expenses(include_all_expenses=False):
-    for expense in instance.getExpenses():
-        if hasattr(expense, "group_id"):
-            if include_all_expenses or str(expense.group_id) == str(cf.first_group):
-                print(serializer(expense))
+def expenses(include_all_groups=False):
+    if include_all_groups == True:
+        groups = instance.getGroups()
+        for num, group in enumerate(groups):
+            print(f"{str(num)}: {group.getName()}")
+        group_num = input("Elige un grupo seleccionando un numero\n")
+        group_id = groups[int(group_num)].getId()
+    else:
+        group_id = cf.first_group
+    selected_group = instance.getGroup(group_id)
+    offset = None
+    limit = 999
+    dated_after = None
+    dated_before = None
+    friendship_id = None
+    updated_after = None
+    updated_before = None
+
+    expenses = instance.getExpenses(
+        offset,
+        limit,
+        group_id,
+        friendship_id,
+        dated_after,
+        dated_before,
+        updated_after,
+        updated_before,
+    )
+    return csv_generator(expenses, selected_group.getName())
