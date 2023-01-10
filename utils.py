@@ -4,7 +4,7 @@ from decimal import Decimal
 from datetime import datetime
 
 
-def csv_generator(expenses, filepath):
+def csv_generator(expenses: list, filepath: str):
     filepath = sub("([A-Z]\w+$)", "_\\1", filepath).lower()
     if not ".csv" in filepath:
         filepath = f"{filepath}.csv"
@@ -32,7 +32,7 @@ def csv_generator(expenses, filepath):
         df.append(df_d)
     df = pd.DataFrame(df)
 
-    def get_user_name(user):
+    def get_user_name(user: type):
         if user != None:
             return f"{user.getFirstName()} {user.getLastName()}"
         else:
