@@ -1,3 +1,5 @@
+from datetime import datetime
+from calendar import monthrange
 from splitwise import Splitwise
 from utils import csv_generator
 from settings import config as cf
@@ -5,7 +7,7 @@ from settings import config as cf
 instance = Splitwise(cf.consumer_key, cf.consumer_secret, api_key=cf.api_key)
 
 
-def expenses(include_all_groups=False):
+def expenses(include_all_groups=False, month=None, year=None):
     offset = None
     limit = 999
     if include_all_groups == True:
@@ -17,8 +19,30 @@ def expenses(include_all_groups=False):
     else:
         group_id = cf.first_group
     friendship_id = None
-    dated_after = None
-    dated_before = None
+    if month != None:
+        if year != None:
+            dated_after = datetime(year, month, 1, 0, 0, 0)
+            dated_before = datetime(
+                year,
+                month,
+                monthrange(dated_after.year, dated_after.month)[1],
+                23,
+                59,
+                59,
+            )
+        else:
+            dated_after = datetime(datetime.now().date().year, month, 1, 0, 0, 0)
+            dated_before = datetime(
+                datetime.now().date().year,
+                month,
+                monthrange(dated_after.year, dated_after.month)[1],
+                23,
+                59,
+                59,
+            )
+    else:
+        dated_after = None
+        dated_before = None
     updated_after = None
     updated_before = None
     expenses = instance.getExpenses(

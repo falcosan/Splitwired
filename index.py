@@ -1,3 +1,3 @@
 from data import expenses
 
-expenses()
+expenses(False, 1)
