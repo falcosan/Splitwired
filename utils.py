@@ -1,7 +1,16 @@
 from re import sub
 import pandas as pd
+from json import dumps
 from decimal import Decimal
 from datetime import datetime
+
+
+def serializer(obj):
+    def convert_to_dict(obj):
+        if hasattr(obj, "__dict__"):
+            return obj.__dict__
+
+    return dumps(obj, default=convert_to_dict)
 
 
 def csv_generator(expenses: list, filepath: str):
@@ -10,6 +19,10 @@ def csv_generator(expenses: list, filepath: str):
         filepath = f"{filepath}.csv"
     df = []
     df_t = 0
+
+    def get_user_name(user: type):
+        return f"{user.getFirstName()} {user.getLastName()}" if user else None
+
     for i, expense in enumerate(reversed(expenses)):
         if (
             not expense.getDeletedBy()
@@ -27,16 +40,11 @@ def csv_generator(expenses: list, filepath: str):
             "Cost": expense.getCost(),
             "Total": df_t,
             "Currency": expense.getCurrencyCode(),
-            "Deleted": expense.getDeletedBy(),
         }
+        for user in expense.getUsers():
+            df_d["Paid by"] = get_user_name(user) if user.paid_share else None
+            df_d[get_user_name(user)] = user.net_balance
+        df_d["Deleted"] = "X" if expense.getDeletedBy() else None
         df.append(df_d)
     df = pd.DataFrame(df)
-
-    def get_user_name(user: type):
-        if user != None:
-            return f"{user.getFirstName()} {user.getLastName()}"
-        else:
-            return None
-
-    df["Deleted"] = df.apply(lambda row: get_user_name(row["Deleted"]), axis=1)
     df.to_csv(filepath, encoding="utf-8", index=False)

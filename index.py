@@ -1,3 +1,3 @@
 from data import expenses
 
-expenses(True, None, 2021)
+expenses(False, None, 2020)
