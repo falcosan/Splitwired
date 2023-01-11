@@ -47,4 +47,4 @@ def csv_generator(expenses: list, filepath: str):
         df_d["Deleted"] = "X" if expense.getDeletedBy() else None
         df.append(df_d)
     df = pd.DataFrame(df)
-    df.to_csv(filepath, encoding="utf-8", index=False)
+    df.to_csv(filepath, index=False)
