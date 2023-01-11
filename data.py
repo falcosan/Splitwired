@@ -1,16 +1,18 @@
 from datetime import datetime
 from calendar import monthrange
 from splitwise import Splitwise
-from utils import csv_generator
-from settings import config as cf
+from config import config as cf
+from utils import expenses_generator
 
 instance = Splitwise(cf.consumer_key, cf.consumer_secret, api_key=cf.api_key)
 
 
-def expenses(include_all_groups: bool = False, month: int = None, year: int = None):
+def expenses(
+    groups: bool = False, csv: bool = False, month: int = None, year: int = None
+):
     offset = None
     limit = 999
-    if include_all_groups == True:
+    if groups == True:
         groups = instance.getGroups()
         for num, group in enumerate(groups):
             print(f"{str(num)}: {group.getName()}")
@@ -58,6 +60,8 @@ def expenses(include_all_groups: bool = False, month: int = None, year: int = No
         else:
             date = ""
         selected_group = instance.getGroup(group_id)
-        return csv_generator(expenses, f"{selected_group.getName()}{date}")
+        return expenses_generator(
+            expenses, f"{selected_group.getName()}{date}" if csv else None
+        )
     except ValueError as error:
         TypeError(error)

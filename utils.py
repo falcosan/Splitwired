@@ -13,10 +13,11 @@ def serializer(obj):
     return dumps(obj, default=convert_to_dict)
 
 
-def csv_generator(expenses: list, filepath: str):
-    filepath = sub("([A-Z]\w+$)", "_\\1", filepath).lower()
-    if not ".csv" in filepath:
-        filepath = f"{filepath}.csv"
+def expenses_generator(expenses: list, filepath: str or None):
+    if filepath:
+        filepath = sub("([A-Z]\w+$)", "_\\1", filepath).lower()
+        if not ".csv" in filepath:
+            filepath = f"{filepath}.csv"
     df = []
     df_t = 0
 
@@ -46,5 +47,8 @@ def csv_generator(expenses: list, filepath: str):
             df_d[get_user_name(user)] = user.net_balance
         df_d["Deleted"] = "X" if expense.getDeletedBy() else None
         df.append(df_d)
-    df = pd.DataFrame(df)
-    df.to_csv(filepath, index=False)
+    if filepath:
+        df = pd.DataFrame(df)
+        df.to_csv(filepath, index=False)
+    else:
+        return df
