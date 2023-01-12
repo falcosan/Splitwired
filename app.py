@@ -29,3 +29,7 @@ def expanses():
     year = parameter["year"]
     response = expenses(groups, csv, month, year)
     return response
+
+
+if __name__ == "__main__":
+    app.run()
