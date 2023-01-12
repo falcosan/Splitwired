@@ -1,5 +1,5 @@
 from backend.data import expenses
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -16,5 +16,5 @@ def expanses():
     csv = parameter["csv"]
     month = parameter["month"]
     year = parameter["year"]
-    response = jsonify(expenses(groups, csv, month, year))
+    response = expenses(groups, csv, month, year)
     return response
