@@ -1,8 +1,8 @@
 from datetime import datetime
 from calendar import monthrange
 from splitwise import Splitwise
-from config import config as cf
-from utils import expenses_generator
+from backend.config import config as cf
+from backend.utils import expenses_generator
 
 instance = Splitwise(cf.consumer_key, cf.consumer_secret, api_key=cf.api_key)
 

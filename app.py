@@ -1,6 +1,5 @@
-import json
-from data import expenses
-from flask import Flask, render_template, request
+from backend.data import expenses
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
@@ -10,15 +9,12 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/choose_expanses", methods=["POST"])
-def choose_expanses():
+@app.route("/expanses", methods=["POST"])
+def expanses():
     parameter = request.get_json()
     groups = parameter["groups"]
     csv = parameter["csv"]
     month = parameter["month"]
     year = parameter["year"]
-    return expenses(groups, csv, month, year)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    response = jsonify(expenses(groups, csv, month, year))
+    return response
