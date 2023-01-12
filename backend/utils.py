@@ -22,7 +22,9 @@ def expenses_generator(expenses: list, filepath: str or None):
     df_t = 0
 
     def get_user_name(user: type):
-        return f"{user.getFirstName()} {user.getLastName()}" if user else None
+        return (
+            f"{user.getFirstName() or ''} {user.getLastName() or ''}" if user else None
+        )
 
     for i, expense in enumerate(reversed(expenses)):
         if (
@@ -48,7 +50,9 @@ def expenses_generator(expenses: list, filepath: str or None):
         df_d["Deleted"] = "X" if expense.getDeletedBy() else None
         df.append(df_d)
     if filepath:
+        df_js = df
         df = pd.DataFrame(df)
         df.to_csv(filepath, index=False)
+        return df_js
     else:
         return df

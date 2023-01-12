@@ -60,8 +60,11 @@ def expenses(
         else:
             date = ""
         selected_group = instance.getGroup(group_id)
+        selected_group_name = (
+            selected_group.getName().replace("/", "").replace(" ", "_")
+        )
         return expenses_generator(
-            expenses, f"{selected_group.getName()}{date}" if csv else None
+            expenses, f"{selected_group_name}{date}" if csv else None
         )
     except ValueError as error:
         TypeError(error)
