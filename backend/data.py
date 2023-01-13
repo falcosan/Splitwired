@@ -10,7 +10,7 @@ from backend.utils import (
 instance = Splitwise(cf.consumer_key, cf.consumer_secret, api_key=cf.api_key)
 
 
-def expenses(
+def data_expenses(
     groups: bool = False,
     personal: bool = False,
     csv: bool = False,

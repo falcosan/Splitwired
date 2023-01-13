@@ -16,7 +16,7 @@ export default function App() {
     year: 2022,
   });
   const getExpenses = () => {
-    fetch("/expanses", {
+    fetch("/expenses", {
       method: "POST",
       body: JSON.stringify(parameters),
       headers: new Headers({

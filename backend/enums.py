@@ -10,6 +10,6 @@ class Groups(metaclass=Singleton):
     def get_group_prop(self, group: str, key: str):
         dict_value = getattr(self, group, None)
         if dict_value:
-            return dict_value.get(key, "key not found")
+            return dict_value.get(key, "Key not found")
         else:
-            return TypeError("group not found")
+            return TypeError("Group not found")
