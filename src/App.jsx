@@ -10,6 +10,7 @@ export default function App() {
   const [expenses, setExpenses] = useState([]);
   const [parameters, setParameters] = useState({
     groups: false,
+    personal: false,
     csv: false,
     month: 1,
     year: 2022,
@@ -41,15 +42,17 @@ export default function App() {
     <div className="p-2">
       {Object.keys(parameters).map((param, index) => (
         <div key={index}>
-          {/groups|csv/.test(param) ? <label>{param}</label> : undefined}
+          {/groups|personal|csv/.test(param) ? (
+            <label>{param}</label>
+          ) : undefined}
           <input
             value={parameters[param]}
-            type={/groups|csv/.test(param) ? "checkbox" : "number"}
+            type={/groups|personal|csv/.test(param) ? "checkbox" : "number"}
             placeholder={param}
             onChange={(e) =>
               setParameters({
                 ...parameters,
-                [param]: /groups|csv/.test(param)
+                [param]: /groups|csv|personal/.test(param)
                   ? e.target.checked
                   : +e.target.value,
               })

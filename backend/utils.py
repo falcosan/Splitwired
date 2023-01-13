@@ -56,14 +56,14 @@ def get_csv(df: list, filepath: str):
 
 
 def get_personal_expense(
+    personal: bool,
     limit: int = 999,
-    group: bool = True,
 ) -> tuple[None, int, int, None, None, None, str]:
     offset = None
     friendship_id = None
     updated_after = None
     updated_before = None
-    group_id: int = int(Groups().get_group_prop("first", "id"))
+    group_id: int = 0 if personal else int(Groups().get_group_prop("first", "id"))
     expense_name: str = Groups().get_group_prop("first", "name")
     return (
         offset,
@@ -77,8 +77,8 @@ def get_personal_expense(
 
 
 def get_grupal_expense(
+    groups: list,
     limit: int = 999,
-    groups: list = [],
 ) -> tuple[None, int, int, None, None, None, str]:
     offset = None
     friendship_id = None

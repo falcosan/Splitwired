@@ -24,7 +24,7 @@ def serve():
 def expanses():
     parameter = request.get_json()
     groups = parameter["groups"]
-    personal = False
+    personal = parameter["personal"]
     csv = parameter["csv"]
     month = parameter["month"]
     year = parameter["year"]

@@ -20,11 +20,14 @@ def expenses(
     dated_after, dated_before, date_control, dated_name = set_dates(month, year)
     if groups:
         expenses_prop = get_grupal_expense(
-            limit=999,
             groups=instance.getGroups(),
+            limit=999,
         )
     else:
-        expenses_prop = get_personal_expense(limit=999, group=personal)
+        expenses_prop = get_personal_expense(
+            personal=personal,
+            limit=999,
+        )
     (
         offset,
         limit,
