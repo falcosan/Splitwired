@@ -34,3 +34,7 @@ class Users(metaclass=Singleton):
             return dict_value.get(key, "Key not found")
         else:
             return TypeError("User not found")
+
+
+enums_groups = Groups()
+enums_users = Users()

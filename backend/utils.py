@@ -4,7 +4,7 @@ from json import dumps
 from decimal import Decimal
 from datetime import datetime
 from calendar import monthrange
-from backend.enums import Groups, Users
+from backend.enums import enums_groups, enums_users
 
 
 def serializer(obj):
@@ -50,7 +50,8 @@ def get_user_name(user: type):
 def get_unique_user_list(arr: list):
     return list(
         filter(
-            lambda user: str(user.getId()) == str(Users().get_user_prop("me", "id")),
+            lambda user: str(user.getId())
+            == str(enums_users.get_user_prop("me", "id")),
             arr,
         )
     )
@@ -67,8 +68,8 @@ def get_csv(df: list, filepath: str):
 def get_home_expense(
     limit: int = 999,
 ) -> tuple[int, int, str]:
-    group_id: int = int(Groups().get_group_prop("first", "id"))
-    expense_name: str = Groups().get_group_prop("first", "name")
+    group_id: int = int(enums_groups.get_group_prop("first", "id"))
+    expense_name: str = enums_groups.get_group_prop("first", "name")
     return (
         limit,
         group_id,
@@ -80,7 +81,7 @@ def get_personal_expense(
     instance: type, dated_after: datetime, dated_before: datetime, limit: int = 999
 ):
     expenses = []
-    expense_name = Users().get_user_prop("me", "filepath")
+    expense_name = enums_users.get_user_prop("me", "filepath")
     for _, group in enumerate(instance.getGroups()):
         grupal_expenses = instance.getExpenses(
             limit=limit,
