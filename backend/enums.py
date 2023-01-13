@@ -13,3 +13,15 @@ class Groups(metaclass=Singleton):
             return dict_value.get(key, "Key not found")
         else:
             return TypeError("Group not found")
+
+
+class Users(metaclass=Singleton):
+    def __init__(self):
+        self.me = {"id": config("ID_ME_USER"), "name": "Daniele Falchetti"}
+
+    def get_user_prop(self, user: str, key: str):
+        dict_value = getattr(self, user, None)
+        if dict_value:
+            return dict_value.get(key, "Key not found")
+        else:
+            return TypeError("User not found")

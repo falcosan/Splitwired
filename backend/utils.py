@@ -4,7 +4,7 @@ from json import dumps
 from decimal import Decimal
 from datetime import datetime
 from calendar import monthrange
-from backend.enums import Groups
+from backend.enums import Groups, Users
 
 
 def serializer(obj):
@@ -47,6 +47,15 @@ def get_user_name(user: type):
     return f"{user.getFirstName() or ''} {user.getLastName() or ''}" if user else None
 
 
+def get_unique_user_list(arr: list):
+    return list(
+        filter(
+            lambda user: str(user.getId()) == str(Users().get_user_prop("me", "id")),
+            arr,
+        )
+    )
+
+
 def get_csv(df: list, filepath: str):
     filepath = sub("([A-Z]\w+$)", "_\\1", filepath).lower()
     if not ".csv" in filepath:
@@ -55,15 +64,14 @@ def get_csv(df: list, filepath: str):
     return df.to_csv(filepath, index=False)
 
 
-def get_personal_expense(
-    personal: bool,
+def get_home_expense(
     limit: int = 999,
 ) -> tuple[None, int, int, None, None, None, str]:
     offset = None
     friendship_id = None
     updated_after = None
     updated_before = None
-    group_id: int = 0 if personal else int(Groups().get_group_prop("first", "id"))
+    group_id: int = int(Groups().get_group_prop("first", "id"))
     expense_name: str = Groups().get_group_prop("first", "name")
     return (
         offset,
@@ -101,15 +109,28 @@ def get_grupal_expense(
     )
 
 
-def generate_expense(expenses: list, filepath: str or None):
+def generate_expense(expenses: list, filepath: str or None, personal: bool = False):
     df = []
     df_t = 0
-    for i, expense in enumerate(reversed(expenses)):
+    sorted_expanses = [expense for expense in expenses if expense.getDate() is not None]
+    sorted_expanses.sort(
+        key=lambda expense: datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ")
+    )
+    if personal:
+        sorted_expanses = list(
+            filter(lambda expense: expense.getCost(), sorted_expanses)
+        )
+    for i, expense in enumerate(sorted_expanses):
+        unique_user_list = get_unique_user_list(expense.getUsers())
         if (
             not expense.getDeletedBy()
             and expense.getCost().replace(".", "", 1).isdigit()
         ):
-            df_t = df_t + Decimal(expense.getCost()).quantize(Decimal("0.00"))
+            if personal:
+                for user in unique_user_list:
+                    df_t = df_t + Decimal(user.owed_share).quantize(Decimal("0.00"))
+            else:
+                df_t = df_t + Decimal(expense.getCost()).quantize(Decimal("0.00"))
         df_d = {
             "Number": i + 1,
             "Description": expense.getDescription(),
@@ -122,8 +143,9 @@ def generate_expense(expenses: list, filepath: str or None):
             "Total": df_t,
             "Currency": expense.getCurrencyCode(),
         }
-        for user in expense.getUsers():
-            df_d["Paid by"] = get_user_name(user) if user.paid_share else None
+        for user in unique_user_list if personal else expense.getUsers():
+            if not personal:
+                df_d["Paid by"] = get_user_name(user) if user.paid_share else None
             df_d[get_user_name(user)] = user.net_balance
         df_d["Deleted"] = "X" if expense.getDeletedBy() else None
         df.append(df_d)

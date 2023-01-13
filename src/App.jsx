@@ -13,7 +13,7 @@ export default function App() {
     personal: false,
     csv: false,
     month: 1,
-    year: 2022,
+    year: 2023,
   });
   const getExpenses = () => {
     fetch("/expenses", {
