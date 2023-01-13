@@ -76,10 +76,27 @@ def get_home_expense(
     )
 
 
+def get_personal_expense(
+    instance: type, dated_after: datetime, dated_before: datetime, limit: int = 999
+):
+    expenses = []
+    expense_name = Users().get_user_prop("me", "filepath")
+    for _, group in enumerate(instance.getGroups()):
+        grupal_expenses = instance.getExpenses(
+            limit=limit,
+            group_id=int(group.getId()),
+            dated_after=dated_after,
+            dated_before=dated_before,
+        )
+        expenses.extend(grupal_expenses)
+    return (expenses, expense_name)
+
+
 def get_grupal_expense(
-    groups: list,
+    instance: type,
     limit: int = 999,
 ) -> tuple[int, int, str]:
+    groups = instance.getGroups()
     for num, group in enumerate(groups):
         print(f"{str(num)}: {group.getName()}")
     group_num = input("Choose a group with a number:\n")
@@ -139,9 +156,6 @@ def generate_expense(expenses: list, filepath: str or None, personal: bool = Fal
             if not personal:
                 df_d["Paid by"] = get_user_name(user) if user.getPaidShare() else None
             df_d[get_user_name(user)] = user.getOwedShare()
-        df_d["Deleted"] = "X" if expense.getDeletedBy() else None
+        df_d["Deleted"] = "-X-" if expense.getDeletedBy() else None
         df.append(df_d)
-    if filepath:
-        return df, get_csv(df, filepath)
-    else:
-        return df
+    return df, get_csv(df, filepath) if filepath else None
