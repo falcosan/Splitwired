@@ -112,7 +112,12 @@ def get_grupal_expense(
 def generate_expense(expenses: list, filepath: str or None, personal: bool = False):
     df = []
     df_t = 0
-    sorted_expanses = [expense for expense in expenses if expense.getDate() is not None]
+    sorted_expanses = list(
+        filter(
+            lambda expense: not expense.getPayment() and expense.getDate() is not None,
+            expenses,
+        )
+    )
     sorted_expanses.sort(
         key=lambda expense: datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ")
     )
@@ -149,7 +154,7 @@ def generate_expense(expenses: list, filepath: str or None, personal: bool = Fal
         for user in unique_user_list if personal else expense.getUsers():
             if not personal:
                 df_d["Paid by"] = get_user_name(user) if user.paid_share else None
-            df_d[get_user_name(user)] = user.net_balance
+            df_d[get_user_name(user)] = user.owed_share
         df_d["Deleted"] = "X" if expense.getDeletedBy() else None
         df.append(df_d)
     if filepath:
