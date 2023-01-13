@@ -24,10 +24,13 @@ def serve():
 def expanses():
     parameter = request.get_json()
     groups = parameter["groups"]
+    personal = False
     csv = parameter["csv"]
     month = parameter["month"]
     year = parameter["year"]
-    response = expenses(groups, csv, month, year)
+    response = expenses(
+        groups=groups, personal=personal, csv=csv, month=month, year=year
+    )
     return response
 
 

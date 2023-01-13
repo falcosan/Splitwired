@@ -58,22 +58,18 @@ def get_csv(df: list, filepath: str):
 def get_personal_expense(
     limit: int = 999,
     group: bool = True,
-    dated_after: datetime or None = None,
-    dated_before: datetime or None = None,
-):
+) -> tuple[None, int, int, None, None, None, str]:
     offset = None
     friendship_id = None
     updated_after = None
     updated_before = None
-    group_id = Groups().get_group_prop("first", "id")
-    expense_name = Groups().get_group_prop("first", "name")
+    group_id: int = int(Groups().get_group_prop("first", "id"))
+    expense_name: str = Groups().get_group_prop("first", "name")
     return (
         offset,
         limit,
         group_id,
         friendship_id,
-        dated_after,
-        dated_before,
         updated_after,
         updated_before,
         expense_name,
@@ -83,9 +79,7 @@ def get_personal_expense(
 def get_grupal_expense(
     limit: int = 999,
     groups: list = [],
-    dated_after: datetime or None = None,
-    dated_before: datetime or None = None,
-):
+) -> tuple[None, int, int, None, None, None, str]:
     offset = None
     friendship_id = None
     updated_after = None
@@ -94,15 +88,13 @@ def get_grupal_expense(
         print(f"{str(num)}: {group.getName()}")
     group_num = input("Choose a group with a number:\n")
     group = groups[int(group_num)]
-    group_id = group.getId()
-    expense_name = group.getName().replace("/", "").replace(" ", "_")
+    group_id: int = int(group.getId())
+    expense_name: str = group.getName().replace("/", "").replace(" ", "_")
     return (
         offset,
         limit,
         group_id,
         friendship_id,
-        dated_after,
-        dated_before,
         updated_after,
         updated_before,
         expense_name,
