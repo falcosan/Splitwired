@@ -66,20 +66,12 @@ def get_csv(df: list, filepath: str):
 
 def get_home_expense(
     limit: int = 999,
-) -> tuple[None, int, int, None, None, None, str]:
-    offset = None
-    friendship_id = None
-    updated_after = None
-    updated_before = None
+) -> tuple[int, int, str]:
     group_id: int = int(Groups().get_group_prop("first", "id"))
     expense_name: str = Groups().get_group_prop("first", "name")
     return (
-        offset,
         limit,
         group_id,
-        friendship_id,
-        updated_after,
-        updated_before,
         expense_name,
     )
 
@@ -87,11 +79,7 @@ def get_home_expense(
 def get_grupal_expense(
     groups: list,
     limit: int = 999,
-) -> tuple[None, int, int, None, None, None, str]:
-    offset = None
-    friendship_id = None
-    updated_after = None
-    updated_before = None
+) -> tuple[int, int, str]:
     for num, group in enumerate(groups):
         print(f"{str(num)}: {group.getName()}")
     group_num = input("Choose a group with a number:\n")
@@ -99,12 +87,8 @@ def get_grupal_expense(
     group_id: int = int(group.getId())
     expense_name: str = group.getName().replace("/", "").replace(" ", "_")
     return (
-        offset,
         limit,
         group_id,
-        friendship_id,
-        updated_after,
-        updated_before,
         expense_name,
     )
 

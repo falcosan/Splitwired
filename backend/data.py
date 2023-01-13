@@ -35,42 +35,22 @@ def data_expenses(
         )
     else:
         if groups:
-            (
-                offset,
-                limit,
-                group_id,
-                friendship_id,
-                updated_after,
-                updated_before,
-                expense_name,
-            ) = get_grupal_expense(
+            (limit, group_id, expense_name) = get_grupal_expense(
                 groups=instance.getGroups(),
                 limit=999,
             )
         else:
-            (
-                offset,
-                limit,
-                group_id,
-                friendship_id,
-                updated_after,
-                updated_before,
-                expense_name,
-            ) = get_home_expense(
+            (limit, group_id, expense_name) = get_home_expense(
                 limit=999,
             )
         try:
             if date_control:
                 raise AttributeError("Date not valid")
             expenses = instance.getExpenses(
-                offset,
-                limit,
-                group_id,
-                friendship_id,
-                dated_after,
-                dated_before,
-                updated_after,
-                updated_before,
+                limit=limit,
+                group_id=group_id,
+                dated_after=dated_after,
+                dated_before=dated_before,
             )
             return generate_expense(
                 expenses,
