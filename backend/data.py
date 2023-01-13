@@ -2,10 +2,9 @@ from splitwise import Splitwise
 from backend.config import config as cf
 from backend.utils import (
     set_dates,
-    serializer,
+    get_home_expense,
     generate_expense,
     get_grupal_expense,
-    get_home_expense,
 )
 
 instance = Splitwise(cf.consumer_key, cf.consumer_secret, api_key=cf.api_key)
@@ -20,19 +19,13 @@ def data_expenses(
 ):
     dated_after, dated_before, date_control, dated_name = set_dates(month, year)
     if personal:
-        personal_groups = instance.getGroups()
         grupal_personal_expenses = []
-        for _, group in enumerate(personal_groups):
-            group_id = int(group.getId())
+        for _, group in enumerate(instance.getGroups()):
             grupal_expenses = instance.getExpenses(
-                offset=None,
                 limit=999,
-                group_id=group_id,
-                friendship_id=None,
+                group_id=int(group.getId()),
                 dated_after=dated_after,
                 dated_before=dated_before,
-                updated_after=None,
-                updated_before=None,
             )
             grupal_personal_expenses.extend(grupal_expenses)
         return generate_expense(

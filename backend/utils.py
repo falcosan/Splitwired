@@ -136,7 +136,7 @@ def generate_expense(expenses: list, filepath: str or None, personal: bool = Fal
         ):
             if personal:
                 for user in unique_user_list:
-                    df_t = df_t + Decimal(user.owed_share).quantize(Decimal("0.00"))
+                    df_t = df_t + Decimal(user.getOwedShare()).quantize(Decimal("0.00"))
             else:
                 df_t = df_t + Decimal(expense.getCost()).quantize(Decimal("0.00"))
         df_d = {
@@ -153,8 +153,8 @@ def generate_expense(expenses: list, filepath: str or None, personal: bool = Fal
         }
         for user in unique_user_list if personal else expense.getUsers():
             if not personal:
-                df_d["Paid by"] = get_user_name(user) if user.paid_share else None
-            df_d[get_user_name(user)] = user.owed_share
+                df_d["Paid by"] = get_user_name(user) if user.getPaidShare() else None
+            df_d[get_user_name(user)] = user.getOwedShare()
         df_d["Deleted"] = "X" if expense.getDeletedBy() else None
         df.append(df_d)
     if filepath:

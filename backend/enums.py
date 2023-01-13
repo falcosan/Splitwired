@@ -18,6 +18,7 @@ class Groups(metaclass=Singleton):
 class Users(metaclass=Singleton):
     def __init__(self):
         self.me = {"id": config("ID_ME_USER"), "name": "Daniele Falchetti"}
+        self.ago = {"id": config("ID_AGO_USER"), "name": "Agostina Dimaio"}
 
     def get_user_prop(self, user: str, key: str):
         dict_value = getattr(self, user, None)
