@@ -118,7 +118,10 @@ def generate_expense(expenses: list, filepath: str or None, personal: bool = Fal
     )
     if personal:
         sorted_expanses = list(
-            filter(lambda expense: expense.getCost(), sorted_expanses)
+            filter(
+                lambda expense: get_unique_user_list(expense.getUsers()),
+                sorted_expanses,
+            )
         )
     for i, expense in enumerate(sorted_expanses):
         unique_user_list = get_unique_user_list(expense.getUsers())
