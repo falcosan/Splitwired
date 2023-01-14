@@ -154,8 +154,6 @@ def generate_expense(expenses: list, filepath: str or None, personal: bool = Fal
             "Currency": expense.getCurrencyCode(),
         }
         for user in unique_user_list if personal else expense.getUsers():
-            if not personal:
-                df_d["Paid by"] = get_user_name(user) if user.getPaidShare() else None
             df_d[get_user_name(user)] = user.getOwedShare()
         df_d["Deleted"] = "-X-" if expense.getDeletedBy() else None
         df.append(df_d)
