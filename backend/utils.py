@@ -4,6 +4,7 @@ from json import dumps
 from decimal import Decimal
 from datetime import datetime
 from calendar import monthrange
+from splitwise import Splitwise
 from backend.enums import enums_groups, enums_users
 
 
@@ -13,6 +14,21 @@ def serializer(obj):
             return obj.__dict__
 
     return dumps(obj, default=convert_to_dict)
+
+
+def get_categories(instance: Splitwise) -> list:
+    categories = []
+    for category in instance.getCategories():
+        categories.append(category)
+        sub_categories = category.getSubcategories()
+        if sub_categories and len(sub_categories):
+            for sub_category in sub_categories:
+                if not len(sub_category.getSubcategories()):
+                    del sub_category.subcategories
+                categories.append(sub_category)
+        del category.subcategories
+    categories.sort(key=lambda category: category.getName())
+    return serializer(categories)
 
 
 def set_dates(month: int = None, year: int = None):
@@ -78,7 +94,7 @@ def get_home_expense(
 
 
 def get_personal_expense(
-    instance: type, dated_after: datetime, dated_before: datetime, limit: int = 999
+    instance: Splitwise, dated_after: datetime, dated_before: datetime, limit: int = 999
 ):
     expenses = []
     expense_name = enums_users.get_user_prop("me", "filepath")
@@ -94,7 +110,7 @@ def get_personal_expense(
 
 
 def get_grupal_expense(
-    instance: type,
+    instance: Splitwise,
     limit: int = 999,
 ) -> tuple[int, int, str]:
     groups = instance.getGroups()
@@ -111,25 +127,23 @@ def get_grupal_expense(
     )
 
 
-def generate_expense(expenses: list, filepath: str or None, personal: bool = False):
+def generate_expense(
+    expenses: list, filepath: str or None, personal: bool = False, category: int = None
+):
     df = []
     df_t = 0
-    sorted_expanses = list(
-        filter(
-            lambda expense: not expense.getPayment() and expense.getDate() is not None,
-            expenses,
-        )
-    )
+
+    def filter_expenses(expense):
+        if personal:
+            return get_unique_user_list(expense.getUsers())
+        if category:
+            return int(expense.getCategory().getId()) == category
+        return not expense.getPayment() and expense.getDate() is not None
+
+    sorted_expanses = list(filter(filter_expenses, expenses))
     sorted_expanses.sort(
         key=lambda expense: datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ")
     )
-    if personal:
-        sorted_expanses = list(
-            filter(
-                lambda expense: get_unique_user_list(expense.getUsers()),
-                sorted_expanses,
-            )
-        )
     for i, expense in enumerate(sorted_expanses):
         unique_user_list = get_unique_user_list(expense.getUsers())
         if (

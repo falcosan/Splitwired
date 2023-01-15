@@ -2,6 +2,7 @@ from splitwise import Splitwise
 from backend.config import config as cf
 from backend.utils import (
     set_dates,
+    get_categories,
     get_home_expense,
     generate_expense,
     get_grupal_expense,
@@ -11,9 +12,14 @@ from backend.utils import (
 instance = Splitwise(cf.consumer_key, cf.consumer_secret, api_key=cf.api_key)
 
 
+def data_categories():
+    return get_categories(instance=instance)
+
+
 def data_expenses(
     groups: bool = False,
     personal: bool = False,
+    category: int = None,
     csv: bool = False,
     month: int = None,
     year: int = None,
@@ -50,6 +56,7 @@ def data_expenses(
             expenses,
             f"{expense_name}{dated_name}" if csv else None,
             personal=personal,
+            category=category,
         )
     except ValueError as error:
         return TypeError(error)

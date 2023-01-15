@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -8,13 +8,21 @@ import {
 
 export default function App() {
   const [expenses, setExpenses] = useState([]);
+  const [categories, setCategories] = useState();
   const [parameters, setParameters] = useState({
     groups: false,
     personal: false,
     csv: false,
     month: 1,
     year: 2023,
+    category: false,
   });
+  useEffect(() => {
+    fetch("/categories")
+      .then((res) => res.json())
+      .then((data) => setCategories(data));
+    return categories;
+  }, []);
   const getExpenses = () => {
     fetch("/expenses", {
       method: "POST",
@@ -26,7 +34,9 @@ export default function App() {
       .then((res) => res.json())
       .then((data) => setExpenses(data));
   };
-
+  const setInputs = (param) => {
+    return /groups|personal|csv/.test(param);
+  };
   const table = useReactTable({
     columns: expenses.length
       ? Object.keys(expenses[0]).map((key) =>
@@ -42,19 +52,15 @@ export default function App() {
     <div className="p-2">
       {Object.keys(parameters).map((param, index) => (
         <div key={index}>
-          {/groups|personal|csv/.test(param) ? (
-            <label>{param}</label>
-          ) : undefined}
+          {setInputs(param) && <label>{param}</label>}
           <input
             value={parameters[param]}
-            type={/groups|personal|csv/.test(param) ? "checkbox" : "number"}
+            type={setInputs(param) ? "checkbox" : "number"}
             placeholder={param}
             onChange={(e) =>
               setParameters({
                 ...parameters,
-                [param]: /groups|csv|personal/.test(param)
-                  ? e.target.checked
-                  : +e.target.value,
+                [param]: setInputs(param) ? e.target.checked : +e.target.value,
               })
             }
           />
