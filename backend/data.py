@@ -13,18 +13,21 @@ instance = Splitwise(cf.consumer_key, cf.consumer_secret, api_key=cf.api_key)
 
 
 def data_categories():
-    return get_categories(instance=instance)
+    return get_categories(categories=instance.getCategories())
 
 
 def data_expenses(
+    csv: bool = False,
     groups: bool = False,
     personal: bool = False,
-    category: int = None,
-    csv: bool = False,
-    month: int = None,
-    year: int = None,
+    year: int or str = None,
+    month: int or str = None,
+    category: int or str = None,
 ):
-    dated_after, dated_before, date_control, dated_name = set_dates(month, year)
+    year = int(year) or None
+    month = int(month) or None
+    category = int(category) or None
+    dated_after, dated_before, dated_name = set_dates(month, year)
     if not personal:
         if groups:
             (limit, group_id, expense_name) = get_grupal_expense(
@@ -36,8 +39,6 @@ def data_expenses(
                 limit=999,
             )
     try:
-        if date_control:
-            raise AttributeError("Date not valid")
         if personal:
             (expenses, expense_name) = get_personal_expense(
                 instance=instance,

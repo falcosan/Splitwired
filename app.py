@@ -30,12 +30,12 @@ def categories():
 @cross_origin()
 def expenses():
     parameter = request.get_json()
+    csv = parameter["csv"]
+    year = parameter["year"]
+    month = parameter["month"]
     groups = parameter["groups"]
     personal = parameter["personal"]
     category = parameter["category"]
-    csv = parameter["csv"]
-    month = parameter["month"]
-    year = parameter["year"]
     response = data_expenses(
         groups=groups,
         personal=personal,

@@ -16,22 +16,22 @@ def serializer(obj):
     return dumps(obj, default=convert_to_dict)
 
 
-def get_categories(instance: Splitwise) -> list:
-    categories = []
-    for category in instance.getCategories():
-        categories.append(category)
+def get_categories(categories: list) -> list:
+    all_categories = []
+    for category in categories:
+        all_categories.append(category)
         sub_categories = category.getSubcategories()
-        if sub_categories and len(sub_categories):
-            for sub_category in sub_categories:
-                if not len(sub_category.getSubcategories()):
-                    del sub_category.subcategories
-                categories.append(sub_category)
-        del category.subcategories
-    categories.sort(key=lambda category: category.getName())
-    return serializer(categories)
+        if sub_categories == None:
+            category["subcategories"] = []
+    all_categories.sort(key=lambda category: category.getName())
+    return serializer(all_categories)
 
 
-def set_dates(month: int = None, year: int = None):
+def set_dates(month: int = None, year: int = None) -> tuple[datetime, datetime, str]:
+    if month and (month < 1 or month > 12):
+        raise AttributeError("Selected month is not valid")
+    if year and len(str(year)) != 4:
+        raise AttributeError("Selected year is not valid")
     dated_after = (
         datetime(year or datetime.now().date().year, month or 1, 1, 0, 0, 0)
         if month or year
@@ -49,14 +49,17 @@ def set_dates(month: int = None, year: int = None):
         if month or year
         else None
     )
-    date_control = dated_after and dated_after.date() > datetime.now().date()
     if month:
         dated_name = dated_after.strftime("_%d-%m-%Y")
     elif year:
         dated_name = dated_after.strftime("_%Y")
     else:
         dated_name = ""
-    return dated_after, dated_before, date_control, dated_name
+    print(
+        datetime(year or datetime.now().date().year, month or 1, 1, 0, 0, 0),
+        dated_before,
+    )
+    return dated_after, dated_before, dated_name
 
 
 def get_user_name(user: type):
@@ -136,7 +139,7 @@ def generate_expense(
     def filter_expenses(expense):
         if personal:
             return get_unique_user_list(expense.getUsers())
-        if category:
+        if category is not None:
             return int(expense.getCategory().getId()) == category
         return not expense.getPayment() and expense.getDate() is not None
 
