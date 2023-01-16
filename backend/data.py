@@ -24,11 +24,11 @@ def data_expenses(
     month: int or str = None,
     category: int or str = None,
 ):
-    if year != None:
+    if isinstance(year, str):
         year = int(year)
-    if month != None:
+    if isinstance(month, str):
         month = int(month)
-    if category != None:
+    if isinstance(category, str):
         category = int(category)
     dated_after, dated_before, dated_name = set_dates(month, year)
     try:
