@@ -55,10 +55,6 @@ def set_dates(month: int = None, year: int = None) -> tuple[datetime, datetime, 
         dated_name = dated_after.strftime("_%Y")
     else:
         dated_name = ""
-    print(
-        datetime(year or datetime.now().date().year, month or 1, 1, 0, 0, 0),
-        dated_before,
-    )
     return dated_after, dated_before, dated_name
 
 

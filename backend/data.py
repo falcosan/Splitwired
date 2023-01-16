@@ -24,20 +24,13 @@ def data_expenses(
     month: int or str = None,
     category: int or str = None,
 ):
-    year = int(year) or None
-    month = int(month) or None
-    category = int(category) or None
+    if year != None:
+        year = int(year)
+    if month != None:
+        month = int(month)
+    if category != None:
+        category = int(category)
     dated_after, dated_before, dated_name = set_dates(month, year)
-    if not personal:
-        if groups:
-            (limit, group_id, expense_name) = get_grupal_expense(
-                instance=instance,
-                limit=999,
-            )
-        else:
-            (limit, group_id, expense_name) = get_home_expense(
-                limit=999,
-            )
     try:
         if personal:
             (expenses, expense_name) = get_personal_expense(
@@ -47,6 +40,15 @@ def data_expenses(
                 limit=999,
             )
         else:
+            if groups:
+                (limit, group_id, expense_name) = get_grupal_expense(
+                    instance=instance,
+                    limit=999,
+                )
+            else:
+                (limit, group_id, expense_name) = get_home_expense(
+                    limit=999,
+                )
             expenses = instance.getExpenses(
                 limit=limit,
                 group_id=group_id,

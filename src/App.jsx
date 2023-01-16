@@ -15,7 +15,7 @@ export default function App() {
     csv: false,
     month: 1,
     year: 2023,
-    category: false,
+    category: null,
   });
   useEffect(() => {
     fetch("/categories")
