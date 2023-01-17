@@ -137,7 +137,7 @@ def generate_expense(
         filter(
             lambda expense: not expense.getDeletedAt()
             and not expense.getPayment()
-            and expense.getDate() is not None,
+            and expense.getDate() != None,
             expenses,
         )
     )
@@ -159,7 +159,8 @@ def generate_expense(
         key=lambda expense: datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ")
     )
     for i, expense in enumerate(sorted_expenses):
-        unique_user_list = get_unique_user_list(expense.getUsers())
+        users_list = expense.getUsers()
+        unique_user_list = get_unique_user_list(users_list)
         if expense.getCost().replace(".", "", 1).isdigit():
             if personal:
                 for user in unique_user_list:
@@ -177,7 +178,7 @@ def generate_expense(
             "6: Total": df_t,
             "7: Currency": expense.getCurrencyCode(),
         }
-        for user in unique_user_list if personal else expense.getUsers():
+        for user in unique_user_list if personal else users_list:
             df_d[get_user_name(user)] = user.getOwedShare()
         df.append(df_d)
     return df, get_csv(df, filepath) if filepath else None
