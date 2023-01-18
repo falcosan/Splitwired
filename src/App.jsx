@@ -6,7 +6,7 @@ import { importFilter } from "@/utils/import";
 import React, { useState, useMemo } from "react";
 
 export default function App() {
-  const [data, setData] = useState([]);
+  const [{ data, table }, setData] = useState({ data: [], table: [] });
   const [parameters, setParameters] = useState({
     groups: false,
     personal: false,
@@ -15,69 +15,77 @@ export default function App() {
     year: null,
     category: null,
   });
-  const inputs = useMemo(() => {
-    return Object.entries(importFilter(parameters, ["category"], false)).map(
-      ([key, value]) => {
-        let type = "";
-        let target = "";
-        switch (key) {
-          case "groups":
-          case "personal":
-          case "csv":
-            type = "checkbox";
-            target = "checked";
-            break;
-          case "month":
-          case "year":
-            type = "number";
-            target = "value";
-            break;
-        }
-        return { label: key, name: key, type, target, value };
-      }
-    );
-  }, [parameters]);
+  const inputs = Object.entries(
+    importFilter(parameters, ["category"], false)
+  ).map(([key, value]) => {
+    let type = "";
+    let target = "";
+    switch (key) {
+      case "groups":
+      case "personal":
+      case "csv":
+        type = "checkbox";
+        target = "checked";
+        break;
+      case "month":
+      case "year":
+        type = "number";
+        target = "value";
+        break;
+    }
+    return { label: key, name: key, type, target, value };
+  });
   const properties = useMemo(() => {
+    let idKey;
     let totalKey;
     let numberKey;
-    let categoryKey;
-    data.forEach((item) => {
+    table.forEach((item) => {
       for (let prop in item) {
-        if (/total/.test(prop.toLowerCase())) totalKey = prop;
-        if (/number/.test(prop.toLowerCase())) numberKey = prop;
-        if (/category/.test(prop.toLowerCase())) categoryKey = prop;
+        const loweCaseProp = prop.toLowerCase();
+        if (loweCaseProp.includes("id")) idKey = prop;
+        if (loweCaseProp.includes("total")) totalKey = prop;
+        if (loweCaseProp.includes("number")) numberKey = prop;
       }
     });
     return {
+      id: idKey,
       total: totalKey,
       number: numberKey,
-      category: categoryKey,
     };
   }, [data]);
   const categories = useMemo(() => {
-    return [...new Set(data.map((item) => item[properties.category]))].map(
-      (category, index) => ({
-        name: category,
-        id: index,
-      })
+    return [...new Set(data.map((item) => item.category))].map(
+      (category, index) => ({ name: category, id: index })
     );
-  }, [data, parameters.category]);
+  }, [data]);
   const expenses = useMemo(() => {
-    if (parameters.category)
-      return data
-        .filter(
-          (item) =>
-            item[properties.category] === categories[+parameters.category].name
+    let total = 0;
+    if (parameters.category) {
+      const filters = data.filter(
+        (item) => item.category === categories[+parameters.category].name
+      );
+      return table
+        .filter((item) =>
+          filters.map((item) => item.id).includes(item[properties.id])
         )
         .map((item, index) => {
+          total = total += Number(
+            filters[index][parameters.personal ? "user_cost" : "cost"]
+          );
           return {
             ...item,
             [properties.number]: index + 1,
+            [properties.total]: total.toLocaleString("en", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+              useGrouping: false,
+            }),
           };
         });
-    else return data;
+    } else return table;
   }, [data, parameters.category]);
-  const getData = () => {
+  const getData = (e) => {
+    e.preventDefault();
     fetch("/expenses", {
       method: "POST",
       body: JSON.stringify(importFilter(parameters, "category", false)),
@@ -86,12 +94,21 @@ export default function App() {
       }),
     })
       .then((res) => res.json())
-      .then((data) => setData(data));
+      .then(({ data, table }) => {
+        setParameters({
+          ...parameters,
+          ...(parameters.category && { category: null }),
+        });
+        setData({ data, table });
+      });
   };
   useRemovesNullClass();
   return (
     <div className="p-2 bg-green-500">
-      <div className="flex flex-col items-start space-y-2.5">
+      <form
+        onSubmit={getData}
+        className="flex flex-col items-start space-y-2.5"
+      >
         {Object.values(inputs).map((param) => (
           <Input
             key={param.name}
@@ -104,16 +121,14 @@ export default function App() {
             }
           />
         ))}
-        {categories.every((c) => c.id != null && c.name) && (
-          <Select
-            options={categories}
-            getSelectValue={(value) =>
-              setParameters({ ...parameters, category: value })
-            }
-          />
-        )}
-      </div>
-      <button onClick={getData}>click me</button>
+        <Select
+          options={categories}
+          getSelectValue={(value) =>
+            setParameters({ ...parameters, category: value })
+          }
+        />
+        <Input type="submit" value="click me" />
+      </form>
       <Table data={expenses} />
     </div>
   );

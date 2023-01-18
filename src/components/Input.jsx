@@ -7,14 +7,18 @@ export default function Input(props) {
   };
   return (
     <label
-      className={`flex ${props.type !== "checkbox" ? "flex-col" : "space-x-1"}`}
+      className={`flex cursor-pointer ${
+        props.type !== "checkbox" ? "flex-col" : "space-x-1"
+      }`}
     >
       {props.label && <span className="capitalize">{props.label}</span>}
       <input
-        onChange={handleChange}
+        className={!props.label ? "cursor-pointer" : null}
         ref={inputRef}
-        type={props.type}
-        placeholder={props.name}
+        onChange={handleChange}
+        value={props.value ?? ""}
+        type={props.type ?? "text"}
+        placeholder={props.name ?? ""}
       />
     </label>
   );

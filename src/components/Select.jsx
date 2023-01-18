@@ -5,16 +5,20 @@ export default function Select(props) {
   const handleChange = () => {
     props.getSelectValue(selectRef.current.value);
   };
-  return (
+  return props.options.length ? (
     <>
       {props.label && <label className="capitalize">{props.label}</label>}
-      <select onChange={handleChange} ref={selectRef}>
-        {props.options.map((option) => (
-          <option key={option.id} value={option.id}>
-            {option.name}
+      <select
+        className="cursor-pointer"
+        onChange={handleChange}
+        ref={selectRef}
+      >
+        {props.options.map((option, index) => (
+          <option key={option.id ?? index} value={option.id ?? index}>
+            {option.name ?? index}
           </option>
         ))}
       </select>
     </>
-  );
+  ) : null;
 }

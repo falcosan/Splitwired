@@ -122,6 +122,7 @@ def generate_expense(
     expenses: list, filepath: str or None, personal: bool = False, category: int = None
 ):
     df = []
+    dd = []
     df_t = 0
     sorted_expenses = list(
         filter(
@@ -148,27 +149,39 @@ def generate_expense(
     sorted_expenses.sort(
         key=lambda expense: datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ")
     )
+
+    def number_to_decimal(number):
+        return Decimal(number).quantize(Decimal("0.00"))
+
     for i, expense in enumerate(sorted_expenses):
         users_list = expense.getUsers()
         unique_user_list = get_unique_user_list(users_list)
         if expense.getCost().replace(".", "", 1).isdigit():
             if personal:
                 for user in unique_user_list:
-                    df_t = df_t + Decimal(user.getOwedShare()).quantize(Decimal("0.00"))
+                    df_t = df_t + number_to_decimal(user.getOwedShare())
             else:
-                df_t = df_t + Decimal(expense.getCost()).quantize(Decimal("0.00"))
+                df_t = df_t + number_to_decimal(expense.getCost())
         df_d = {
             "1: Number": i + 1,
-            "2: Description": expense.getDescription(),
-            "3: Date": datetime.strptime(
+            "2: Id": expense.getId(),
+            "3: Description": expense.getDescription(),
+            "4: Date": datetime.strptime(
                 expense.getDate(), "%Y-%m-%dT%H:%M:%SZ"
             ).strftime("%d %B %Y"),
-            "4: Category": expense.getCategory().getName(),
-            "5: Cost": expense.getCost(),
-            "6: Total": df_t,
-            "7: Currency": expense.getCurrencyCode(),
+            "5: Category": expense.getCategory().getName(),
+            "6: Cost": number_to_decimal(expense.getCost()),
+            "7: Total": df_t,
+            "8: Currency": expense.getCurrencyCode(),
+        }
+        dd_d = {
+            "id": expense.getId(),
+            "category": expense.getCategory().getName(),
+            "cost": number_to_decimal(expense.getCost()),
         }
         for user in unique_user_list if personal else users_list:
-            df_d[get_user_name(user)] = user.getOwedShare()
+            df_d[get_user_name(user)] = number_to_decimal(user.getOwedShare())
+            dd_d["user_cost"] = number_to_decimal(user.getOwedShare())
         df.append(df_d)
-    return df, get_csv(df, filepath) if filepath else None
+        dd.append(dd_d)
+    return {"table": df, "data": dd}, get_csv(df, filepath) if filepath else None
