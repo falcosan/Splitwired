@@ -1,30 +1,20 @@
 from re import sub
 import pandas as pd
-from json import dumps
 from decimal import Decimal
+from json import dumps, loads
 from datetime import datetime
 from calendar import monthrange
 from splitwise import Splitwise
 from backend.enums import enums_groups, enums_users
 
 
-def serializer(obj):
-    def convert_to_dict(obj):
-        if hasattr(obj, "__dict__"):
-            return obj.__dict__
+def serializer(data, to_json=False):
+    def convert_to_dict(data):
+        if hasattr(data, "__dict__"):
+            return data.__dict__
 
-    return dumps(obj, default=convert_to_dict)
-
-
-def get_categories(categories: list) -> list:
-    all_categories = []
-    for category in categories:
-        all_categories.append(category)
-        sub_categories = category.getSubcategories()
-        if sub_categories == None:
-            category["subcategories"] = []
-    all_categories.sort(key=lambda category: category.getName())
-    return serializer(all_categories)
+    result = dumps(data, default=convert_to_dict)
+    return loads(result) if to_json else result
 
 
 def set_dates(month: int = None, year: int = None) -> tuple[datetime, datetime, str]:

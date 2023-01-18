@@ -1,7 +1,7 @@
+from backend.data import data_expenses
 from flask_cors import CORS, cross_origin
 from flask.helpers import send_from_directory
 from flask import Flask, render_template, request
-from backend.data import data_expenses, data_categories
 
 app = Flask(__name__, template_folder="static", static_url_path="")
 CORS(app)
@@ -35,14 +35,12 @@ def expenses():
     month = parameter["month"]
     groups = parameter["groups"]
     personal = parameter["personal"]
-    category = parameter["category"]
     response = data_expenses(
+        csv=csv,
+        year=year,
+        month=month,
         groups=groups,
         personal=personal,
-        category=category,
-        csv=csv,
-        month=month,
-        year=year,
     )
     return response
 

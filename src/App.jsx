@@ -3,11 +3,10 @@ import Table from "@/components/Table";
 import Select from "@/components/Select";
 import { useRemovesNullClass } from "@/hooks";
 import { importFilter } from "@/utils/import";
-import React, { useState, useLayoutEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 
 export default function App() {
-  const [expenses, setExpenses] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [data, setData] = useState([]);
   const [parameters, setParameters] = useState({
     groups: false,
     personal: false,
@@ -15,51 +14,63 @@ export default function App() {
     month: null,
     year: null,
     category: null,
-    subcategory: null,
   });
-  useLayoutEffect(() => {
-    fetch("/categories")
-      .then((res) => res.json())
-      .then((data) => setCategories(data));
-  }, []);
   const inputs = useMemo(() => {
-    return Object.entries(
-      importFilter(parameters, ["category", "subcategory"], false)
-    ).map(([key, value]) => {
-      let type = "";
-      let target = "";
-      switch (key) {
-        case "groups":
-        case "personal":
-        case "csv":
-          type = "checkbox";
-          target = "checked";
-          break;
-        case "month":
-        case "year":
-          type = "number";
-          target = "value";
-          break;
+    return Object.entries(importFilter(parameters, ["category"], false)).map(
+      ([key, value]) => {
+        let type = "";
+        let target = "";
+        switch (key) {
+          case "groups":
+          case "personal":
+          case "csv":
+            type = "checkbox";
+            target = "checked";
+            break;
+          case "month":
+          case "year":
+            type = "number";
+            target = "value";
+            break;
+        }
+        return { label: key, name: key, type, target, value };
       }
-      return { label: key, name: key, type, target, value };
-    });
-  }, [parameters]);
-  const subCategories = useMemo(() => {
-    const choosesCategory = categories.find(
-      (category) => String(category.id) === String(parameters.category)
     );
-    return choosesCategory?.subcategories ?? [];
-  }, [parameters.category]);
-  const getExpenses = () => {
+  }, [parameters]);
+  const categoryKey = useMemo(() => {
+    let key;
+    data.forEach((item) => {
+      for (let prop in item) {
+        if (/category/.test(prop.toLowerCase())) key = prop;
+      }
+    });
+    return key;
+  });
+  const categories = useMemo(() => {
+    return [...new Set(data.map((item) => item[categoryKey]))].map(
+      (category, index) => ({
+        name: category,
+        id: index,
+      })
+    );
+  }, [data]);
+  const expenses = useMemo(() => {
+    if (parameters.category)
+      return data.filter(
+        (item) => item[categoryKey] === categories[+parameters.category].name
+      );
+    else return data;
+  });
+  const getData = () => {
     fetch("/expenses", {
       method: "POST",
-      body: JSON.stringify(importFilter(parameters, "subcategory", false)),
+      body: JSON.stringify(importFilter(parameters, "category", false)),
       headers: new Headers({
         "content-type": "application/json",
       }),
     })
       .then((res) => res.json())
-      .then((data) => setExpenses(data));
+      .then((data) => setData(data));
   };
   useRemovesNullClass();
   return (
@@ -85,16 +96,8 @@ export default function App() {
             }
           />
         )}
-        {subCategories.every((s) => s.id != null && s.name) && (
-          <Select
-            options={subCategories}
-            getSelectValue={(value) =>
-              setParameters({ ...parameters, subcategory: value })
-            }
-          />
-        )}
       </div>
-      <button onClick={getExpenses}>click me</button>
+      <button onClick={getData}>click me</button>
       <Table data={expenses} />
     </div>
   );
