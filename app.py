@@ -19,13 +19,6 @@ def serve():
     return send_from_directory(app.static_folder, "index.html")
 
 
-@app.route("/categories")
-@cross_origin()
-def categories():
-    categories = data_categories()
-    return categories
-
-
 @app.route("/expenses", methods=["POST"])
 @cross_origin()
 def expenses():

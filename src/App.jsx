@@ -37,30 +37,46 @@ export default function App() {
       }
     );
   }, [parameters]);
-  const categoryKey = useMemo(() => {
-    let key;
+  const properties = useMemo(() => {
+    let totalKey;
+    let numberKey;
+    let categoryKey;
     data.forEach((item) => {
       for (let prop in item) {
-        if (/category/.test(prop.toLowerCase())) key = prop;
+        if (/total/.test(prop.toLowerCase())) totalKey = prop;
+        if (/number/.test(prop.toLowerCase())) numberKey = prop;
+        if (/category/.test(prop.toLowerCase())) categoryKey = prop;
       }
     });
-    return key;
-  });
+    return {
+      total: totalKey,
+      number: numberKey,
+      category: categoryKey,
+    };
+  }, [data]);
   const categories = useMemo(() => {
-    return [...new Set(data.map((item) => item[categoryKey]))].map(
+    return [...new Set(data.map((item) => item[properties.category]))].map(
       (category, index) => ({
         name: category,
         id: index,
       })
     );
-  }, [data]);
+  }, [data, parameters.category]);
   const expenses = useMemo(() => {
     if (parameters.category)
-      return data.filter(
-        (item) => item[categoryKey] === categories[+parameters.category].name
-      );
+      return data
+        .filter(
+          (item) =>
+            item[properties.category] === categories[+parameters.category].name
+        )
+        .map((item, index) => {
+          return {
+            ...item,
+            [properties.number]: index + 1,
+          };
+        });
     else return data;
-  });
+  }, [data, parameters.category]);
   const getData = () => {
     fetch("/expenses", {
       method: "POST",
