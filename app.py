@@ -23,12 +23,12 @@ def serve():
 @cross_origin()
 def expenses():
     parameter = request.get_json()
-    csv = parameter["csv"]
-    year = parameter["year"]
-    month = parameter["month"]
-    groups = parameter["groups"]
-    category = parameter["category"]
-    personal = parameter["personal"]
+    csv = parameter.get("csv", False)
+    year = parameter.get("year", None)
+    month = parameter.get("month", None)
+    groups = parameter.get("groups", False)
+    category = parameter.get("category", None)
+    personal = parameter.get("personal", False)
     response = data_expenses(
         csv=csv,
         year=year,

@@ -16,7 +16,7 @@ export default function App() {
     category: null,
   });
   const inputs = Object.entries(
-    importFilter(parameters, ["category"], false)
+    importFilter(parameters, "category", false)
   ).map(([key, value]) => {
     let type = "";
     let target = "";
@@ -89,18 +89,29 @@ export default function App() {
     e.preventDefault();
     fetch("/expenses", {
       method: "POST",
-      body: JSON.stringify(parameters),
+      body: JSON.stringify(
+        importFilter(parameters, ["category", "csv"], false)
+      ),
       headers: new Headers({
         "content-type": "application/json",
       }),
     })
       .then((res) => res.json())
-      .then(({ data, table }) => {
+      .then(({ data, table }) => setData({ data, table }))
+      .finally(() => {
+        if (parameters.csv) {
+          fetch("/expenses", {
+            method: "POST",
+            body: JSON.stringify(parameters),
+            headers: new Headers({
+              "content-type": "application/json",
+            }),
+          });
+        }
         setParameters({
           ...parameters,
           ...(parameters.category && { category: null }),
         });
-        setData({ data, table });
       });
   };
   useRemovesNullClass();

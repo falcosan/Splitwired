@@ -2,8 +2,8 @@ from splitwise import Splitwise
 from backend.config import config as cf
 from backend.utils import (
     set_dates,
-    get_home_expense,
     generate_expense,
+    get_home_expense,
     get_grupal_expense,
     get_personal_expense,
 )
