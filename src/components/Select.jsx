@@ -14,8 +14,8 @@ export default function Select(props) {
         ref={selectRef}
       >
         {props.options.map((option, index) => (
-          <option key={option.id ?? index} value={option.id ?? index}>
-            {option.name ?? index}
+          <option key={option?.id ?? index} value={option?.id ?? index}>
+            {option?.name ?? index}
           </option>
         ))}
       </select>

@@ -17,11 +17,14 @@ def data_expenses(
     personal: bool = False,
     year: int or str = None,
     month: int or str = None,
+    category: int or str = None,
 ):
     if year and isinstance(year, str):
         year = int(year)
     if month and isinstance(month, str):
         month = int(month)
+    if category and isinstance(category, str):
+        category = int(category)
     dated_after, dated_before, dated_name = set_dates(month, year)
     try:
         if personal:
@@ -51,6 +54,7 @@ def data_expenses(
             expenses,
             f"{expense_name}{dated_name}" if csv else None,
             personal=personal,
+            category=category,
         )
     except ValueError as error:
         return TypeError(error)

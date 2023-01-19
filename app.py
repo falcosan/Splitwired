@@ -27,12 +27,14 @@ def expenses():
     year = parameter["year"]
     month = parameter["month"]
     groups = parameter["groups"]
+    category = parameter["category"]
     personal = parameter["personal"]
     response = data_expenses(
         csv=csv,
         year=year,
         month=month,
         groups=groups,
+        category=category,
         personal=personal,
     )
     return response

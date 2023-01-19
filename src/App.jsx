@@ -54,16 +54,17 @@ export default function App() {
     };
   }, [data]);
   const categories = useMemo(() => {
-    return [...new Set(data.map((item) => item.category))].map(
-      (category, index) => ({ name: category, id: index })
-    );
+    return data
+      .map((item) => item.category)
+      .filter((v, i, a) => a.findIndex((v2) => v2.id === v.id) === i);
   }, [data]);
   const expenses = useMemo(() => {
     let total = 0;
     if (parameters.category) {
-      const filters = data.filter(
-        (item) => item.category === categories[+parameters.category].name
+      const found = categories.find(
+        (item) => String(item.id) === String(parameters.category)
       );
+      const filters = data.filter((item) => item.category.name === found.name);
       return table
         .filter((item) =>
           filters.map((item) => item.id).includes(item[properties.id])
@@ -88,7 +89,7 @@ export default function App() {
     e.preventDefault();
     fetch("/expenses", {
       method: "POST",
-      body: JSON.stringify(importFilter(parameters, "category", false)),
+      body: JSON.stringify(parameters),
       headers: new Headers({
         "content-type": "application/json",
       }),

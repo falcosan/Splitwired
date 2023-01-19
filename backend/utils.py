@@ -176,7 +176,10 @@ def generate_expense(
         }
         dd_d = {
             "id": expense.getId(),
-            "category": expense.getCategory().getName(),
+            "category": {
+                "name": expense.getCategory().getName(),
+                "id": expense.getCategory().getId(),
+            },
             "cost": number_to_decimal(expense.getCost()),
         }
         for user in unique_user_list if personal else users_list:
