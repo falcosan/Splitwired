@@ -1,6 +1,7 @@
 from re import sub
 import pandas as pd
 from decimal import Decimal
+import plotly.express as px
 from json import dumps, loads
 from datetime import datetime
 from calendar import monthrange
@@ -208,3 +209,12 @@ def generate_expense(
         df.append(df_d)
         dd.append(dd_d)
     return {"table": df, "data": dd}, get_csv(df, filepath) if filepath else None
+
+
+def generate_chart():
+    df = px.data.gapminder().query("year == 2007").query("continent == 'Europe'")
+    df.loc[df["pop"] < 2.0e6, "country"] = "Other countries"
+    fig = px.pie(
+        df, values="pop", names="country", title="Population of European continent"
+    )
+    fig.show()
