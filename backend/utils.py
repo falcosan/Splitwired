@@ -118,6 +118,26 @@ def get_grupal_expense(
     )
 
 
+def get_categories(categories: list, category: int = None) -> list:
+    categories_all = []
+    for original_category in categories:
+        categories_all.append(original_category)
+        sub_categories = original_category.getSubcategories()
+        if sub_categories and len(sub_categories):
+            for sub_category in sub_categories:
+                if not len(sub_category.getSubcategories()):
+                    del sub_category.subcategories
+                categories_all.append(sub_category)
+        del original_category.subcategories
+    if category != None:
+        category_found = next(
+            original_category
+            for original_category in categories_all
+            if original_category.getId() == category
+        )
+    return category_found if category != None else categories_all
+
+
 def generate_expense(
     expenses: list, filepath: str or None, personal: bool = False, category: int = None
 ):

@@ -2,6 +2,7 @@ from splitwise import Splitwise
 from backend.config import config as cf
 from backend.utils import (
     set_dates,
+    get_categories,
     generate_expense,
     get_home_expense,
     get_grupal_expense,
@@ -23,8 +24,15 @@ def data_expenses(
         year = int(year)
     if month and isinstance(month, str):
         month = int(month)
-    if category and isinstance(category, str):
-        category = int(category)
+    if category:
+        if isinstance(category, str):
+            category = int(category)
+        category_found = get_categories(
+            categories=instance.getCategories(), category=category
+        )
+        category_name = f'{category_found.getName().replace("/", "").replace(" ", "_")}'
+    else:
+        category_name = ""
     dated_after, dated_before, dated_name = set_dates(month, year)
     try:
         if personal:
@@ -52,7 +60,7 @@ def data_expenses(
             )
         return generate_expense(
             expenses,
-            f"{expense_name}{dated_name}" if csv else None,
+            f"{expense_name}{category_name}{dated_name}" if csv else None,
             personal=personal,
             category=category,
         )

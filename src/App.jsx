@@ -40,7 +40,7 @@ export default function App() {
     let totalKey;
     let numberKey;
     table.forEach((item) => {
-      for (let prop in item) {
+      for (const prop in item) {
         const loweCaseProp = prop.toLowerCase();
         if (loweCaseProp.includes("id")) idKey = prop;
         if (loweCaseProp.includes("total")) totalKey = prop;
