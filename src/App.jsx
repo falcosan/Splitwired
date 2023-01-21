@@ -1,3 +1,4 @@
+import Plot from "react-plotly.js";
 import Input from "@/components/Input";
 import Table from "@/components/Table";
 import Select from "@/components/Select";
@@ -6,7 +7,11 @@ import { importFilter } from "@/utils/import";
 import React, { useState, useMemo } from "react";
 
 export default function App() {
-  const [{ data, table }, setData] = useState({ data: [], table: [] });
+  const [{ data, table, chart }, setData] = useState({
+    data: [],
+    table: [],
+    chart: {},
+  });
   const [parameters, setParameters] = useState({
     groups: false,
     personal: false,
@@ -97,7 +102,7 @@ export default function App() {
       }),
     })
       .then((res) => res.json())
-      .then(({ data, table }) => setData({ data, table }))
+      .then(({ data, table, chart }) => setData({ data, table, chart }))
       .finally(() => {
         if (parameters.csv) {
           fetch("/expenses", {
@@ -142,6 +147,9 @@ export default function App() {
         <Input type="submit" value="click me" />
       </form>
       <Table data={expenses} />
+      {Object.keys(chart).length ? (
+        <Plot data={chart.data} layout={chart.layout} />
+      ) : null}
     </div>
   );
 }

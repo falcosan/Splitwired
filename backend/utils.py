@@ -1,11 +1,11 @@
 from re import sub
 import pandas as pd
 from decimal import Decimal
-import plotly.express as px
 from json import dumps, loads
 from datetime import datetime
 from calendar import monthrange
 from splitwise import Splitwise
+from plotly import graph_objects as go
 from backend.enums import enums_groups, enums_users
 
 
@@ -139,11 +139,37 @@ def get_categories(categories: list, category: int = None) -> list:
     return category_found if category != None else categories_all
 
 
+def generate_chart(data, type: str = "pie"):
+    type = type.lower()
+    chart_types = {"pie": go.Pie}
+    if chart_types[type] == None:
+        raise TypeError("Chart not imported")
+    labels = list(map(lambda d: d["label"], data))
+    values = list(map(lambda d: d["value"], data))
+    config = {
+        "pie": {
+            "labels": labels,
+            "values": values,
+            "textinfo": "label+percent",
+            "hole": 0.3,
+        }
+    }
+    data = [chart_types[type](**config[type])]
+    layout = {
+        "height": 500,
+        "width": 900,
+        "margin": dict(l=50, r=50, b=100, t=100, pad=4),
+    }
+    fig = go.Figure(data=data, layout=layout)
+    return fig.to_plotly_json()
+
+
 def generate_expense(
     expenses: list, filepath: str or None, personal: bool = False, category: int = None
 ):
     df = []
     dd = []
+    dc = []
     df_t = 0
     sorted_expenses = list(
         filter(
@@ -203,18 +229,17 @@ def generate_expense(
             },
             "cost": number_to_decimal(expense.getCost()),
         }
+        dc_d = {
+            "label": expense.getCategory().getName(),
+            "value": number_to_decimal(expense.getCost()),
+        }
         for user in unique_user_list if personal else users_list:
             df_d[get_user_name(user)] = number_to_decimal(user.getOwedShare())
             dd_d["user_cost"] = number_to_decimal(user.getOwedShare())
         df.append(df_d)
         dd.append(dd_d)
-    return {"table": df, "data": dd}, get_csv(df, filepath) if filepath else None
-
-
-def generate_chart():
-    df = px.data.gapminder().query("year == 2007").query("continent == 'Europe'")
-    df.loc[df["pop"] < 2.0e6, "country"] = "Other countries"
-    fig = px.pie(
-        df, values="pop", names="country", title="Population of European continent"
-    )
-    fig.show()
+        dc.append(dc_d)
+    dc = generate_chart(dc)
+    return {"table": df, "data": dd, "chart": dc}, get_csv(
+        df, filepath
+    ) if filepath else None

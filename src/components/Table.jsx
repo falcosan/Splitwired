@@ -19,8 +19,8 @@ export default function Table(props) {
     getCoreRowModel: getCoreRowModel(),
   });
   return (
-    <table>
-      <thead>
+    <table className="relative block max-h-[50rem] overflow-y-auto">
+      <thead className="sticky top-0 bg-slate-200">
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
