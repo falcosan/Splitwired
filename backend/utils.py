@@ -59,7 +59,7 @@ def get_unique_user_list(arr: list):
     return list(
         filter(
             lambda user: str(user.getId())
-            == str(enums_users.get_user_prop("me", "id")),
+            == str(enums_users.get_user_prop("dan", "id")),
             arr,
         )
     )
@@ -89,7 +89,7 @@ def get_personal_expense(
     instance: Splitwise, dated_after: datetime, dated_before: datetime, limit: int = 999
 ):
     expenses = []
-    expense_name = enums_users.get_user_prop("me", "filepath")
+    expense_name = enums_users.get_user_prop("dan", "filepath")
     for group in instance.getGroups():
         grupal_expenses = instance.getExpenses(
             limit=limit,
@@ -251,12 +251,14 @@ def generate_expense(
         }
         dc_d = {
             "name": expense.getCategory().getName(),
-            "cost": number_to_decimal(expense.getCost()),
+            "cost": number_to_decimal(expense.getCost()) if not personal else None,
             "date": date_to_format(expense.getDate()),
         }
         for user in unique_user_list if personal else users_list:
             df_d[get_user_name(user)] = number_to_decimal(user.getOwedShare())
             dd_d["user_cost"] = number_to_decimal(user.getOwedShare())
+            if personal:
+                dc_d["cost"] = number_to_decimal(user.getOwedShare())
         df.append(df_d)
         dd.append(dd_d)
         if chart:

@@ -17,8 +17,8 @@ class Groups(metaclass=Singleton):
 
 class Users(metaclass=Singleton):
     def __init__(self):
-        self.me = {
-            "id": config("ID_ME_USER"),
+        self.dan = {
+            "id": config("ID_DAN_USER"),
             "name": "Daniele Falchetti",
             "filepath": "dd",
         }
