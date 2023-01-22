@@ -139,35 +139,45 @@ def get_categories(categories: list, category: int = None) -> list:
     return category_found if category != None else categories_all
 
 
-def generate_chart(data, chart_type: str or list[str] = "pie"):
-    charts = []
-    types = {"pie": go.Pie}
-
+def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = None):
     def get_data(value):
         return list(map(lambda d: d[value], data))
 
+    charts = []
+    types = {"pie": go.Pie, "bar": go.Bar}
+    layout = {
+        "height": 1024,
+        "width": 964,
+        "margin": dict(l=50, r=50, b=100, t=100, pad=4),
+    }
     config = {
+        "autosizable": True,
+        "toImageButtonOptions": {"format": "svg", "filename": filename or "chart"},
+    }
+    content = {
         "pie": {
             "labels": get_data("name"),
             "values": get_data("cost"),
             "textinfo": "label+percent",
             "hole": 0.3,
         },
-    }
-    layout = {
-        "height": 1024,
-        "width": 1440,
-        "margin": dict(l=50, r=50, b=100, t=100, pad=4),
+        "bar": {
+            "x": get_data("date"),
+            "y": get_data("name"),
+        },
     }
     for chart in [chart_type] if type(chart_type) == str else chart_type:
         chart = chart.lower()
-        data = [types[chart](**config[chart])]
+        data = [types[chart](**content[chart])]
         fig = go.Figure(data=data, layout=layout)
-        charts.append(fig.to_plotly_json())
+        json = fig.to_plotly_json()
+        json["config"] = config
+        charts.append(json)
     return charts
 
 
 def generate_expense(
+    csv: bool,
     expenses: list,
     filepath: str or None,
     category: int = None,
@@ -250,7 +260,7 @@ def generate_expense(
         if chart:
             dc.append(dc_d)
     if chart:
-        dc = generate_chart(dc, chart_type=chart)
+        dc = generate_chart(dc, chart_type=chart, filename=filepath)
     return {"table": df, "data": dd, "chart": dc}, get_csv(
         df, filepath
-    ) if filepath else None
+    ) if csv else None

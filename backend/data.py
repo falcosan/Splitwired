@@ -60,11 +60,12 @@ def data_expenses(
                 dated_before=dated_before,
             )
         return generate_expense(
+            csv=csv,
             chart=chart,
             expenses=expenses,
             personal=personal,
             category=category,
-            filepath=f"{expense_name}{category_name}{dated_name}" if csv else None,
+            filepath=f"{expense_name}{category_name}{dated_name}",
         )
     except ValueError as error:
         return TypeError(error)

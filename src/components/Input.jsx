@@ -15,6 +15,8 @@ export default function Input(props) {
       <input
         className={!props.label ? "cursor-pointer" : null}
         ref={inputRef}
+        max={props.max}
+        min={props.min}
         onChange={handleChange}
         value={props.value ?? ""}
         type={props.type ?? "text"}

@@ -19,27 +19,28 @@ export default function App() {
     month: null,
     year: null,
     category: null,
-    chart: "pie",
+    chart: ["pie"],
   });
   const inputs = Object.entries(
     importFilter(parameters, ["category", "chart"], false)
   ).map(([key, value]) => {
-    let type = "";
-    let target = "";
+    const state = { type: "", target: "", max: null, min: null };
     switch (key) {
       case "groups":
       case "personal":
       case "csv":
-        type = "checkbox";
-        target = "checked";
+        state.type = "checkbox";
+        state.target = "checked";
         break;
       case "month":
+        state.min = 1;
+        state.max = 12;
       case "year":
-        type = "number";
-        target = "value";
+        state.type = "number";
+        state.target = "value";
         break;
     }
-    return { label: key, name: key, type, target, value };
+    return { label: key, name: key, value, ...state };
   });
   const properties = useMemo(() => {
     let idKey;
@@ -62,7 +63,8 @@ export default function App() {
   const categories = useMemo(() => {
     return data
       .map((item) => item.category)
-      .filter((v, i, a) => a.findIndex((v2) => v2.id === v.id) === i);
+      .filter((v, i, a) => a.findIndex((v2) => v2.id === v.id) === i)
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [data]);
   const expenses = useMemo(() => {
     let total = 0;
@@ -148,11 +150,16 @@ export default function App() {
         <Input type="submit" value="click me" />
       </form>
       <Table data={expenses} />
-      {chart.length ? (
-        <div className="flex flex-wrap">
-          {chart[0] && <Plot data={chart[0].data} layout={chart[0].layout} />}
+      {Array.from({ length: chart.length }, (_, i) => (
+        <div key={i}>
+          <Plot
+            data={chart[i].data}
+            layout={chart[i].layout}
+            config={chart[i].config}
+            useResizeHandler
+          />
         </div>
-      ) : null}
+      ))}
     </div>
   );
 }
