@@ -74,7 +74,7 @@ def get_csv(df: list, filepath: str):
 
 
 def get_home_expense(
-    limit: int = 999,
+    limit: int = 9999,
 ) -> tuple[int, int, str]:
     group_id: int = int(enums_groups.get_group_prop("first", "id"))
     expense_name: str = enums_groups.get_group_prop("first", "name")
@@ -86,7 +86,10 @@ def get_home_expense(
 
 
 def get_personal_expense(
-    instance: Splitwise, dated_after: datetime, dated_before: datetime, limit: int = 999
+    instance: Splitwise,
+    dated_after: datetime,
+    dated_before: datetime,
+    limit: int = 9999,
 ):
     expenses = []
     expense_name = enums_users.get_user_prop("dan", "filepath")
@@ -103,7 +106,7 @@ def get_personal_expense(
 
 def get_grupal_expense(
     instance: Splitwise,
-    limit: int = 999,
+    limit: int = 9999,
 ) -> tuple[int, int, str]:
     groups = instance.getGroups()
     for num, group in enumerate(groups):

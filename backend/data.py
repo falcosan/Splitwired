@@ -41,17 +41,17 @@ def data_expenses(
                 instance=instance,
                 dated_after=dated_after,
                 dated_before=dated_before,
-                limit=999,
+                limit=9999,
             )
         else:
             if groups:
                 (limit, group_id, expense_name) = get_grupal_expense(
                     instance=instance,
-                    limit=999,
+                    limit=9999,
                 )
             else:
                 (limit, group_id, expense_name) = get_home_expense(
-                    limit=999,
+                    limit=9999,
                 )
             expenses = instance.getExpenses(
                 limit=limit,
