@@ -18,6 +18,7 @@ def data_expenses(
     personal: bool = False,
     year: int or str = None,
     month: int or str = None,
+    chart: str or list = False,
     category: int or str = None,
 ):
     if year and isinstance(year, str):
@@ -59,10 +60,11 @@ def data_expenses(
                 dated_before=dated_before,
             )
         return generate_expense(
-            expenses,
-            f"{expense_name}{category_name}{dated_name}" if csv else None,
+            chart=chart,
+            expenses=expenses,
             personal=personal,
             category=category,
+            filepath=f"{expense_name}{category_name}{dated_name}" if csv else None,
         )
     except ValueError as error:
         return TypeError(error)

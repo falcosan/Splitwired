@@ -10,7 +10,7 @@ export default function App() {
   const [{ data, table, chart }, setData] = useState({
     data: [],
     table: [],
-    chart: {},
+    chart: [],
   });
   const [parameters, setParameters] = useState({
     groups: false,
@@ -19,9 +19,10 @@ export default function App() {
     month: null,
     year: null,
     category: null,
+    chart: "pie",
   });
   const inputs = Object.entries(
-    importFilter(parameters, "category", false)
+    importFilter(parameters, ["category", "chart"], false)
   ).map(([key, value]) => {
     let type = "";
     let target = "";
@@ -147,8 +148,10 @@ export default function App() {
         <Input type="submit" value="click me" />
       </form>
       <Table data={expenses} />
-      {Object.keys(chart).length ? (
-        <Plot data={chart.data} layout={chart.layout} />
+      {chart.length ? (
+        <div className="flex flex-wrap">
+          {chart[0] && <Plot data={chart[0].data} layout={chart[0].layout} />}
+        </div>
       ) : null}
     </div>
   );

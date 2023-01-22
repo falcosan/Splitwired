@@ -139,33 +139,40 @@ def get_categories(categories: list, category: int = None) -> list:
     return category_found if category != None else categories_all
 
 
-def generate_chart(data, type: str = "pie"):
-    type = type.lower()
-    chart_types = {"pie": go.Pie}
-    if chart_types[type] == None:
-        raise TypeError("Chart not imported")
-    labels = list(map(lambda d: d["label"], data))
-    values = list(map(lambda d: d["value"], data))
+def generate_chart(data, chart_type: str or list[str] = "pie"):
+    charts = []
+    types = {"pie": go.Pie}
+
+    def get_data(value):
+        return list(map(lambda d: d[value], data))
+
     config = {
         "pie": {
-            "labels": labels,
-            "values": values,
+            "labels": get_data("name"),
+            "values": get_data("cost"),
             "textinfo": "label+percent",
             "hole": 0.3,
-        }
+        },
     }
-    data = [chart_types[type](**config[type])]
     layout = {
-        "height": 500,
-        "width": 900,
+        "height": 1024,
+        "width": 1440,
         "margin": dict(l=50, r=50, b=100, t=100, pad=4),
     }
-    fig = go.Figure(data=data, layout=layout)
-    return fig.to_plotly_json()
+    for chart in [chart_type] if type(chart_type) == str else chart_type:
+        chart = chart.lower()
+        data = [types[chart](**config[chart])]
+        fig = go.Figure(data=data, layout=layout)
+        charts.append(fig.to_plotly_json())
+    return charts
 
 
 def generate_expense(
-    expenses: list, filepath: str or None, personal: bool = False, category: int = None
+    expenses: list,
+    filepath: str or None,
+    category: int = None,
+    personal: bool = False,
+    chart: str or list = False,
 ):
     df = []
     dd = []
@@ -200,6 +207,9 @@ def generate_expense(
     def number_to_decimal(number):
         return Decimal(number).quantize(Decimal("0.00"))
 
+    def date_to_format(date):
+        return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").strftime("%d %B %Y")
+
     for i, expense in enumerate(sorted_expenses):
         users_list = expense.getUsers()
         unique_user_list = get_unique_user_list(users_list)
@@ -213,9 +223,7 @@ def generate_expense(
             "1: Number": i + 1,
             "2: Id": expense.getId(),
             "3: Description": expense.getDescription(),
-            "4: Date": datetime.strptime(
-                expense.getDate(), "%Y-%m-%dT%H:%M:%SZ"
-            ).strftime("%d %B %Y"),
+            "4: Date": date_to_format(expense.getDate()),
             "5: Category": expense.getCategory().getName(),
             "6: Cost": number_to_decimal(expense.getCost()),
             "7: Total": df_t,
@@ -230,16 +238,19 @@ def generate_expense(
             "cost": number_to_decimal(expense.getCost()),
         }
         dc_d = {
-            "label": expense.getCategory().getName(),
-            "value": number_to_decimal(expense.getCost()),
+            "name": expense.getCategory().getName(),
+            "cost": number_to_decimal(expense.getCost()),
+            "date": date_to_format(expense.getDate()),
         }
         for user in unique_user_list if personal else users_list:
             df_d[get_user_name(user)] = number_to_decimal(user.getOwedShare())
             dd_d["user_cost"] = number_to_decimal(user.getOwedShare())
         df.append(df_d)
         dd.append(dd_d)
-        dc.append(dc_d)
-    dc = generate_chart(dc)
+        if chart:
+            dc.append(dc_d)
+    if chart:
+        dc = generate_chart(dc, chart_type=chart)
     return {"table": df, "data": dd, "chart": dc}, get_csv(
         df, filepath
     ) if filepath else None

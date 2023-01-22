@@ -26,12 +26,14 @@ def expenses():
     csv = parameter.get("csv", False)
     year = parameter.get("year", None)
     month = parameter.get("month", None)
+    chart = parameter.get("chart", False)
     groups = parameter.get("groups", False)
     category = parameter.get("category", None)
     personal = parameter.get("personal", False)
     response = data_expenses(
         csv=csv,
         year=year,
+        chart=chart,
         month=month,
         groups=groups,
         category=category,
