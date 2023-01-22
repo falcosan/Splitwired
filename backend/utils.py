@@ -159,11 +159,13 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = N
             "labels": get_data("name"),
             "values": get_data("cost"),
             "textinfo": "label+percent",
+            "hovertemplate": "%{label}: <br>%{percent}</br> %{value} €<extra></extra>",
             "hole": 0.3,
+            "marker": dict(line=dict(color="#000000", width=1)),
         },
         "bar": {
-            "x": get_data("date"),
-            "y": get_data("name"),
+            "x": get_data("name"),
+            "y": get_data("date"),
         },
     }
     for chart in [chart_type] if type(chart_type) == str else chart_type:

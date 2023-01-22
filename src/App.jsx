@@ -124,7 +124,7 @@ export default function App() {
   };
   useRemovesNullClass();
   return (
-    <div className="p-2 bg-green-500">
+    <div className="p-2 bg-green-400">
       <form
         onSubmit={getData}
         className="flex flex-col items-start space-y-2.5"
@@ -150,16 +150,17 @@ export default function App() {
         <Input type="submit" value="click me" />
       </form>
       <Table data={expenses} />
-      {Array.from({ length: chart.length }, (_, i) => (
-        <div key={i}>
+      <div className="mt-5">
+        {Array.from({ length: chart.length }, (_, i) => (
           <Plot
+            key={i}
             data={chart[i].data}
             layout={chart[i].layout}
             config={chart[i].config}
             useResizeHandler
           />
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
