@@ -6,3 +6,6 @@ pip install --upgrade pip
 pip install $(grep -vE "numpy|pandas" requirements.txt)
 pip install numpy==1.16.0
 pip install pandas==1.3.5
+
+npm install
+npm run build
