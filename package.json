@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "freeze": "pip freeze > requirements.txt",
+    "upgrade": "pip freeze --local | grep -v '^\\-e' | cut -d = -f 1  | xargs -n1 pip install -U",
     "dev": "webpack --config webpack.config.js --watch",
     "build": "webpack --config webpack.config.js",
     "server": "flask run"
@@ -35,7 +36,7 @@
     "css-loader": "^6.7.3",
     "postcss": "^8.4.21",
     "postcss-loader": "^7.0.2",
-    "postcss-preset-env": "^7.8.3",
+    "postcss-preset-env": "^8.0.0",
     "style-loader": "^3.3.1",
     "tailwindcss": "^3.2.4",
     "webpack": "^5.75.0",
