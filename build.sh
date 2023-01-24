@@ -3,7 +3,7 @@
 set -o errexit
 
 pip install --upgrade pip
-pip install -r requirements.txt --exclude-editable numpy pandas
+pip install $(grep -vE "numpy|pandas" requirements.txt)
 pip install numpy==1.16.0
 pip install pandas==1.3.5
 npm run build
