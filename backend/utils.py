@@ -85,6 +85,21 @@ def get_home_expense(
     )
 
 
+def get_grupal_expense(
+    instance: Splitwise,
+    group: int,
+    limit: int = 9999,
+) -> tuple[int, int, str]:
+    group = instance.getGroup(group)
+    group_id = int(group.getId())
+    expense_name: str = group.getName().replace("/", "").replace(" ", "_")
+    return (
+        limit,
+        group_id,
+        expense_name,
+    )
+
+
 def get_personal_expense(
     instance: Splitwise,
     dated_after: datetime,
@@ -104,22 +119,15 @@ def get_personal_expense(
     return (expenses, expense_name)
 
 
-def get_grupal_expense(
-    instance: Splitwise,
-    limit: int = 9999,
-) -> tuple[int, int, str]:
-    groups = instance.getGroups()
-    for num, group in enumerate(groups):
-        print(f"{str(num)}: {group.getName()}")
-    group_num = input("Choose a group with a number:\n")
-    group = groups[int(group_num)]
-    group_id: int = int(group.getId())
-    expense_name: str = group.getName().replace("/", "").replace(" ", "_")
-    return (
-        limit,
-        group_id,
-        expense_name,
+def get_groups(groups: list):
+    groups = list(
+        filter(
+            lambda g: g["id"] != 0
+            and g["id"] != int(enums_groups.get_group_prop("first", "id")),
+            list(map(lambda g: {"name": g.getName(), "id": g.getId()}, groups)),
+        )
     )
+    return serializer(groups)
 
 
 def get_categories(categories: list, category: int = None) -> list:

@@ -4,29 +4,29 @@ import Table from "@/components/Table";
 import Select from "@/components/Select";
 import { useRemovesNullClass } from "@/hooks";
 import { importFilter } from "@/utils/import";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useLayoutEffect } from "react";
 
 export default function App() {
-  const [{ data, table, chart }, setData] = useState({
+  const [{ data, table, chart, groups }, setData] = useState({
     data: [],
     table: [],
     chart: [],
+    groups: [],
   });
   const [parameters, setParameters] = useState({
-    groups: false,
     personal: false,
     csv: false,
     month: null,
     year: null,
-    category: null,
+    group: null,
     chart: ["pie"],
+    category: null,
   });
   const inputs = Object.entries(
-    importFilter(parameters, ["category", "chart"], false)
+    importFilter(parameters, ["group", "chart", "category"], false)
   ).map(([key, value]) => {
     const state = { type: "", target: "", max: null, min: null };
     switch (key) {
-      case "groups":
       case "personal":
       case "csv":
         state.type = "checkbox";
@@ -35,6 +35,7 @@ export default function App() {
       case "month":
         state.min = 1;
         state.max = 12;
+        break;
       case "year":
         state.type = "number";
         state.target = "value";
@@ -93,6 +94,11 @@ export default function App() {
         });
     } else return table;
   }, [data, parameters.category]);
+  useLayoutEffect(() => {
+    fetch("/groups")
+      .then((res) => res.json())
+      .then((groups) => setData({ data, table, chart, groups }));
+  }, []);
   const getData = (e) => {
     e.preventDefault();
     fetch("/expenses", {
@@ -105,7 +111,7 @@ export default function App() {
       }),
     })
       .then((res) => res.json())
-      .then(({ data, table, chart }) => setData({ data, table, chart }))
+      .then(({ data, table, chart }) => setData({ data, table, chart, groups }))
       .finally(() => {
         if (parameters.csv) {
           fetch("/expenses", {
@@ -129,6 +135,12 @@ export default function App() {
         onSubmit={getData}
         className="flex flex-col items-start space-y-2.5"
       >
+        <Select
+          options={groups}
+          getSelectValue={(value) =>
+            setParameters({ ...parameters, group: value })
+          }
+        />
         {Object.values(inputs).map((param) => (
           <Input
             key={param.name}
