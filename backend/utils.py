@@ -175,8 +175,8 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = N
             "marker": dict(line=dict(color="#000000", width=1)),
         },
         "bar": {
+            "y": list(map(lambda d: get_data("name").count(d), get_data("name"))),
             "x": get_data("name"),
-            "y": get_data("date"),
         },
     }
     for chart in [chart_type] if type(chart_type) == str else chart_type:

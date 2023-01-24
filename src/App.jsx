@@ -7,11 +7,12 @@ import { importFilter } from "@/utils/import";
 import React, { useState, useMemo, useLayoutEffect } from "react";
 
 export default function App() {
-  const [{ data, table, chart, groups }, setData] = useState({
+  const [{ data, table, chart, groups, status }, setData] = useState({
     data: [],
     table: [],
     chart: [],
     groups: [],
+    status: "",
   });
   const [parameters, setParameters] = useState({
     personal: false,
@@ -19,29 +20,8 @@ export default function App() {
     month: null,
     year: null,
     group: null,
-    chart: ["pie"],
+    chart: ["pie", "bar"],
     category: null,
-  });
-  const inputs = Object.entries(
-    importFilter(parameters, ["group", "chart", "category"], false)
-  ).map(([key, value]) => {
-    const state = { type: "", target: "", max: null, min: null };
-    switch (key) {
-      case "personal":
-      case "csv":
-        state.type = "checkbox";
-        state.target = "checked";
-        break;
-      case "month":
-        state.min = 1;
-        state.max = 12;
-        break;
-      case "year":
-        state.type = "number";
-        state.target = "value";
-        break;
-    }
-    return { label: key, name: key, value, ...state };
   });
   const properties = useMemo(() => {
     let idKey;
@@ -73,7 +53,9 @@ export default function App() {
       const found = categories.find(
         (item) => String(item.id) === String(parameters.category)
       );
-      const filters = data.filter((item) => item.category.name === found.name);
+      const filters = found
+        ? data.filter((item) => item.category.name === found.name)
+        : data;
       return table
         .filter((item) =>
           filters.map((item) => item.id).includes(item[properties.id])
@@ -97,10 +79,11 @@ export default function App() {
   useLayoutEffect(() => {
     fetch("/groups")
       .then((res) => res.json())
-      .then((groups) => setData({ data, table, chart, groups }));
+      .then((groups) => setData({ data, table, chart, groups, status }));
   }, []);
   const getData = (e) => {
     e.preventDefault();
+    setData({ data, table, chart, groups, status: "loading" });
     fetch("/expenses", {
       method: "POST",
       body: JSON.stringify(
@@ -111,7 +94,15 @@ export default function App() {
       }),
     })
       .then((res) => res.json())
-      .then(({ data, table, chart }) => setData({ data, table, chart, groups }))
+      .then(({ data, table, chart }) => {
+        setData({
+          data,
+          table,
+          chart,
+          groups,
+          status: data.length ? "" : "No data",
+        });
+      })
       .finally(() => {
         if (parameters.csv) {
           fetch("/expenses", {
@@ -126,21 +117,46 @@ export default function App() {
           ...parameters,
           ...(parameters.category && { category: null }),
         });
+        e.target.reset();
       });
   };
+  const selects = {
+    groups: { label: "Group", options: groups },
+    categories: { label: "Category", options: categories },
+  };
+  const inputs = Object.entries(
+    importFilter(parameters, ["group", "chart", "category"], false)
+  ).map(([key, value]) => {
+    const state = { type: "", target: "", max: null, min: null };
+    switch (key) {
+      case "personal":
+      case "csv":
+        state.type = "checkbox";
+        state.target = "checked";
+        break;
+      case "month":
+        state.min = 1;
+        state.max = 12;
+      case "year":
+        state.type = "number";
+        state.target = "value";
+        break;
+    }
+    return { label: key, name: key, value, ...state };
+  });
   useRemovesNullClass();
   return (
     <div className="p-2 bg-green-400">
+      <Select
+        {...selects.groups}
+        getSelectValue={(value) =>
+          setParameters({ ...parameters, group: value })
+        }
+      />
       <form
         onSubmit={getData}
         className="flex flex-col items-start space-y-2.5"
       >
-        <Select
-          options={groups}
-          getSelectValue={(value) =>
-            setParameters({ ...parameters, group: value })
-          }
-        />
         {Object.values(inputs).map((param) => (
           <Input
             key={param.name}
@@ -154,25 +170,29 @@ export default function App() {
           />
         ))}
         <Select
-          options={categories}
+          {...selects.categories}
           getSelectValue={(value) =>
             setParameters({ ...parameters, category: value })
           }
         />
         <Input type="submit" value="click me" />
       </form>
-      <Table data={expenses} />
-      <div className="mt-5">
-        {Array.from({ length: chart.length }, (_, i) => (
-          <Plot
-            key={i}
-            data={chart[i].data}
-            layout={chart[i].layout}
-            config={chart[i].config}
-            useResizeHandler
-          />
-        ))}
-      </div>
+      {status || (
+        <>
+          <Table data={expenses} />
+          <div className="mt-5">
+            {Array.from({ length: chart.length }, (_, i) => (
+              <Plot
+                key={i}
+                data={chart[i].data}
+                layout={chart[i].layout}
+                config={chart[i].config}
+                useResizeHandler
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -3,22 +3,24 @@ import React, { useRef } from "react";
 export default function Select(props) {
   const selectRef = useRef(null);
   const handleChange = () => {
-    props.getSelectValue(selectRef.current.value);
+    const value =
+      props.label && !selectRef.current.selectedIndex
+        ? null
+        : selectRef.current.value;
+    props.getSelectValue(value);
   };
   return props.options.length ? (
-    <>
-      {props.label && <label className="capitalize">{props.label}</label>}
-      <select
-        className="cursor-pointer"
-        onChange={handleChange}
-        ref={selectRef}
-      >
-        {props.options.map((option, index) => (
-          <option key={option?.id ?? index} value={option?.id ?? index}>
-            {option?.name ?? index}
-          </option>
-        ))}
-      </select>
-    </>
+    <select className="cursor-pointer" onChange={handleChange} ref={selectRef}>
+      {props.label ? (
+        <option key={null} value={null}>
+          - {props.label} -
+        </option>
+      ) : null}
+      {props.options.map((option, index) => (
+        <option key={option?.id ?? index} value={option?.id ?? index}>
+          {option?.name ?? index}
+        </option>
+      ))}
+    </select>
   ) : null;
 }
