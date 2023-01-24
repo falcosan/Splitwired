@@ -23,9 +23,10 @@
   "homepage": "https://github.com/falcosan/Splitwired#readme",
   "dependencies": {
     "@tanstack/react-table": "^8.7.6",
+    "plotly.js": "^2.18.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-plotly.js": "^2.5.1"
+    "react-plotly.js": "^2.6.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.20.7",
