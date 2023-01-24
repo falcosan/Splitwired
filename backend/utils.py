@@ -18,7 +18,7 @@ def serializer(data, to_json=False):
     return loads(result) if to_json else result
 
 
-def set_dates(month: int = None, year: int = None) -> tuple[datetime, datetime, str]:
+def set_dates(month: int = None, year: int = None):
     if month and (month < 1 or month > 12):
         raise AttributeError("Selected month is not valid")
     if year and len(str(year)) != 4:
