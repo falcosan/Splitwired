@@ -1,5 +1,6 @@
+import io
 from flask_cors import CORS, cross_origin
-from flask import Flask, render_template, request
+from flask import Flask, send_file, render_template, request
 from backend.data import data_groups, data_expenses
 
 app = Flask(__name__, template_folder="static")
@@ -29,7 +30,7 @@ def expenses():
     chart = parameter.get("chart", False)
     category = parameter.get("category", None)
     personal = parameter.get("personal", False)
-    response = data_expenses(
+    (data, file) = data_expenses(
         csv=csv,
         year=year,
         chart=chart,
@@ -38,7 +39,16 @@ def expenses():
         category=category,
         personal=personal,
     )
-    return response
+    if file:
+        buf_str = io.StringIO(file)
+        buf_byt = io.BytesIO(buf_str.read().encode("utf-8"))
+        return send_file(
+            path_or_file=buf_byt,
+            mimetype="text/csv",
+            as_attachment=True,
+            download_name="data.csv",
+        )
+    return data
 
 
 if __name__ == "__main__":

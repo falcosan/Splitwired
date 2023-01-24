@@ -70,7 +70,7 @@ def get_csv(df: list, filepath: str):
     if not ".csv" in filepath:
         filepath = f"{filepath}.csv"
     df = pd.DataFrame(df)
-    return df.to_csv(filepath, index=False)
+    return df.to_csv(filepath, index=False, header=True, sep=";")
 
 
 def get_home_expense(limit: int = 9999):
@@ -270,6 +270,6 @@ def generate_expense(
             dc.append(dc_d)
     if chart:
         dc = generate_chart(dc, chart_type=chart, filename=filepath)
-    return {"table": df, "data": dd, "chart": dc}, get_csv(
-        df, filepath
-    ) if csv else None
+    data = {"table": df, "data": dd, "chart": dc}
+    file = get_csv(df, filepath) if csv else None
+    return data, file
