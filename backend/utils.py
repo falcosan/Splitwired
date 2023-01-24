@@ -5,7 +5,7 @@ from json import dumps, loads
 from datetime import datetime
 from calendar import monthrange
 from splitwise import Splitwise
-from plotly import graph_objects as go
+import plotly.graph_objects as go
 from backend.enums import enums_groups, enums_users
 
 
