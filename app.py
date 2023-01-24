@@ -1,5 +1,4 @@
 from flask_cors import CORS, cross_origin
-from flask.helpers import send_from_directory
 from flask import Flask, render_template, request
 from backend.data import data_groups, data_expenses
 
