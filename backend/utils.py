@@ -73,9 +73,7 @@ def get_csv(df: list, filepath: str):
     return df.to_csv(filepath, index=False)
 
 
-def get_home_expense(
-    limit: int = 9999,
-) -> tuple[int, int, str]:
+def get_home_expense(limit: int = 9999):
     group_id: int = int(enums_groups.get_group_prop("first", "id"))
     expense_name: str = enums_groups.get_group_prop("first", "name")
     return (
@@ -85,11 +83,7 @@ def get_home_expense(
     )
 
 
-def get_grupal_expense(
-    instance: Splitwise,
-    group: int,
-    limit: int = 9999,
-) -> tuple[int, int, str]:
+def get_grupal_expense(instance: Splitwise, group: int, limit: int = 9999):
     group = instance.getGroup(group)
     group_id = int(group.getId())
     expense_name: str = group.getName().replace("/", "").replace(" ", "_")
