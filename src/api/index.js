@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 export default {
   getGroups: () =>
     fetch("/groups")
@@ -8,7 +9,7 @@ export default {
       headers: { secret: process.env.HEADER_DOWNLOAD_SECRET },
     })
       .then((res) => res.text())
-      .then((res) => res),
+      .then((res) => DOMPurify.sanitize(res)),
   getExpanses: (parameters) =>
     fetch("/expenses", {
       method: "POST",
