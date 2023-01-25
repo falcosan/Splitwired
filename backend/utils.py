@@ -65,14 +65,6 @@ def get_unique_user_list(arr: list):
     )
 
 
-def get_csv(df: list, filepath: str):
-    filepath = sub("([A-Z]\w+$)", "_\\1", filepath).lower()
-    if not ".csv" in filepath:
-        filepath = f"{filepath}.csv"
-    df = pd.DataFrame(df)
-    return df.to_csv(filepath, index=False, header=True, sep=";")
-
-
 def get_home_expense(limit: int = 9999):
     group_id: int = int(enums_groups.get_group_prop("first", "id"))
     expense_name: str = enums_groups.get_group_prop("first", "name")
@@ -183,10 +175,15 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = N
     return charts
 
 
+def get_csv(data, filepath):
+    df = pd.DataFrame(data)
+    return df.to_csv(filepath, index=False, header=True, sep=";")
+
+
 def generate_expense(
     csv: bool,
     expenses: list,
-    filepath: str or None,
+    filename: str or None,
     category: int = None,
     personal: bool = False,
     chart: str or list = False,
@@ -269,7 +266,9 @@ def generate_expense(
         if chart:
             dc.append(dc_d)
     if chart:
-        dc = generate_chart(dc, chart_type=chart, filename=filepath)
-    data = {"table": df, "data": dd, "chart": dc}
-    file = get_csv(df, filepath) if csv else None
-    return data, file
+        dc = generate_chart(dc, chart_type=chart, filename=filename)
+    filename = sub("([A-Z]\w+$)", "_\\1", filename).lower()
+    filepath = f"{filename}.csv" if not ".csv" in filename else filename
+    if csv:
+        get_csv(df, filepath)
+    return {"table": df, "data": dd, "chart": dc, "filepath": filepath}

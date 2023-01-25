@@ -69,7 +69,7 @@ def data_expenses(
             expenses=expenses,
             personal=personal,
             category=category,
-            filepath=f"{expense_name}{category_name}{dated_name}",
+            filename=f"{expense_name}{category_name}{dated_name}",
         )
     except ValueError as error:
         return TypeError(error)
