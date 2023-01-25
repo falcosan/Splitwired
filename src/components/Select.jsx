@@ -10,7 +10,11 @@ export default function Select(props) {
     props.getSelectValue(value);
   };
   return props.options.length ? (
-    <select className="cursor-pointer" onChange={handleChange} ref={selectRef}>
+    <select
+      className={`cursor-pointer ${props.className ?? null}`}
+      onChange={handleChange}
+      ref={selectRef}
+    >
       {props.label ? (
         <option key={null} value={null}>
           - {props.label} -

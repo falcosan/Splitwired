@@ -19,7 +19,7 @@ export default function Table(props) {
     getCoreRowModel: getCoreRowModel(),
   });
   return (
-    <table>
+    <table className={`overflow-hidden rounded-t ${props.className ?? null}`}>
       <thead className="bg-slate-200">
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
