@@ -1,7 +1,19 @@
 {% for file in files|sort(attribute='name') %}
-<li>
-  <a href="{{ url_for('download_file', filename=file.name) }}"
-    >{{ file.name }} - {{ file.date }}</a
+<li class="mb-2.5 last:mb-0 rounded hover:bg-opacity-80 bg-blue-800">
+  <a
+    class="block py-2.5 px-4 text-white"
+    href="{{ url_for('download_file', filename=file.name) }}"
   >
+    <div class="flex justify-between">
+      <div class="flex items-end space-x-2.5">
+        <span class="text-sm">{{ file.index }}:</span
+        ><span>{{ file.name }}</span>
+      </div>
+      <span
+        class="ml-2.5 pl-2.5 font-bold border-l-2 border-opacity-60 border-slate-50"
+        >{{ file.date }}</span
+      >
+    </div>
+  </a>
 </li>
 {% endfor %}

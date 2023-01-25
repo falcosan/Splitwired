@@ -7,13 +7,13 @@ export default function Input(props) {
   };
   return (
     <label
-      className={`flex cursor-pointer ${
-        props.type !== "checkbox" ? "flex-col" : "space-x-1"
-      }`}
+      className={`flex items-baseline cursor-pointer ${
+        props.className ?? null
+      } ${props.type !== "checkbox" ? "flex-col" : "space-x-1"}`}
     >
-      {props.label && <span className="capitalize">{props.label}</span>}
+      {props.label && <span className="w-full capitalize">{props.label}</span>}
       <input
-        className={!props.label ? "cursor-pointer" : null}
+        className={`w-full ${!props.label ? "cursor-pointer" : null}`}
         ref={inputRef}
         max={props.max}
         min={props.min}

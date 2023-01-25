@@ -70,10 +70,11 @@ def set_files(files: list):
     return list(
         map(
             lambda file: {
-                "name": file,
+                "index": str(file[0] + 1),
+                "name": file[1],
                 "date": datetime.now().date().strftime("%d-%m-%Y"),
             },
-            files,
+            enumerate(files),
         )
     )
 
