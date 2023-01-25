@@ -44,6 +44,7 @@ def expenses():
 
 
 @app.route("/download")
+@cross_origin()
 def download():
     response = render_template("templates/download.html", files=listdir("output"))
     return responser(
@@ -55,6 +56,7 @@ def download():
 
 
 @app.route("/download/<filename>")
+@cross_origin()
 def download_file(filename):
     return send_from_directory("output", filename)
 
