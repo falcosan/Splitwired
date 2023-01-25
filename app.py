@@ -5,7 +5,7 @@ from flask_cors import CORS, cross_origin
 from backend.data import data_groups, data_expenses
 from flask import Flask, request, render_template, send_from_directory
 
-app = Flask(__name__, template_folder="static")
+app = Flask(__name__, template_folder="static", static_url_path="")
 CORS(app)
 
 
@@ -46,7 +46,7 @@ def expenses():
 @app.route("/download")
 @cross_origin()
 def download():
-    response = render_template("templates/download.html", files=listdir("output"))
+    response = render_template("download.html", files=listdir("output"))
     return responser(
         request=request,
         response=response,
