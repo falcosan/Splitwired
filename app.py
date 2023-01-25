@@ -1,6 +1,9 @@
+from os import listdir
+from backend.utils import responser
+from backend.enums import enums_headers
 from flask_cors import CORS, cross_origin
 from backend.data import data_groups, data_expenses
-from flask import Flask, render_template, request, send_file
+from flask import Flask, request, render_template, send_from_directory
 
 app = Flask(__name__, template_folder="static")
 CORS(app)
@@ -38,6 +41,22 @@ def expenses():
         category=category,
         personal=personal,
     )
+
+
+@app.route("/download")
+def download():
+    response = render_template("templates/download.html", files=listdir("output"))
+    return responser(
+        request=request,
+        response=response,
+        header=enums_headers.get_header_prop("download_secret", "key"),
+        secret=enums_headers.get_header_prop("download_secret", "value"),
+    )
+
+
+@app.route("/download/<filename>")
+def download_file(filename):
+    return send_from_directory("output", filename)
 
 
 if __name__ == "__main__":

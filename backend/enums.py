@@ -12,7 +12,7 @@ class Groups(metaclass=Singleton):
         if dict_value:
             return dict_value.get(key, "Key not found")
         else:
-            return TypeError("Group not found")
+            raise TypeError("Group not found")
 
 
 class Users(metaclass=Singleton):
@@ -33,8 +33,24 @@ class Users(metaclass=Singleton):
         if dict_value:
             return dict_value.get(key, "Key not found")
         else:
-            return TypeError("User not found")
+            raise TypeError("User not found")
 
 
-enums_groups = Groups()
+class Headers(metaclass=Singleton):
+    def __init__(self):
+        self.download_secret = {
+            "key": "secret",
+            "value": config("HEADER_DOWNLOAD_SECRET"),
+        }
+
+    def get_header_prop(self, group: str, key: str):
+        dict_value = getattr(self, group, None)
+        if dict_value:
+            return dict_value.get(key, "Key not found")
+        else:
+            raise TypeError("Header not found")
+
+
 enums_users = Users()
+enums_groups = Groups()
+enums_headers = Headers()
