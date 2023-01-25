@@ -1,0 +1,291 @@
+from re import sub
+import pandas as pd
+from decimal import Decimal
+from json import dumps, loads
+from datetime import datetime
+from calendar import monthrange
+from splitwise import Splitwise
+from flask import make_response
+import plotly.graph_objects as go
+from requests import Request, Response
+from backend.enums import enums_groups, enums_users
+
+
+def serializer(data, to_json=False):
+    def convert_to_dict(data):
+        if hasattr(data, "__dict__"):
+            return data.__dict__
+
+    result = dumps(data, default=convert_to_dict)
+    return loads(result) if to_json else result
+
+
+def responser(
+    request: Request,
+    response: Response,
+    header: str,
+    secret: str,
+    message: str = "Rejected",
+):
+    if not request.headers.get(header) == secret:
+        return make_response(dumps({"message": message}), 401)
+    else:
+        return response
+
+
+def set_dates(month: int = None, year: int = None):
+    if month and (month < 1 or month > 12):
+        raise AttributeError("Selected month is not valid")
+    if year and len(str(year)) != 4:
+        raise AttributeError("Selected year is not valid")
+    dated_after = (
+        datetime(year or datetime.now().date().year, month or 1, 1, 0, 0, 0)
+        if month or year
+        else None
+    )
+    dated_before = (
+        datetime(
+            year or datetime.now().date().year,
+            month or 12,
+            monthrange(dated_after.year, dated_after.month)[1],
+            23,
+            59,
+            59,
+        )
+        if month or year
+        else None
+    )
+    if dated_after and dated_after.date() > datetime.now().date():
+        raise AttributeError("Selected date is about the future")
+    if month:
+        dated_name = dated_after.strftime("_%d-%m-%Y")
+    elif year:
+        dated_name = dated_after.strftime("_%Y")
+    else:
+        dated_name = ""
+    return dated_after, dated_before, dated_name
+
+
+def get_user_name(user: type):
+    return f"{user.getFirstName() or ''} {user.getLastName() or ''}" if user else None
+
+
+def get_unique_user_list(arr: list):
+    return list(
+        filter(
+            lambda user: str(user.getId())
+            == str(enums_users.get_user_prop("dan", "id")),
+            arr,
+        )
+    )
+
+
+def get_home_expense(limit: int = 9999):
+    group_id: int = int(enums_groups.get_group_prop("first", "id"))
+    expense_name: str = enums_groups.get_group_prop("first", "name")
+    return (
+        limit,
+        group_id,
+        expense_name,
+    )
+
+
+def get_grupal_expense(instance: Splitwise, group: int, limit: int = 9999):
+    group = instance.getGroup(group)
+    group_id = int(group.getId())
+    expense_name: str = group.getName().replace("/", "").replace(" ", "_")
+    return (
+        limit,
+        group_id,
+        expense_name,
+    )
+
+
+def get_personal_expense(
+    instance: Splitwise,
+    dated_after: datetime,
+    dated_before: datetime,
+    limit: int = 9999,
+):
+    expenses = []
+    expense_name = enums_users.get_user_prop("dan", "filepath")
+    for group in instance.getGroups():
+        grupal_expenses = instance.getExpenses(
+            limit=limit,
+            group_id=int(group.getId()),
+            dated_after=dated_after,
+            dated_before=dated_before,
+        )
+        expenses.extend(grupal_expenses)
+    return (expenses, expense_name)
+
+
+def get_groups(groups: list):
+    groups = list(
+        filter(
+            lambda g: g["id"] != 0
+            and g["id"] != int(enums_groups.get_group_prop("first", "id")),
+            list(map(lambda g: {"name": g.getName(), "id": g.getId()}, groups)),
+        )
+    )
+    return serializer(groups)
+
+
+def get_categories(categories: list, category: int = None) -> list:
+    categories_all = []
+    for original_category in categories:
+        categories_all.append(original_category)
+        sub_categories = original_category.getSubcategories()
+        if sub_categories and len(sub_categories):
+            for sub_category in sub_categories:
+                if not len(sub_category.getSubcategories()):
+                    del sub_category.subcategories
+                categories_all.append(sub_category)
+        del original_category.subcategories
+    if category != None:
+        category_found = next(
+            original_category
+            for original_category in categories_all
+            if original_category.getId() == category
+        )
+    return category_found if category != None else categories_all
+
+
+def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = None):
+    def get_data(value):
+        return list(map(lambda d: d[value], data))
+
+    charts = []
+    types = {"pie": go.Pie, "bar": go.Bar}
+    layout = {
+        "height": 1024,
+        "width": 964,
+        "margin": dict(l=50, r=50, b=100, t=100, pad=4),
+    }
+    config = {
+        "autosizable": True,
+        "toImageButtonOptions": {"format": "svg", "filename": filename or "chart"},
+    }
+    content = {
+        "pie": {
+            "labels": get_data("name"),
+            "values": get_data("cost"),
+            "textinfo": "label+percent",
+            "hovertemplate": "%{label}: <br>%{percent}</br> %{value} €<extra></extra>",
+            "hole": 0.3,
+            "marker": dict(line=dict(color="#000000", width=1)),
+        },
+        "bar": {
+            "y": list(map(lambda d: get_data("name").count(d), get_data("name"))),
+            "x": get_data("name"),
+        },
+    }
+    for chart in [chart_type] if type(chart_type) == str else chart_type:
+        chart = chart.lower()
+        data = [types[chart](**content[chart])]
+        fig = go.Figure(data=data, layout=layout)
+        json = fig.to_plotly_json()
+        json["config"] = config
+        charts.append(json)
+    return charts
+
+
+def get_csv(data, filepath):
+    df = pd.DataFrame(data)
+    return df.to_csv(
+        path_or_buf=f"output/{filepath}", index=False, header=True, sep=";"
+    )
+
+
+def generate_expense(
+    csv: bool,
+    expenses: list,
+    filename: str or None,
+    category: int = None,
+    personal: bool = False,
+    chart: str or list = False,
+):
+    df = []
+    dd = []
+    dc = []
+    df_t = 0
+    sorted_expenses = list(
+        filter(
+            lambda expense: not expense.getDeletedAt()
+            and not expense.getPayment()
+            and expense.getDate() != None,
+            expenses,
+        )
+    )
+    if personal:
+        sorted_expenses = list(
+            filter(
+                lambda expense: get_unique_user_list(expense.getUsers()),
+                sorted_expenses,
+            )
+        )
+    if category != None:
+        sorted_expenses = list(
+            filter(
+                lambda expense: int(expense.getCategory().getId()) == category,
+                sorted_expenses,
+            )
+        )
+    sorted_expenses.sort(
+        key=lambda expense: datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ")
+    )
+
+    def number_to_decimal(number):
+        return Decimal(number).quantize(Decimal("0.00"))
+
+    def date_to_format(date):
+        return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").strftime("%d %B %Y")
+
+    for i, expense in enumerate(sorted_expenses):
+        users_list = expense.getUsers()
+        unique_user_list = get_unique_user_list(users_list)
+        if expense.getCost().replace(".", "", 1).isdigit():
+            if personal:
+                for user in unique_user_list:
+                    df_t = df_t + number_to_decimal(user.getOwedShare())
+            else:
+                df_t = df_t + number_to_decimal(expense.getCost())
+        df_d = {
+            "1: Number": i + 1,
+            "2: Id": expense.getId(),
+            "3: Description": expense.getDescription(),
+            "4: Date": date_to_format(expense.getDate()),
+            "5: Category": expense.getCategory().getName(),
+            "6: Cost": number_to_decimal(expense.getCost()),
+            "7: Total": df_t,
+            "8: Currency": expense.getCurrencyCode(),
+        }
+        dd_d = {
+            "id": expense.getId(),
+            "category": {
+                "name": expense.getCategory().getName(),
+                "id": expense.getCategory().getId(),
+            },
+            "cost": number_to_decimal(expense.getCost()),
+        }
+        dc_d = {
+            "name": expense.getCategory().getName(),
+            "cost": number_to_decimal(expense.getCost()) if not personal else None,
+            "date": date_to_format(expense.getDate()),
+        }
+        for user in unique_user_list if personal else users_list:
+            df_d[get_user_name(user)] = number_to_decimal(user.getOwedShare())
+            dd_d["user_cost"] = number_to_decimal(user.getOwedShare())
+            if personal:
+                dc_d["cost"] = number_to_decimal(user.getOwedShare())
+        df.append(df_d)
+        dd.append(dd_d)
+        if chart:
+            dc.append(dc_d)
+    if chart:
+        dc = generate_chart(dc, chart_type=chart, filename=filename)
+    filename = sub("([A-Z]\w+$)", "\\1", filename).lower()
+    filepath = f"{filename}.csv" if not ".csv" in filename else filename
+    if csv:
+        get_csv(df, filepath)
+    return {"table": df, "data": dd, "chart": dc, "filepath": filepath}
