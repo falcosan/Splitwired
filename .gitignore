@@ -1,8 +1,0 @@
-env/
-__pycache__
-node_modules
-.env
-.DS_Store
-*.csv
-.tool-versions
-bundle.js
