@@ -5,7 +5,9 @@ from json import dumps, loads
 from datetime import datetime
 from calendar import monthrange
 from splitwise import Splitwise
+from flask import make_response
 import plotly.graph_objects as go
+from requests import Request, Response
 from backend.enums import enums_groups, enums_users
 
 
@@ -16,6 +18,19 @@ def serializer(data, to_json=False):
 
     result = dumps(data, default=convert_to_dict)
     return loads(result) if to_json else result
+
+
+def responser(
+    request: Request,
+    response: Response,
+    header: str,
+    secret: str,
+    message: str = "Rejected",
+):
+    if not request.headers.get(header) == secret:
+        return make_response(dumps({"message": message}), 401)
+    else:
+        return response
 
 
 def set_dates(month: int = None, year: int = None):
@@ -177,7 +192,9 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = N
 
 def get_csv(data, filepath):
     df = pd.DataFrame(data)
-    return df.to_csv(filepath, index=False, header=True, sep=";")
+    return df.to_csv(
+        path_or_buf=f"output/{filepath}", index=False, header=True, sep=";"
+    )
 
 
 def generate_expense(
@@ -267,7 +284,7 @@ def generate_expense(
             dc.append(dc_d)
     if chart:
         dc = generate_chart(dc, chart_type=chart, filename=filename)
-    filename = sub("([A-Z]\w+$)", "_\\1", filename).lower()
+    filename = sub("([A-Z]\w+$)", "\\1", filename).lower()
     filepath = f"{filename}.csv" if not ".csv" in filename else filename
     if csv:
         get_csv(df, filepath)

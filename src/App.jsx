@@ -1,3 +1,4 @@
+import api from "./api";
 import Plot from "react-plotly.js";
 import Input from "@/components/Input";
 import Table from "@/components/Table";
@@ -7,12 +8,13 @@ import { importFilter } from "@/utils/import";
 import React, { useState, useMemo, useLayoutEffect } from "react";
 
 export default function App() {
-  const [{ data, table, chart, groups, status }, setData] = useState({
+  const [status, setStatus] = useState("");
+  const [downloads, setDownloads] = useState("");
+  const [{ data, table, chart, groups }, setData] = useState({
     data: [],
     table: [],
     chart: [],
     groups: [],
-    status: "",
   });
   const [parameters, setParameters] = useState({
     personal: false,
@@ -77,41 +79,26 @@ export default function App() {
     } else return table;
   }, [data, parameters.category]);
   useLayoutEffect(() => {
-    fetch("/groups")
-      .then((res) => res.json())
-      .then((groups) => setData({ data, table, chart, groups, status }));
+    Promise.all([api.getGroups(), api.getDownloads()]).then(
+      async ([groups, downloads]) => {
+        setData({ data, table, chart, groups });
+        setDownloads(downloads);
+      }
+    );
   }, []);
   const getData = (e) => {
     e.preventDefault();
-    setData({ data, table, chart, groups, status: "loading" });
-    fetch("/expenses", {
-      method: "POST",
-      body: JSON.stringify(
-        importFilter(parameters, ["category", "csv"], false)
-      ),
-      headers: new Headers({
-        "content-type": "application/json",
-      }),
-    })
-      .then((res) => res.json())
+    setData({ data, table, chart, groups });
+    setStatus("loading");
+    api
+      .getExpanses(importFilter(parameters, ["category"], false))
       .then(({ data, table, chart }) => {
-        setData({
-          data,
-          table,
-          chart,
-          groups,
-          status: data.length ? "" : "No data",
-        });
+        setStatus(data.length ? "" : "No expanses");
+        setData({ data, table, chart, groups });
       })
       .finally(() => {
         if (parameters.csv) {
-          fetch("/expenses", {
-            method: "POST",
-            body: JSON.stringify(parameters),
-            headers: new Headers({
-              "content-type": "application/json",
-            }),
-          });
+          api.getDownloads().then((res) => setDownloads(res));
         }
         setParameters({
           ...parameters,
@@ -177,6 +164,7 @@ export default function App() {
         />
         <Input type="submit" value="click me" />
       </form>
+      <ul dangerouslySetInnerHTML={{ __html: downloads }} />
       {status || (
         <>
           <Table data={expenses} />
