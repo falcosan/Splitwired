@@ -1,5 +1,7 @@
-{% for filename in files %}
+{% for file in files|sort(attribute='name') %}
 <li>
-  <a href="{{ url_for('download_file', filename=filename) }}">{{ filename }}</a>
+  <a href="{{ url_for('download_file', filename=file.name) }}"
+    >{{ file.name }} - {{ file.date }}</a
+  >
 </li>
 {% endfor %}

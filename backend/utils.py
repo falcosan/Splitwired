@@ -66,6 +66,18 @@ def set_dates(month: int = None, year: int = None):
     return dated_after, dated_before, dated_name
 
 
+def set_files(files: list):
+    return list(
+        map(
+            lambda file: {
+                "name": file,
+                "date": datetime.now().date().strftime("%d-%m-%Y"),
+            },
+            files,
+        )
+    )
+
+
 def get_user_name(user: type):
     return f"{user.getFirstName() or ''} {user.getLastName() or ''}" if user else None
 

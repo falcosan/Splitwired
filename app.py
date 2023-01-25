@@ -1,6 +1,6 @@
 import os
-from backend.utils import responser
 from flask_cors import CORS, cross_origin
+from backend.utils import responser, set_files
 from backend.data import data_groups, data_expenses
 from backend.enums import enums_headers, enums_folders
 from flask import Flask, request, render_template, send_from_directory
@@ -52,7 +52,7 @@ def expenses():
 def download():
     path = os.path.join(os.getcwd(), output_folder)
     os.makedirs(path, exist_ok=True)
-    files = os.listdir(output_folder)
+    files = set_files(os.listdir(output_folder))
     response = render_template("templates/download.html", files=files)
     return responser(
         request=request,
