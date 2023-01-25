@@ -51,6 +51,19 @@ class Headers(metaclass=Singleton):
             raise TypeError("Header not found")
 
 
+class Folders(metaclass=Singleton):
+    def __init__(self):
+        self.output = {"value": "output"}
+
+    def get_folder_prop(self, group: str, key: str):
+        dict_value = getattr(self, group, None)
+        if dict_value:
+            return dict_value.get(key, "Key not found")
+        else:
+            raise TypeError("Folder not found")
+
+
 enums_users = Users()
 enums_groups = Groups()
+enums_folders = Folders()
 enums_headers = Headers()
