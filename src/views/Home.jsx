@@ -93,7 +93,7 @@ export default function Home() {
     api
       .getExpanses(importFilter(parameters, ["category"], false))
       .then(({ data, table, chart }) => {
-        setStatus(data.length ? "" : "No expanses");
+        setStatus(data.length ? "" : "No expenses");
         setData({ data, table, chart, groups });
       })
       .finally(() => {
@@ -132,7 +132,7 @@ export default function Home() {
         state.target = "value";
         break;
       case "year":
-        state.min = 0;
+        state.min = 2020;
         state.max = new Date().getFullYear();
         state.type = "number";
         state.target = "value";
@@ -143,37 +143,36 @@ export default function Home() {
   useRemovesNullClass();
   return (
     <div className="p-5">
-      <div className="container mx-auto flex flex-col space-y-5">
+      <div className="container mx-auto flex flex-col">
         {downloads.length ? (
           <div>
-            <span>Downloads</span>
+            <span className="block mb-2.5">Downloads</span>
             <ul
               className="p-2.5 overflow-y-auto rounded bg-slate-200"
               dangerouslySetInnerHTML={{ __html: downloads }}
             />
           </div>
         ) : null}
-        <div className="space-y-5">
+        <div className="space-y-5 mt-5">
           <form
             onSubmit={getData}
             className="flex flex-col items-start space-y-5"
           >
-            <div className="flex">
+            <div className="grid grid-cols-1 md:grid-cols-2 auto-cols-fr gap-5">
               {Object.values(selects).map((select, index) => (
                 <Select
                   {...select}
                   key={index}
-                  className="m-1.5"
                   getSelectValue={(value) =>
                     setParameters({ ...parameters, [select.parameter]: value })
                   }
                 />
               ))}
             </div>
-            <div className="flex">
+            <div className="grid grid-cols-1 md:grid-cols-4 auto-cols-fr gap-5">
               {Object.values(inputs).map((input) => (
                 <Input
-                  className={`m-1.5 self-baseline ${
+                  className={`justify-self-start self-start ${
                     input.type == null || /text|number/.test(input.type)
                       ? "min-w-[200px]"
                       : null
@@ -196,20 +195,33 @@ export default function Home() {
             />
           </form>
         </div>
-        {status || <Table className="w-full mt-5" data={expenses} />}
+
+        {status ? (
+          <span className="block w-full mt-10 text-center text-lg font-bold">
+            {status}
+          </span>
+        ) : expenses.length ? (
+          <>
+            <hr className="mt-10" />
+            <Table className="w-full mt-10" data={expenses} />
+          </>
+        ) : null}
       </div>
-      {chart.length ? (
-        <div className="flex flex-wrap justify-center mt-5">
-          {Array.from({ length: chart.length }, (_, i) => (
-            <Plot
-              key={i}
-              data={chart[i].data}
-              layout={chart[i].layout}
-              config={chart[i].config}
-              useResizeHandler
-            />
-          ))}
-        </div>
+      {chart.length && !status ? (
+        <>
+          <hr className="mt-10" />
+          <div className="flex flex-wrap justify-center mt-10">
+            {Array.from({ length: chart.length }, (_, i) => (
+              <Plot
+                key={i}
+                data={chart[i].data}
+                layout={chart[i].layout}
+                config={chart[i].config}
+                useResizeHandler
+              />
+            ))}
+          </div>
+        </>
       ) : null}
     </div>
   );

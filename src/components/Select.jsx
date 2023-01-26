@@ -11,7 +11,7 @@ export default function Select(props) {
   };
   return props.options.length ? (
     <select
-      className={`cursor-pointer ${props.className ?? null}`}
+      className={`rounded px-2 py-1 cursor-pointer ${props.className ?? null}`}
       onChange={handleChange}
       ref={selectRef}
     >
