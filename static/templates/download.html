@@ -1,5 +1,5 @@
 {% for file in files|sort(attribute='name') %}
-<li class="mb-2.5 last:mb-0 rounded hover:bg-opacity-80 bg-blue-800">
+<li class="mb-2.5 last:mb-0 rounded hover:bg-opacity-80 bg-green-700">
   <a
     class="block py-2.5 px-4 text-white"
     href="{{ url_for('download_file', filename=file.name) }}"

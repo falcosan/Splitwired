@@ -164,21 +164,16 @@ def get_categories(categories: list, category: int = None) -> list:
     return category_found if category != None else categories_all
 
 
-def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = None):
+def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "None"):
     def get_data(value):
         return list(map(lambda d: d[value], data))
 
     charts = []
-    types = {"pie": go.Pie, "bar": go.Bar}
-    layout = {
-        "height": 1024,
-        "autosize": True,
-        "showlegend": False,
-        "margin": dict(l=50, r=50, b=50, t=50, pad=50),
-    }
     content = {
         "pie": {
-            "name": "pie_chart",
+            "type": go.Pie,
+            "title": f"Pie chart {filename}" if filename else "Pie chart",
+            "filename": f"`pie_chart_`{filename}" if filename else "pie_chart",
             "labels": get_data("name"),
             "values": get_data("cost"),
             "textinfo": "label+percent",
@@ -187,23 +182,43 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = N
             "marker": dict(line=dict(color="#000000", width=1)),
         },
         "bar": {
-            "name": "bar_chart",
+            "type": go.Bar,
+            "title": f"Bar chart {filename}" if filename else "Bar chart",
+            "filename": f"`bar_chart_`{filename}" if filename else "bar_chart",
             "y": list(map(lambda d: get_data("name").count(d), get_data("name"))),
             "x": get_data("name"),
+            "text": "y",
+            "customdata": get_data("date"),
+            "texttemplate": "%{y}",
+            "hovertemplate": "%{x}<br>Date: %{customdata}</br><extra></extra>",
         },
     }
     for chart in [chart_type] if type(chart_type) == str else chart_type:
         chart = chart.lower()
+        layout = {
+            "title": content[chart]["title"],
+            "height": 1024,
+            "barmode": "relative",
+            "autosize": True,
+            "showlegend": False,
+            "margin": dict(l=50, r=50, b=50, t=50, pad=50),
+        }
         config = {
             "autosizable": True,
             "toImageButtonOptions": {
                 "format": "svg",
-                "filename": f"{content[chart]['name']}_{filename}"
-                if filename
-                else "chart",
+                "filename": content[chart]["filename"],
             },
         }
-        data = [types[chart](**content[chart])]
+        data = [
+            content[chart]["type"](
+                **{
+                    key: value
+                    for key, value in content[chart].items()
+                    if key != "filename" and key != "type" and key != "title"
+                }
+            )
+        ]
         fig = go.Figure(data=data, layout=layout)
         json = fig.to_plotly_json()
         json["config"] = config

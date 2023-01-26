@@ -20,7 +20,8 @@ export default function Input(props) {
         max={props.max}
         min={props.min}
         onChange={handleChange}
-        value={props.value ?? ""}
+        value={props.type !== "checkbox" ? props.value ?? "" : undefined}
+        checked={props.type == "checkbox" ? props.value ?? "" : undefined}
         type={props.type ?? "text"}
         placeholder={props.name ?? ""}
       />
