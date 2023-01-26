@@ -19,8 +19,8 @@ export default function Table(props) {
     getCoreRowModel: getCoreRowModel(),
   });
   return (
-    <table className={`overflow-hidden rounded-t ${props.className ?? null}`}>
-      <thead className="bg-slate-200">
+    <table className={`overflow-hidden rounded ${props.className ?? null}`}>
+      <thead className="bg-slate-800 text-slate-300">
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
@@ -40,7 +40,7 @@ export default function Table(props) {
         {table.getRowModel().rows.map((row) => (
           <tr key={row.id}>
             {row.getVisibleCells().map((cell) => (
-              <td key={cell.id}>
+              <td className="p-1 bg-zinc-600 text-slate-300" key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>
             ))}

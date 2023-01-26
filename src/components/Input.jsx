@@ -3,7 +3,7 @@ import React, { useRef } from "react";
 export default function Input(props) {
   const inputRef = useRef(null);
   const handleChange = () => {
-    props.getInputValue(inputRef.current[props.target]);
+    props.getInputValue(inputRef.current[props.target] || null);
   };
   return (
     <label
@@ -12,7 +12,7 @@ export default function Input(props) {
       } ${props.type !== "checkbox" ? "flex-col" : "space-x-2.5"}`}
     >
       {props.label && props.type != null && !/text|number/.test(props.type) && (
-        <span className="w-full capitalize">{props.label}</span>
+        <span className="w-full capitalize text-slate-300">{props.label}</span>
       )}
       <input
         className="w-full rounded px-2 py-1 cursor-pointer placeholder:capitalize"
