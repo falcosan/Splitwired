@@ -35,9 +35,9 @@ def responser(
 
 def set_dates(month: int = None, year: int = None):
     if month and (month < 1 or month > 12):
-        raise AttributeError("Selected month is not valid")
+        raise ValueError("Selected month is not valid")
     if year and len(str(year)) != 4:
-        raise AttributeError("Selected year is not valid")
+        raise ValueError("Selected year is not valid")
     dated_after = (
         datetime(year or datetime.now().date().year, month or 1, 1, 0, 0, 0)
         if month or year
@@ -56,7 +56,7 @@ def set_dates(month: int = None, year: int = None):
         else None
     )
     if dated_after and dated_after.date() > datetime.now().date():
-        raise AttributeError("Selected date is about the future")
+        raise ValueError("Selected date is about the future")
     if month:
         dated_name = dated_after.strftime("_%d-%m-%Y")
     elif year:
