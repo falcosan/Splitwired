@@ -173,7 +173,7 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "
         "pie": {
             "type": go.Pie,
             "title": f"Pie chart {filename}" if filename else "Pie chart",
-            "filename": f"`pie_chart_`{filename}" if filename else "pie_chart",
+            "filename": f"pie_chart_{filename}" if filename else "pie_chart",
             "labels": get_data("name"),
             "values": get_data("cost"),
             "textinfo": "label+percent",
@@ -184,7 +184,7 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "
         "bar": {
             "type": go.Bar,
             "title": f"Bar chart {filename}" if filename else "Bar chart",
-            "filename": f"`bar_chart_`{filename}" if filename else "bar_chart",
+            "filename": f"bar_chart_{filename}" if filename else "bar_chart",
             "y": list(map(lambda d: get_data("name").count(d), get_data("name"))),
             "x": get_data("name"),
             "text": "y",
