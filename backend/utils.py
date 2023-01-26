@@ -176,12 +176,9 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = N
         "showlegend": False,
         "margin": dict(l=50, r=50, b=50, t=50, pad=50),
     }
-    config = {
-        "autosizable": True,
-        "toImageButtonOptions": {"format": "svg", "filename": filename or "chart"},
-    }
     content = {
         "pie": {
+            "name": "pie_chart",
             "labels": get_data("name"),
             "values": get_data("cost"),
             "textinfo": "label+percent",
@@ -190,12 +187,22 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = N
             "marker": dict(line=dict(color="#000000", width=1)),
         },
         "bar": {
+            "name": "bar_chart",
             "y": list(map(lambda d: get_data("name").count(d), get_data("name"))),
             "x": get_data("name"),
         },
     }
     for chart in [chart_type] if type(chart_type) == str else chart_type:
         chart = chart.lower()
+        config = {
+            "autosizable": True,
+            "toImageButtonOptions": {
+                "format": "svg",
+                "filename": f"{content[chart]['name']}_{filename}"
+                if filename
+                else "chart",
+            },
+        }
         data = [types[chart](**content[chart])]
         fig = go.Figure(data=data, layout=layout)
         json = fig.to_plotly_json()
