@@ -7,11 +7,13 @@ export default function Select(props) {
       props.label && !selectRef.current.selectedIndex
         ? null
         : selectRef.current.value;
-    props.getSelectValue(value);
+    props.getSelectValue(value || null);
   };
   return props.options.length ? (
     <select
-      className={`rounded px-2 py-1 cursor-pointer ${props.className ?? null}`}
+      className={`h-8 rounded px-2 py-1 cursor-pointer ${
+        props.className ?? null
+      }`}
       onChange={handleChange}
       ref={selectRef}
     >

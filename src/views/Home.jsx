@@ -28,11 +28,13 @@ export default function Home() {
     personal: true,
     csv: false,
     month: null,
-    year: max.year,
+    year: String(max.year),
     group: null,
     chart: ["pie", "bar"],
     category: null,
   });
+  const currentYear = useRef(parameters.year);
+  const currentMonth = useRef(parameters.month);
   const currentGroup = useRef(parameters.category);
   const currentPersonal = useRef(parameters.personal);
   useRemovesNullClass();
@@ -55,16 +57,13 @@ export default function Home() {
     };
   }, [data]);
   const categories = useMemo(() => {
-    if (
-      parameters.group === currentGroup.current &&
-      parameters.personal === currentPersonal.current
-    ) {
+    if (data.length) {
       return data
         .map((item) => item.category)
         .filter((v, i, a) => a.findIndex((v2) => v2.id === v.id) === i)
         .sort((a, b) => a.name.localeCompare(b.name));
     } else return [];
-  }, [data, parameters.group, parameters.personal]);
+  }, [data]);
   const expenses = useMemo(() => {
     let total = 0;
     if (parameters.category) {
@@ -94,52 +93,81 @@ export default function Home() {
         });
     } else return table;
   }, [data, parameters.category]);
-  const title = useMemo(() => {
-    const group = (() => {
-      if (parameters.personal) {
-        return "DD";
-      } else if (parameters.group) {
-        const found = groups.find(
-          (group) => String(group.id) === String(parameters.group)
-        );
-        return found ? found.name : "";
-      } else return "Ago&Dan";
-    })();
-    const category = (() => {
-      if (parameters.category) {
-        const found = categories.find(
-          (category) => String(category.id) === String(parameters.category)
-        );
-        return found ? ` - ${found.name}` : "";
-      } else return "";
-    })();
-    const month =
-      (() => {
-        if (parameters.month) {
-          const num = parameters.month;
-          if (num >= min.month && num <= max.month) {
-            const date = new Date();
-            date.setMonth(num - 1);
-            return ` - ${date.toLocaleString("en", { month: "long" })}`;
+
+  const query = useMemo(() => {
+    function builderQuery(version) {
+      const params = {
+        ...(version === "static" && {
+          year: currentYear.current,
+          month: currentMonth.current,
+          group: currentGroup.current,
+          personal: currentPersonal.current,
+        }),
+        ...(version === "dynamic" && {
+          year: parameters.year,
+          month: parameters.month,
+          group: parameters.group,
+          category: parameters.category,
+          personal: parameters.personal,
+        }),
+      };
+      const group = (() => {
+        if (params.personal) {
+          return "DD";
+        } else if (params.group) {
+          const found = groups.find(
+            (group) => String(group.id) === String(params.group)
+          );
+          return found ? found.name : "";
+        } else return "Ago&Dan";
+      })();
+      const category = (() => {
+        if (params.category) {
+          const found = categories.find(
+            (category) => String(category.id) === String(params.category)
+          );
+          return found ? ` - ${found.name}` : "";
+        } else return "";
+      })();
+      const month =
+        (() => {
+          if (params.month) {
+            const num = params.month;
+            if (num >= min.month && num <= max.month) {
+              const date = new Date();
+              date.setMonth(num - 1);
+              return ` - ${date.toLocaleString("en", { month: "long" })}${
+                params.month && !params.year ? ` - ${max.year}` : ""
+              }`;
+            }
           }
-        }
-      })() ?? "";
-    const year = (() => {
-      if (
-        parameters.year &&
-        +parameters.year >= min.year &&
-        +parameters.year <= max.year
-      ) {
-        return ` - ${parameters.year}`;
-      } else return "";
-    })();
-    return `${group}${category}${month}${year}`;
+        })() ?? "";
+      const year = (() => {
+        if (
+          params.year &&
+          +params.year >= min.year &&
+          +params.year <= max.year
+        ) {
+          return ` - ${params.year}`;
+        } else return "";
+      })();
+      return `${group}${category}${month}${year}`;
+    }
+    return {
+      searched: builderQuery("dynamic"),
+      current: builderQuery("static"),
+    };
   }, [
-    parameters.personal,
-    parameters.month,
+    data,
     parameters.year,
+    parameters.month,
     parameters.group,
+    parameters.personal,
     parameters.category,
+    currentYear.current,
+    currentGroup.current,
+    currentMonth.current,
+    currentPersonal.current,
   ]);
   useLayoutEffect(() => {
     Promise.all([api.getGroups(), api.getDownloads()]).then(
@@ -151,8 +179,12 @@ export default function Home() {
   }, []);
   const getData = (e) => {
     e.preventDefault();
-    setData({ data, table, chart, groups });
     setStatus("Loading");
+    setData({ data, table, chart, groups });
+    currentYear.current = parameters.year;
+    currentGroup.current = parameters.group;
+    currentMonth.current = parameters.month;
+    currentPersonal.current = parameters.personal;
     api
       .getExpanses(importFilter(parameters, ["category", "csv"], false))
       .then(({ data, table, chart }) => {
@@ -164,16 +196,16 @@ export default function Home() {
             ...(parameters.category && { category: null }),
           });
           if (data.length) {
-            currentPersonal.current = parameters.personal;
-            currentGroup.current = parameters.group;
             if (parameters.csv) {
               api.getExpanses(parameters).then(() => {
                 api.getDownloads().then((res) => setDownloads(res));
               });
             }
-            e.target.reset();
           }
-        } else setStatus("Error");
+        } else {
+          setStatus("Error");
+          setData({ data: [], table: [], chart: [], groups });
+        }
       });
   };
   const selects = {
@@ -214,7 +246,7 @@ export default function Home() {
       <div className="container mx-auto">
         {downloads.length ? (
           <div>
-            <span className="block mb-2.5">Downloads</span>
+            <span className="block mb-2.5 text-slate-300">Downloads</span>
             <ul
               className="p-2.5 overflow-y-auto rounded bg-slate-200"
               dangerouslySetInnerHTML={{ __html: downloads }}
@@ -226,21 +258,22 @@ export default function Home() {
             onSubmit={getData}
             className="flex flex-col items-start space-y-5"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-5">
               {Object.values(selects).map((select, index) => (
                 <Select
                   {...select}
                   key={index}
+                  className="min-w-[200px]"
                   getSelectValue={(value) =>
                     setParameters({ ...parameters, [select.parameter]: value })
                   }
                 />
               ))}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {inputs.map((input) => (
                 <Input
-                  className={`justify-self-start self-start ${
+                  className={`w-full justify-self-start self-start ${
                     input.type == null || /text|number/.test(input.type)
                       ? "min-w-[200px]"
                       : null
@@ -257,16 +290,29 @@ export default function Home() {
               ))}
             </div>
             <Input
-              className="self-end p-2.5 rounded text-white bg-blue-700"
+              className="self-end p-2.5 rounded bg-zinc-600 text-slate-300"
               type="submit"
-              value="generate expense"
+              value="Expenses"
             />
           </form>
         </div>
-        <span className="block mt-5 text-lg font-semibold">{title}</span>
-        <hr className="mt-5" />
+        {data.length || status ? (
+          <div className="flex space-x-2.5 mt-5">
+            <span className="block text-lg text-slate-300">Current: </span>
+            <span className="block text-lg font-semibold text-slate-300">
+              {query.current}
+            </span>
+          </div>
+        ) : null}
+        <div className="flex space-x-2.5 mt-5">
+          <span className="block text-lg text-slate-300">Searching for: </span>
+          <span className="block text-lg font-semibold text-slate-300">
+            {query.searched}
+          </span>
+        </div>
+        <hr className="mt-5 border-slate-600" />
         {status ? (
-          <span className="block w-full mt-10 text-center text-lg font-semibold">
+          <span className="block w-full mt-10 text-center text-lg font-semibold text-slate-300">
             {status}
           </span>
         ) : expenses.length ? (
@@ -279,11 +325,11 @@ export default function Home() {
 
         {chart.length && !status ? (
           <>
-            <hr className="mt-10" />
+            <hr className="mt-10 border-slate-600" />
             <div className="overflow-x-auto">
               {Array.from({ length: chart.length }, (_, i) => (
                 <Plot
-                  className="w-full mt-10"
+                  className="w-full mt-10 rounded overflow-hidden"
                   key={i}
                   data={chart[i].data}
                   layout={chart[i].layout}
