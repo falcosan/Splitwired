@@ -17,7 +17,7 @@ export default function Home() {
     groups: [],
   });
   const [parameters, setParameters] = useState({
-    personal: false,
+    personal: true,
     csv: false,
     month: null,
     year: new Date().getFullYear(),
@@ -78,6 +78,39 @@ export default function Home() {
         });
     } else return table;
   }, [data, parameters.category]);
+  const title = useMemo(() => {
+    function getMonthName(num) {
+      const date = new Date();
+      date.setMonth(num - 1);
+      return date.toLocaleString("en-US", { month: "long" });
+    }
+    const group = (() => {
+      if (parameters.personal) {
+        return "DD";
+      } else if (parameters.group) {
+        const found = groups.find(
+          (group) => String(group.id) === parameters.group
+        );
+        return found ? found.name : "";
+      } else {
+        return "Ago&Dan";
+      }
+    })();
+    const month = parameters.month
+      ? ` - month: ${getMonthName(parameters.month)}`
+      : "";
+    const year = parameters.year ? ` - year: ${parameters.year}` : "";
+    const category = parameters.category
+      ? ` - category: ${parameters.category}`
+      : "";
+    return `group: ${group}${month}${year}${category}`;
+  }, [
+    parameters.personal,
+    parameters.month,
+    parameters.year,
+    parameters.group,
+    parameters.category,
+  ]);
   useLayoutEffect(() => {
     Promise.all([api.getGroups(), api.getDownloads()]).then(
       async ([groups, downloads]) => {
@@ -97,9 +130,7 @@ export default function Home() {
         setData({ data, table, chart, groups });
       })
       .finally(() => {
-        if (parameters.csv) {
-          api.getDownloads().then((res) => setDownloads(res));
-        }
+        if (parameters.csv) api.getDownloads().then((res) => setDownloads(res));
         setParameters({
           ...parameters,
           ...(parameters.category && { category: null }),
@@ -189,19 +220,20 @@ export default function Home() {
               ))}
             </div>
             <Input
-              className="self-end p-2.5 rounded text-white bg-blue-800"
+              className="self-end p-2.5 rounded text-white bg-blue-700"
               type="submit"
               value="generate expense"
             />
           </form>
         </div>
+        <span className="block mt-5 text-lg font-semibold">{title}</span>
+        <hr className="mt-5" />
         {status ? (
-          <span className="block w-full mt-10 text-center text-lg font-bold">
+          <span className="block w-full mt-10 text-center text-lg font-semibold">
             {status}
           </span>
         ) : expenses.length ? (
           <>
-            <hr className="mt-10" />
             <div className="overflow-x-auto">
               <Table className="w-full mt-10" data={expenses} />
             </div>
