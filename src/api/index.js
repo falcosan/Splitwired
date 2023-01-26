@@ -15,7 +15,7 @@ export default {
       method: "POST",
       body: JSON.stringify(parameters),
       headers: new Headers({
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       }),
     })
       .then((res) => res.json())

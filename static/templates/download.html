@@ -5,12 +5,12 @@
     href="{{ url_for('download_file', filename=file.name) }}"
   >
     <div class="flex justify-between">
-      <div class="flex items-end space-x-2.5">
+      <div class="space-x-2 md:space-x-2.5">
         <span class="text-sm">{{ file.index }}:</span
-        ><span>{{ file.name }}</span>
+        ><span class="break-all">{{ file.name }}</span>
       </div>
       <span
-        class="ml-2.5 pl-2.5 font-bold border-l-2 border-opacity-60 border-slate-50"
+        class="self-center flex-none ml-1.5 pl-1.5 md:2.5 md:2.5 text-xs font-bold border-l-2 border-opacity-60 border-slate-50"
         >{{ file.date }}</span
       >
     </div>

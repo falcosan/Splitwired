@@ -20,7 +20,7 @@ export default function Home() {
     personal: false,
     csv: false,
     month: null,
-    year: null,
+    year: new Date().getFullYear(),
     group: null,
     chart: ["pie", "bar"],
     category: null,
@@ -143,7 +143,7 @@ export default function Home() {
   useRemovesNullClass();
   return (
     <div className="p-5">
-      <div className="container mx-auto flex flex-col">
+      <div className="container mx-auto">
         {downloads.length ? (
           <div>
             <span className="block mb-2.5">Downloads</span>
@@ -158,7 +158,7 @@ export default function Home() {
             onSubmit={getData}
             className="flex flex-col items-start space-y-5"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 auto-cols-fr gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {Object.values(selects).map((select, index) => (
                 <Select
                   {...select}
@@ -169,7 +169,7 @@ export default function Home() {
                 />
               ))}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 auto-cols-fr gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               {Object.values(inputs).map((input) => (
                 <Input
                   className={`justify-self-start self-start ${
@@ -195,7 +195,6 @@ export default function Home() {
             />
           </form>
         </div>
-
         {status ? (
           <span className="block w-full mt-10 text-center text-lg font-bold">
             {status}
@@ -203,26 +202,30 @@ export default function Home() {
         ) : expenses.length ? (
           <>
             <hr className="mt-10" />
-            <Table className="w-full mt-10" data={expenses} />
+            <div className="overflow-x-auto">
+              <Table className="w-full mt-10" data={expenses} />
+            </div>
+          </>
+        ) : null}
+
+        {chart.length && !status ? (
+          <>
+            <hr className="mt-10" />
+            <div className="overflow-x-auto">
+              {Array.from({ length: chart.length }, (_, i) => (
+                <Plot
+                  className="w-full mt-10"
+                  key={i}
+                  data={chart[i].data}
+                  layout={chart[i].layout}
+                  config={chart[i].config}
+                  useResizeHandler
+                />
+              ))}
+            </div>
           </>
         ) : null}
       </div>
-      {chart.length && !status ? (
-        <>
-          <hr className="mt-10" />
-          <div className="flex flex-wrap justify-center mt-10">
-            {Array.from({ length: chart.length }, (_, i) => (
-              <Plot
-                key={i}
-                data={chart[i].data}
-                layout={chart[i].layout}
-                config={chart[i].config}
-                useResizeHandler
-              />
-            ))}
-          </div>
-        </>
-      ) : null}
     </div>
   );
 }
