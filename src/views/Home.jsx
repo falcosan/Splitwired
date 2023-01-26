@@ -8,6 +8,14 @@ import { useRemovesNullClass } from "@/hooks";
 import React, { useState, useMemo, useLayoutEffect } from "react";
 
 export default function Home() {
+  const min = {
+    year: 2020,
+    month: 1,
+  };
+  const max = {
+    year: new Date().getFullYear(),
+    month: 12,
+  };
   const [status, setStatus] = useState("");
   const [downloads, setDownloads] = useState("");
   const [{ data, table, chart, groups }, setData] = useState({
@@ -20,7 +28,7 @@ export default function Home() {
     personal: true,
     csv: false,
     month: null,
-    year: new Date().getFullYear(),
+    year: max.year,
     group: null,
     chart: ["pie", "bar"],
     category: null,
@@ -79,30 +87,44 @@ export default function Home() {
     } else return table;
   }, [data, parameters.category]);
   const title = useMemo(() => {
-    function getMonthName(num) {
-      const date = new Date();
-      date.setMonth(num - 1);
-      return date.toLocaleString("en-US", { month: "long" });
-    }
     const group = (() => {
       if (parameters.personal) {
         return "DD";
       } else if (parameters.group) {
         const found = groups.find(
-          (group) => String(group.id) === parameters.group
+          (group) => String(group.id) === String(parameters.group)
         );
         return found ? found.name : "";
-      } else {
-        return "Ago&Dan";
-      }
+      } else return "Ago&Dan";
     })();
-    const month = parameters.month
-      ? ` - month: ${getMonthName(parameters.month)}`
-      : "";
-    const year = parameters.year ? ` - year: ${parameters.year}` : "";
-    const category = parameters.category
-      ? ` - category: ${parameters.category}`
-      : "";
+    const month =
+      (() => {
+        if (parameters.month) {
+          const num = parameters.month;
+          if (num >= min.month && num <= max.month) {
+            const date = new Date();
+            date.setMonth(num - 1);
+            return ` - month: ${date.toLocaleString("en", { month: "long" })}`;
+          }
+        }
+      })() ?? "";
+    const year = (() => {
+      if (
+        parameters.year &&
+        +parameters.year >= min.year &&
+        +parameters.year <= max.year
+      ) {
+        return ` - year: ${parameters.year}`;
+      } else return "";
+    })();
+    const category = (() => {
+      if (parameters.category) {
+        const found = categories.find(
+          (category) => String(category.id) === String(parameters.category)
+        );
+        return found ? ` - category: ${found.name}` : "";
+      } else return "";
+    })();
     return `group: ${group}${month}${year}${category}`;
   }, [
     parameters.personal,
@@ -126,8 +148,10 @@ export default function Home() {
     api
       .getExpanses(importFilter(parameters, ["category"], false))
       .then(({ data, table, chart }) => {
-        setStatus(data.length ? "" : "No expenses");
-        setData({ data, table, chart, groups });
+        if (data) {
+          setStatus(data.length ? "" : "No expenses");
+          if (table && chart) setData({ data, table, chart, groups });
+        } else setStatus("Error");
       })
       .finally(() => {
         if (parameters.csv) api.getDownloads().then((res) => setDownloads(res));
@@ -157,14 +181,14 @@ export default function Home() {
         state.target = "checked";
         break;
       case "month":
-        state.min = 1;
-        state.max = 12;
+        state.min = min.month;
+        state.max = max.month;
         state.type = "number";
         state.target = "value";
         break;
       case "year":
-        state.min = 2020;
-        state.max = new Date().getFullYear();
+        state.min = min.year;
+        state.max = max.year;
         state.type = "number";
         state.target = "value";
         break;
@@ -201,7 +225,7 @@ export default function Home() {
               ))}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-              {Object.values(inputs).map((input) => (
+              {inputs.map((input) => (
                 <Input
                   className={`justify-self-start self-start ${
                     input.type == null || /text|number/.test(input.type)

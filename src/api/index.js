@@ -3,13 +3,15 @@ export default {
   getGroups: () =>
     fetch("/groups")
       .then((res) => res.json())
-      .then((res) => res),
+      .then((res) => res)
+      .catch((err) => err),
   getDownloads: () =>
     fetch("/download", {
       headers: { secret: process.env.HEADER_DOWNLOAD_SECRET },
     })
       .then((res) => res.text())
-      .then((res) => DOMPurify.sanitize(res)),
+      .then((res) => DOMPurify.sanitize(res))
+      .catch((err) => err),
   getExpanses: (parameters) =>
     fetch("/expenses", {
       method: "POST",
@@ -19,5 +21,6 @@ export default {
       }),
     })
       .then((res) => res.json())
-      .then((res) => res),
+      .then((res) => res)
+      .catch((err) => err),
 };
