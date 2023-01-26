@@ -5,7 +5,7 @@ import Table from "@/components/Table";
 import Select from "@/components/Select";
 import { importFilter } from "@/utils/import";
 import { useRemovesNullClass } from "@/hooks";
-import React, { useState, useMemo, useLayoutEffect } from "react";
+import React, { useState, useMemo, useLayoutEffect, useRef } from "react";
 
 export default function Home() {
   const min = {
@@ -33,6 +33,9 @@ export default function Home() {
     chart: ["pie", "bar"],
     category: null,
   });
+  const currentGroup = useRef(parameters.category);
+  const currentPersonal = useRef(parameters.personal);
+  useRemovesNullClass();
   const properties = useMemo(() => {
     let idKey;
     let totalKey;
@@ -52,11 +55,16 @@ export default function Home() {
     };
   }, [data]);
   const categories = useMemo(() => {
-    return data
-      .map((item) => item.category)
-      .filter((v, i, a) => a.findIndex((v2) => v2.id === v.id) === i)
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [data]);
+    if (
+      parameters.group === currentGroup.current &&
+      parameters.personal === currentPersonal.current
+    ) {
+      return data
+        .map((item) => item.category)
+        .filter((v, i, a) => a.findIndex((v2) => v2.id === v.id) === i)
+        .sort((a, b) => a.name.localeCompare(b.name));
+    } else return [];
+  }, [data, parameters.group, parameters.personal]);
   const expenses = useMemo(() => {
     let total = 0;
     if (parameters.category) {
@@ -97,6 +105,14 @@ export default function Home() {
         return found ? found.name : "";
       } else return "Ago&Dan";
     })();
+    const category = (() => {
+      if (parameters.category) {
+        const found = categories.find(
+          (category) => String(category.id) === String(parameters.category)
+        );
+        return found ? ` - ${found.name}` : "";
+      } else return "";
+    })();
     const month =
       (() => {
         if (parameters.month) {
@@ -104,7 +120,7 @@ export default function Home() {
           if (num >= min.month && num <= max.month) {
             const date = new Date();
             date.setMonth(num - 1);
-            return ` - month: ${date.toLocaleString("en", { month: "long" })}`;
+            return ` - ${date.toLocaleString("en", { month: "long" })}`;
           }
         }
       })() ?? "";
@@ -114,18 +130,10 @@ export default function Home() {
         +parameters.year >= min.year &&
         +parameters.year <= max.year
       ) {
-        return ` - year: ${parameters.year}`;
+        return ` - ${parameters.year}`;
       } else return "";
     })();
-    const category = (() => {
-      if (parameters.category) {
-        const found = categories.find(
-          (category) => String(category.id) === String(parameters.category)
-        );
-        return found ? ` - category: ${found.name}` : "";
-      } else return "";
-    })();
-    return `group: ${group}${month}${year}${category}`;
+    return `${group}${category}${month}${year}`;
   }, [
     parameters.personal,
     parameters.month,
@@ -144,22 +152,28 @@ export default function Home() {
   const getData = (e) => {
     e.preventDefault();
     setData({ data, table, chart, groups });
-    setStatus("loading");
+    setStatus("Loading");
     api
-      .getExpanses(importFilter(parameters, ["category"], false))
+      .getExpanses(importFilter(parameters, ["category", "csv"], false))
       .then(({ data, table, chart }) => {
         if (data) {
-          setStatus(data.length ? "" : "No expenses");
           if (table && chart) setData({ data, table, chart, groups });
+          setStatus(data.length ? "" : "No expenses");
+          setParameters({
+            ...parameters,
+            ...(parameters.category && { category: null }),
+          });
+          if (data.length) {
+            currentPersonal.current = parameters.personal;
+            currentGroup.current = parameters.group;
+            if (parameters.csv) {
+              api.getExpanses(parameters).then(() => {
+                api.getDownloads().then((res) => setDownloads(res));
+              });
+            }
+            e.target.reset();
+          }
         } else setStatus("Error");
-      })
-      .finally(() => {
-        if (parameters.csv) api.getDownloads().then((res) => setDownloads(res));
-        setParameters({
-          ...parameters,
-          ...(parameters.category && { category: null }),
-        });
-        e.target.reset();
       });
   };
   const selects = {
@@ -195,7 +209,6 @@ export default function Home() {
     }
     return { label: key, name: key, value, ...state };
   });
-  useRemovesNullClass();
   return (
     <div className="p-5">
       <div className="container mx-auto">

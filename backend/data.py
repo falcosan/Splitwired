@@ -36,7 +36,9 @@ def data_expenses(
         category_found = get_categories(
             categories=instance.getCategories(), category=category
         )
-        category_name = f'{category_found.getName().replace("/", "").replace(" ", "_")}'
+        category_name = (
+            f'_{category_found.getName().replace("/", "").replace(" ", "_")}'
+        )
     else:
         category_name = ""
     dated_after, dated_before, dated_name = set_dates(month, year)
