@@ -9,11 +9,13 @@ export default function Input(props) {
     <label
       className={`flex items-baseline cursor-pointer ${
         props.className ?? null
-      } ${props.type !== "checkbox" ? "flex-col" : "space-x-1"}`}
+      } ${props.type !== "checkbox" ? "flex-col" : "space-x-2.5"}`}
     >
-      {props.label && <span className="w-full capitalize">{props.label}</span>}
+      {props.label && props.type != null && !/text|number/.test(props.type) && (
+        <span className="w-full capitalize">{props.label}</span>
+      )}
       <input
-        className={`w-full ${!props.label ? "cursor-pointer" : null}`}
+        className="w-full rounded px-2 py-1 cursor-pointer placeholder:capitalize"
         ref={inputRef}
         max={props.max}
         min={props.min}

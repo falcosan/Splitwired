@@ -1,10 +1,11 @@
 const path = require("path");
-const webpack = require("webpack");
+const dotenv = require("dotenv");
 const Dotenv = require("dotenv-webpack");
 
 module.exports = () => {
+  const env = { ...process.env, ...dotenv.config().parsed };
   return {
-    mode: "development",
+    mode: env.ENVIRONMENT ?? "production",
     entry: "./src/index.js",
     output: {
       filename: "bundle.js",
