@@ -189,6 +189,8 @@ export default function Home() {
     parameters.csv,
     parameters.year,
     parameters.month,
+    parameters.group,
+    parameters.personal,
     parameters.category,
     currentYear.current,
     currentMonth.current,
