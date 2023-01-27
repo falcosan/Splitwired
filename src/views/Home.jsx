@@ -122,7 +122,13 @@ export default function Home() {
         } else return "Ago&Dan";
       })();
       const category = (() => {
-        if (params.category) {
+        if (
+          parameters.csv &&
+          params.category &&
+          (Boolean(parameters.personal)
+            ? Boolean(parameters.personal) === Boolean(currentPersonal.current)
+            : String(params.group) === String(currentGroup.current))
+        ) {
           const found = categories.find(
             (category) => String(category.id) === String(params.category)
           );
@@ -159,6 +165,7 @@ export default function Home() {
     };
   }, [
     data,
+    parameters.csv,
     parameters.year,
     parameters.month,
     parameters.group,
@@ -180,21 +187,17 @@ export default function Home() {
   const getData = (e) => {
     e.preventDefault();
     setStatus("Loading");
-    setData({ data, table, chart, groups });
     currentYear.current = parameters.year;
     currentGroup.current = parameters.group;
     currentMonth.current = parameters.month;
     currentPersonal.current = parameters.personal;
+    setData({ data: [], table: [], chart: [], groups });
     api
       .getExpanses(importFilter(parameters, ["category", "csv"], false))
       .then(({ data, table, chart }) => {
         if (data) {
           if (table && chart) setData({ data, table, chart, groups });
           setStatus(data.length ? "" : "No expenses");
-          setParameters({
-            ...parameters,
-            ...(parameters.category && { category: null }),
-          });
           if (data.length) {
             if (parameters.csv) {
               api.getExpanses(parameters).then(() => {
@@ -202,10 +205,11 @@ export default function Home() {
               });
             }
           }
-        } else {
-          setStatus("Error");
-          setData({ data: [], table: [], chart: [], groups });
-        }
+          setParameters({
+            ...parameters,
+            ...(parameters.category && { category: null }),
+          });
+        } else setStatus("Error");
       });
   };
   const selects = {
@@ -253,6 +257,9 @@ export default function Home() {
             />
           </div>
         ) : null}
+        <span className="block mt-5 font-semibold text-slate-300">
+          {data.length ? query.current : "No query"}
+        </span>
         <div className="space-y-5 mt-5">
           <form
             onSubmit={getData}
@@ -273,10 +280,10 @@ export default function Home() {
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {inputs.map((input) => (
                 <Input
-                  className={`w-full justify-self-start self-start ${
+                  className={`justify-self-start self-start ${
                     input.type == null || /text|number/.test(input.type)
-                      ? "min-w-[200px]"
-                      : null
+                      ? "w-full min-w-[200px]"
+                      : "w-32"
                   }`}
                   key={input.name}
                   {...input}
@@ -296,20 +303,9 @@ export default function Home() {
             />
           </form>
         </div>
-        {data.length || status ? (
-          <div className="flex space-x-2.5 mt-5">
-            <span className="block text-lg text-slate-300">Current: </span>
-            <span className="block text-lg font-semibold text-slate-300">
-              {query.current}
-            </span>
-          </div>
-        ) : null}
-        <div className="flex space-x-2.5 mt-5">
-          <span className="block text-lg text-slate-300">Searching for: </span>
-          <span className="block text-lg font-semibold text-slate-300">
-            {query.searched}
-          </span>
-        </div>
+        <span className="block mt-5 text-lg font-semibold text-slate-300">
+          {query.searched}
+        </span>
         <hr className="mt-5 border-slate-600" />
         {status ? (
           <span className="block w-full mt-10 text-center text-lg font-semibold text-slate-300">
@@ -322,7 +318,6 @@ export default function Home() {
             </div>
           </>
         ) : null}
-
         {chart.length && !status ? (
           <>
             <hr className="mt-10 border-slate-600" />
