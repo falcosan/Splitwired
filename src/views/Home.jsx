@@ -5,7 +5,13 @@ import Table from "@/components/Table";
 import Select from "@/components/Select";
 import { importFilter } from "@/utils/import";
 import { useRemovesNullClass } from "@/hooks";
-import React, { useState, useMemo, useLayoutEffect, useRef } from "react";
+import React, {
+  useState,
+  useMemo,
+  useLayoutEffect,
+  useRef,
+  useEffect,
+} from "react";
 
 export default function Home() {
   const min = {
@@ -56,14 +62,30 @@ export default function Home() {
       number: numberKey,
     };
   }, [data]);
+  const categoryCheck = useMemo(() => {
+    return Boolean(parameters.personal)
+      ? Boolean(parameters.personal) === Boolean(currentPersonal.current)
+      : Boolean(parameters.personal) === Boolean(currentPersonal.current) &&
+          String(parameters.group) === String(currentGroup.current);
+  }, [
+    parameters.group,
+    parameters.personal,
+    currentGroup.current,
+    currentPersonal.current,
+  ]);
   const categories = useMemo(() => {
-    if (data.length) {
+    if (
+      data.length &&
+      categoryCheck &&
+      String(parameters.year) === String(currentYear.current) &&
+      String(parameters.month) === String(currentMonth.current)
+    ) {
       return data
         .map((item) => item.category)
         .filter((v, i, a) => a.findIndex((v2) => v2.id === v.id) === i)
         .sort((a, b) => a.name.localeCompare(b.name));
     } else return [];
-  }, [data]);
+  }, [data, categoryCheck, parameters.year, parameters.month]);
   const expenses = useMemo(() => {
     let total = 0;
     if (parameters.category) {
@@ -101,6 +123,7 @@ export default function Home() {
           year: currentYear.current,
           month: currentMonth.current,
           group: currentGroup.current,
+          category: parameters.category,
           personal: currentPersonal.current,
         }),
         ...(version === "dynamic" && {
@@ -123,11 +146,8 @@ export default function Home() {
       })();
       const category = (() => {
         if (
-          parameters.csv &&
           params.category &&
-          (Boolean(parameters.personal)
-            ? Boolean(parameters.personal) === Boolean(currentPersonal.current)
-            : String(params.group) === String(currentGroup.current))
+          (version === "dynamic" ? parameters.csv && categoryCheck : true)
         ) {
           const found = categories.find(
             (category) => String(category.id) === String(params.category)
@@ -165,17 +185,20 @@ export default function Home() {
     };
   }, [
     data,
+    categoryCheck,
     parameters.csv,
     parameters.year,
     parameters.month,
-    parameters.group,
-    parameters.personal,
     parameters.category,
     currentYear.current,
-    currentGroup.current,
     currentMonth.current,
-    currentPersonal.current,
   ]);
+  useEffect(() => {
+    setParameters({
+      ...parameters,
+      ...(parameters.category && { category: null }),
+    });
+  }, [categories]);
   useLayoutEffect(() => {
     Promise.all([api.getGroups(), api.getDownloads()]).then(
       async ([groups, downloads]) => {
@@ -198,12 +221,10 @@ export default function Home() {
         if (data) {
           if (table && chart) setData({ data, table, chart, groups });
           setStatus(data.length ? "" : "No expenses");
-          if (data.length) {
-            if (parameters.csv) {
-              api.getExpanses(parameters).then(() => {
-                api.getDownloads().then((res) => setDownloads(res));
-              });
-            }
+          if (data.length && parameters.csv) {
+            api.getExpanses(parameters).then(() => {
+              api.getDownloads().then((res) => setDownloads(res));
+            });
           }
           setParameters({
             ...parameters,
@@ -258,7 +279,7 @@ export default function Home() {
           </div>
         ) : null}
         <span className="block mt-5 font-semibold text-slate-300">
-          {data.length ? query.current : "No query"}
+          {data.length || status ? query.current : "No query"}
         </span>
         <div className="space-y-5 mt-5">
           <form
