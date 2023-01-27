@@ -279,7 +279,7 @@ export default function Home() {
           </div>
         ) : null}
         <span className="block mt-5 font-semibold text-slate-300">
-          {data.length || status ? query.current : "No query"}
+          {query.searched}
         </span>
         <div className="space-y-5 mt-5">
           <form
@@ -325,7 +325,7 @@ export default function Home() {
           </form>
         </div>
         <span className="block mt-5 text-lg font-semibold text-slate-300">
-          {query.searched}
+          {data.length || status ? query.current : "No query"}
         </span>
         <hr className="mt-5 border-slate-600" />
         {status ? (
