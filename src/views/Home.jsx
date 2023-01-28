@@ -24,11 +24,12 @@ export default function Home() {
   };
   const [status, setStatus] = useState("");
   const [downloads, setDownloads] = useState("");
-  const [{ data, table, chart, groups }, setData] = useState({
+  const [{ data, table, chart, groups, average }, setData] = useState({
     data: [],
     table: [],
     chart: [],
     groups: [],
+    average: 0,
   });
   const [parameters, setParameters] = useState({
     personal: true,
@@ -204,7 +205,7 @@ export default function Home() {
   useLayoutEffect(() => {
     Promise.all([api.getGroups(), api.getDownloads()]).then(
       async ([groups, downloads]) => {
-        setData({ data, table, chart, groups });
+        setData({ data, table, chart, groups, average });
         setDownloads(downloads);
       }
     );
@@ -216,12 +217,12 @@ export default function Home() {
     currentGroup.current = parameters.group;
     currentMonth.current = parameters.month;
     currentPersonal.current = parameters.personal;
-    setData({ data: [], table: [], chart: [], groups });
+    setData({ data: [], table: [], chart: [], groups, average });
     api
       .getExpanses(importFilter(parameters, ["category", "csv"], false))
-      .then(({ data, table, chart }) => {
+      .then(({ data, table, chart, average }) => {
         if (data) {
-          if (table && chart) setData({ data, table, chart, groups });
+          if (table && chart) setData({ data, table, chart, groups, average });
           setStatus(data.length ? "" : "No expenses");
           if (data.length && parameters.csv) {
             api.getExpanses(parameters).then(() => {
@@ -283,49 +284,50 @@ export default function Home() {
         <span className="block mt-5 font-semibold text-slate-300">
           {query.searched}
         </span>
-        <div className="space-y-5 mt-5">
-          <form
-            onSubmit={getData}
-            className="flex flex-col items-start space-y-5"
-          >
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {Object.values(selects).map((select, index) => (
-                <Select
-                  {...select}
-                  key={index}
-                  className="min-w-[200px]"
-                  getSelectValue={(value) =>
-                    setParameters({ ...parameters, [select.parameter]: value })
-                  }
-                />
-              ))}
-            </div>
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {inputs.map((input) => (
-                <Input
-                  className={`justify-self-start self-start ${
-                    input.type == null || /text|number/.test(input.type)
-                      ? "w-full min-w-[200px]"
-                      : "w-32"
-                  }`}
-                  key={input.name}
-                  {...input}
-                  getInputValue={(value) =>
-                    setParameters({
-                      ...parameters,
-                      [input.name]: value,
-                    })
-                  }
-                />
-              ))}
-            </div>
-            <Input
-              className="self-end p-2.5 rounded bg-zinc-600 text-slate-300"
-              type="submit"
-              value="Expenses"
-            />
-          </form>
-        </div>
+        <form
+          onSubmit={getData}
+          className="flex flex-col items-start space-y-5 mt-5"
+        >
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {Object.values(selects).map((select, index) => (
+              <Select
+                {...select}
+                key={index}
+                className="min-w-[200px]"
+                getSelectValue={(value) =>
+                  setParameters({ ...parameters, [select.parameter]: value })
+                }
+              />
+            ))}
+          </div>
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {inputs.map((input) => (
+              <Input
+                className={`justify-self-start self-start ${
+                  input.type == null || /text|number/.test(input.type)
+                    ? "w-full min-w-[200px]"
+                    : "w-32"
+                }`}
+                key={input.name}
+                {...input}
+                getInputValue={(value) =>
+                  setParameters({
+                    ...parameters,
+                    [input.name]: value,
+                  })
+                }
+              />
+            ))}
+          </div>
+          <Input
+            className="self-end p-2.5 rounded bg-zinc-600 text-slate-300"
+            type="submit"
+            value="Expenses"
+          />
+        </form>
+        {data.length ? (
+          <span className="block mt-5 text-slate-300">Average {average} €</span>
+        ) : null}
         <span className="block mt-5 text-lg font-semibold text-slate-300">
           {data.length || status ? query.current : "No query"}
         </span>
