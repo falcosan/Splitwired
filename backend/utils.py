@@ -164,6 +164,21 @@ def get_categories(categories: list, category: int = None) -> list:
     return category_found if category != None else categories_all
 
 
+def get_csv(data, filepath):
+    df = pd.DataFrame(data)
+    return df.to_csv(
+        path_or_buf=f"output/{filepath}", index=False, header=True, sep=";"
+    )
+
+
+def date_to_format(date):
+    return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").strftime("%d %B %Y")
+
+
+def number_to_decimal(number):
+    return Decimal(number).quantize(Decimal("0.00"))
+
+
 def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "None"):
     def get_data(value):
         return list(map(lambda d: d[value], data))
@@ -226,13 +241,6 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "
     return charts
 
 
-def get_csv(data, filepath):
-    df = pd.DataFrame(data)
-    return df.to_csv(
-        path_or_buf=f"output/{filepath}", index=False, header=True, sep=";"
-    )
-
-
 def generate_expense(
     csv: bool,
     expenses: list,
@@ -244,7 +252,7 @@ def generate_expense(
     df = []
     dd = []
     dc = []
-    df_t = 0
+    dt_d = 0
     sorted_expenses = list(
         filter(
             lambda expense: not expense.getDeletedAt()
@@ -271,21 +279,15 @@ def generate_expense(
         key=lambda expense: datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ")
     )
 
-    def number_to_decimal(number):
-        return Decimal(number).quantize(Decimal("0.00"))
-
-    def date_to_format(date):
-        return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").strftime("%d %B %Y")
-
     for i, expense in enumerate(sorted_expenses):
         users_list = expense.getUsers()
         unique_user_list = get_unique_user_list(users_list)
         if expense.getCost().replace(".", "", 1).isdigit():
             if personal:
                 for user in unique_user_list:
-                    df_t = df_t + number_to_decimal(user.getOwedShare())
+                    dt_d = dt_d + number_to_decimal(user.getOwedShare())
             else:
-                df_t = df_t + number_to_decimal(expense.getCost())
+                dt_d = dt_d + number_to_decimal(expense.getCost())
         df_d = {
             "1: Number": i + 1,
             "2: Id": expense.getId(),
@@ -293,7 +295,7 @@ def generate_expense(
             "4: Date": date_to_format(expense.getDate()),
             "5: Category": expense.getCategory().getName(),
             "6: Cost": number_to_decimal(expense.getCost()),
-            "7: Total": df_t,
+            "7: Total": dt_d,
             "8: Currency": expense.getCurrencyCode(),
         }
         dd_d = {
@@ -321,7 +323,7 @@ def generate_expense(
     if chart:
         dc = generate_chart(dc, chart_type=chart, filename=filename)
     filename = sub("([A-Z]\w+$)", "\\1", filename).lower()
-    filepath = f"{filename}.csv" if not ".csv" in filename else filename
     if csv:
-        get_csv(df, filepath)
-    return {"table": df, "data": dd, "chart": dc, "filepath": filepath}
+        get_csv(df, f"{filename}.csv" if not ".csv" in filename else filename)
+    da_d = number_to_decimal(dt_d / len(df))
+    return {"table": df, "data": dd, "chart": dc, "average": da_d}
