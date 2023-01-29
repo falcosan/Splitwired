@@ -8,7 +8,7 @@ from splitwise import Splitwise
 from flask import make_response
 import plotly.graph_objects as go
 from requests import Request, Response
-from backend.enums import enums_groups, enums_users
+from backend.enums import enums_groups, enums_users, enums_folders
 
 
 def serializer(data, to_json=False):
@@ -164,10 +164,25 @@ def get_categories(categories: list, category: int = None) -> list:
     return category_found if category != None else categories_all
 
 
-def get_csv(data, filepath):
-    df = pd.DataFrame(data)
+def get_csv(data: list, filepath: str, additional_data: tuple[str, str or int] = None):
+    cleaned_path = sub("([A-Z]\w+$)", "\\1", filepath).lower()
+    filename = f"{cleaned_path}.csv" if not ".csv" in cleaned_path else cleaned_path
+    output_folder = enums_folders.get_folder_prop("output", "value")
+    data_frame_principal = pd.DataFrame(data)
+    data_frame_additional = None
+    if additional_data:
+        listing_additional_data = list(
+            map(
+                lambda d: [d.capitalize() if isinstance(d, str) else d], additional_data
+            )
+        )
+        data_frame_additional = pd.DataFrame(
+            listing_additional_data[1], columns=listing_additional_data[0]
+        )
+
+    df = pd.concat([data_frame_principal, data_frame_additional], ignore_index=True)
     return df.to_csv(
-        path_or_buf=f"output/{filepath}", index=False, header=True, sep=";"
+        path_or_buf=f"{output_folder}/{filename}", index=False, header=True, sep=";"
     )
 
 
@@ -320,10 +335,9 @@ def generate_expense(
         dd.append(dd_d)
         if chart:
             dc.append(dc_d)
+    da_d = number_to_decimal(dt_d / len(df))
     if chart:
         dc = generate_chart(dc, chart_type=chart, filename=filename)
-    filename = sub("([A-Z]\w+$)", "\\1", filename).lower()
     if csv:
-        get_csv(df, f"{filename}.csv" if not ".csv" in filename else filename)
-    da_d = number_to_decimal(dt_d / len(df))
+        get_csv(df, filename, ("average", da_d))
     return {"table": df, "data": dd, "chart": dc, "average": da_d}
