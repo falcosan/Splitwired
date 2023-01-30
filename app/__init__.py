@@ -1,11 +1,11 @@
 import os
 from flask_cors import CORS, cross_origin
-from backend.utils import responser, set_files
-from backend.data import data_groups, data_expenses
-from backend.enums import enums_headers, enums_folders
+from app.utils import responser, set_files
+from app.data import data_groups, data_expenses
+from app.enums import enums_headers, enums_folders
 from flask import Flask, request, render_template, send_from_directory
 
-app = Flask(__name__, template_folder="static")
+app = Flask(__name__, template_folder="../static", static_folder="../static")
 CORS(app)
 
 output_folder = enums_folders.get_folder_prop("output", "value")
