@@ -1,6 +1,6 @@
 from splitwise import Splitwise
-from backend.config import config as cf
-from backend.utils import (
+from app.config import config as cf
+from app.utils import (
     set_dates,
     get_groups,
     get_categories,

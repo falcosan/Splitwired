@@ -1,5 +1,5 @@
 from decouple import config
-from backend.patterns import Singleton
+from app.patterns import Singleton
 
 
 class Groups(metaclass=Singleton):

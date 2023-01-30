@@ -8,7 +8,7 @@ from splitwise import Splitwise
 from flask import make_response
 import plotly.graph_objects as go
 from requests import Request, Response
-from backend.enums import enums_groups, enums_users, enums_folders
+from app.enums import enums_groups, enums_users, enums_folders
 
 
 def serializer(data, to_json=False):
