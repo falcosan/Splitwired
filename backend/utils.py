@@ -164,7 +164,7 @@ def get_categories(categories: list, category: int = None) -> list:
     return category_found if category != None else categories_all
 
 
-def get_csv(data: list, filepath: str, additional_data: tuple[str, str or int] = None):
+def get_csv(data: list, filepath: str, additional_data: tuple = None):
     cleaned_path = sub("([A-Z]\w+$)", "\\1", filepath).lower()
     filename = f"{cleaned_path}.csv" if not ".csv" in cleaned_path else cleaned_path
     output_folder = enums_folders.get_folder_prop("output", "value")
