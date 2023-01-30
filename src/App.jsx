@@ -225,9 +225,9 @@ export default function Home() {
           if (table && chart) setData({ data, table, chart, groups, average });
           setStatus(data.length ? "" : "No expenses");
           if (data.length && parameters.csv) {
-            api.getExpanses(parameters).then(() => {
-              api.getDownloads().then((res) => setDownloads(res));
-            });
+            api
+              .getExpanses(parameters)
+              .then(() => api.getDownloads().then((res) => setDownloads(res)));
           }
           setParameters({
             ...parameters,
@@ -320,7 +320,7 @@ export default function Home() {
             ))}
           </div>
           <Input
-            className="self-end p-2.5 rounded bg-zinc-600 text-slate-300"
+            className="self-end p-2.5 rounded border-2 hover:bg-opacity-80 border-slate-200 text-zinc-900 bg-[#5dc4a7]"
             type="submit"
             value="Expenses"
           />
