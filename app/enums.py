@@ -1,18 +1,5 @@
 from decouple import config
-from app.patterns import Singleton
-
-
-class Groups(metaclass=Singleton):
-    def __init__(self):
-        self.personal = {"id": config("ID_PERSONAL_GROUP"), "name": "dd"}
-        self.first = {"id": config("ID_FIRST_GROUP"), "name": "ago_dan"}
-
-    def get_group_prop(self, group: str, key: str):
-        dict_value = getattr(self, group, None)
-        if dict_value:
-            return dict_value.get(key, "Key not found")
-        else:
-            raise TypeError("Group not found")
+from .patterns import Singleton
 
 
 class Users(metaclass=Singleton):
@@ -34,6 +21,19 @@ class Users(metaclass=Singleton):
             return dict_value.get(key, "Key not found")
         else:
             raise TypeError("User not found")
+
+
+class Groups(metaclass=Singleton):
+    def __init__(self):
+        self.personal = {"id": config("ID_PERSONAL_GROUP"), "name": "dd"}
+        self.first = {"id": config("ID_FIRST_GROUP"), "name": "ago_dan"}
+
+    def get_group_prop(self, group: str, key: str):
+        dict_value = getattr(self, group, None)
+        if dict_value:
+            return dict_value.get(key, "Key not found")
+        else:
+            raise TypeError("Group not found")
 
 
 class Headers(metaclass=Singleton):

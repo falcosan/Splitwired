@@ -8,7 +8,7 @@ from splitwise import Splitwise
 from flask import make_response
 import plotly.graph_objects as go
 from requests import Request, Response
-from app.enums import enums_groups, enums_users, enums_folders
+from .enums import enums_groups, enums_users, enums_folders
 
 
 def serializer(data, to_json=False):
@@ -231,7 +231,7 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "
             "barmode": "relative",
             "autosize": True,
             "showlegend": False,
-            "margin": dict(l=50, r=50, b=50, t=50, pad=50),
+            "margin": dict(l=50, r=50, b=100, t=100),
         }
         config = {
             "autosizable": True,

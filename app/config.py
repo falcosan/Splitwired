@@ -1,5 +1,5 @@
 from decouple import config
-from app.patterns import Singleton
+from .patterns import Singleton
 
 
 class Config(metaclass=Singleton):
