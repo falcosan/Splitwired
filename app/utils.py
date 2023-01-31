@@ -7,6 +7,7 @@ from calendar import monthrange
 from splitwise import Splitwise
 from flask import make_response
 import plotly.graph_objects as go
+from flask_login import current_user
 from requests import Request, Response
 from .enums import enums_groups, enums_users, enums_folders
 
@@ -86,8 +87,7 @@ def get_user_name(user: type):
 def get_unique_user_list(arr: list):
     return list(
         filter(
-            lambda user: str(user.getId())
-            == str(enums_users.get_user_prop("dan", "id")),
+            lambda user: str(user.getId()) == str(current_user.__dict__.get("token")),
             arr,
         )
     )
@@ -121,7 +121,7 @@ def get_personal_expense(
     limit: int = 9999,
 ):
     expenses = []
-    expense_name = enums_users.get_user_prop("dan", "filepath")
+    expense_name = current_user.__dict__.get("filepath")
     for group in instance.getGroups():
         grupal_expenses = instance.getExpenses(
             limit=limit,

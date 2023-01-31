@@ -10,13 +10,14 @@ login_manager.init_app(app)
 
 class Authentication(UserMixin):
     authentications = {
-        v["username"]: {"password": v["password"]}
-        for _, v in serializer(enums_users, to_json=True).items()
+        v["username"]: {**v} for _, v in serializer(enums_users, to_json=True).items()
     }
 
     def __init__(self, username):
         self.id = username
+        self.token = self.authentications[username]["id"]
         self.password = self.authentications[username]["password"]
+        self.filepath = self.authentications[username]["filepath"]
 
     @classmethod
     def contain(self, username):
@@ -32,14 +33,6 @@ class Authentication(UserMixin):
 
 @login_manager.user_loader
 def user_loader(username):
-    if Authentication.contain(username):
-        return
-    return Authentication(username)
-
-
-@login_manager.request_loader
-def request_loader(request):
-    username = request.form.get("username")
     if Authentication.contain(username):
         return
     return Authentication(username)
