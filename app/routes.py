@@ -13,6 +13,12 @@ secret_download_key = enums_headers.get_header_prop("download_secret", "key")
 secret_download_value = enums_headers.get_header_prop("download_secret", "value")
 
 
+@app.route("/")
+@cross_origin()
+def index():
+    return render_template("index.html")
+
+
 @app.route("/login", methods=["POST"])
 @cross_origin()
 def login():
@@ -24,10 +30,11 @@ def login():
     return redirect(url_for("index"))
 
 
-@app.route("/")
+@app.route("/sw.js")
 @cross_origin()
-def index():
-    return render_template("index.html")
+@login_required
+def sw():
+    return app.send_static_file("sw.js")
 
 
 @app.route("/groups", methods=["GET"])

@@ -13,6 +13,7 @@ main#form {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 10rem;
   color: #e2e8f0;
 }
 main#form form {
