@@ -1,12 +1,18 @@
+* {
+  margin: 0;
+  padding: 0;
+}
 body {
+  font-family: monospace;
   background-color: #18181b;
 }
 main {
   padding: 1.25rem;
 }
 main#form {
-  font-family: monospace;
+  height: calc(100vh - 2.5rem);
   display: flex;
+  align-items: center;
   justify-content: center;
   color: #e2e8f0;
 }
@@ -35,8 +41,13 @@ main#form form > input {
   width: 100%;
   cursor: pointer;
   border: 1px solid #e2e8f0;
+  font-weight: 600;
   color: #18181b;
   background: #5dc4a7;
+  transition: opacity 0.2s;
+}
+main#form form > input:hover {
+  opacity: 0.9;
 }
 main#form form > label > input {
   margin-top: 0.5rem;
