@@ -137,13 +137,13 @@ export default function Home() {
       };
       const group = (() => {
         if (params.personal) {
-          return "DD";
+          return "Personal";
         } else if (params.group) {
           const found = groups.find(
             (group) => String(group.id) === String(params.group)
           );
           return found ? found.name : "";
-        } else return "Ago&Dan";
+        } else return "Home";
       })();
       const category = (() => {
         if (

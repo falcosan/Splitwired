@@ -5,7 +5,7 @@ from flask_cors import cross_origin
 from .utils import responser, set_files
 from .data import data_groups, data_expenses
 from .enums import enums_headers, enums_folders
-from flask_login import login_required, login_user, current_user
+from flask_login import login_required, login_user
 from flask import request, render_template, send_from_directory, redirect, url_for
 
 output_folder = enums_folders.get_folder_prop("output", "value")
@@ -80,4 +80,4 @@ def download():
 @cross_origin()
 @login_required
 def download_file(filename):
-    return send_from_directory(output_folder, filename)
+    return send_from_directory(f"../{output_folder}", filename)
