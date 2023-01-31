@@ -247,12 +247,16 @@ export default function Home() {
   const inputs = Object.entries(
     importFilter(parameters, ["group", "chart", "category"], false)
   ).map(([key, value]) => {
-    const state = { type: "", target: "", max: null, min: null };
-    switch (key) {
+    const state = { label: key, type: "", target: "", max: null, min: null };
+    switch (key.toLowerCase()) {
       case "personal":
+        state.type = "checkbox";
+        state.target = "checked";
+        break;
       case "csv":
         state.type = "checkbox";
         state.target = "checked";
+        state.label = key.toUpperCase();
         break;
       case "month":
         state.min = min.month;
@@ -267,7 +271,7 @@ export default function Home() {
         state.target = "value";
         break;
     }
-    return { label: key, name: key, value, ...state };
+    return { value, name: key, ...state };
   });
   return (
     <div className="container mx-auto">
@@ -319,7 +323,7 @@ export default function Home() {
           ))}
         </div>
         <Input
-          className="self-end p-2.5 rounded border-2 hover:bg-opacity-80 border-slate-200 text-zinc-900 bg-[#5dc4a7]"
+          className="self-end p-2.5 font-semibold rounded border-2 hover:bg-opacity-80 border-slate-200 text-zinc-900 bg-[#5dc4a7]"
           type="submit"
           value="Expenses"
         />
@@ -328,7 +332,7 @@ export default function Home() {
         <span className="block mt-5 text-slate-300">Average {average} €</span>
       ) : null}
       <span className="block mt-5 text-lg font-semibold text-slate-300">
-        {data.length || status ? query.current : "No query"}
+        {data.length || status ? query.current : ""}
       </span>
       <hr className="mt-5 border-slate-600" />
       {status ? (
