@@ -1,0 +1,45 @@
+body {
+  background-color: #18181b;
+}
+main {
+  padding: 1.25rem;
+}
+main#form {
+  font-family: monospace;
+  display: flex;
+  justify-content: center;
+  color: #e2e8f0;
+}
+main#form form {
+  display: flex;
+  flex-direction: column;
+  color: #e2e8f0;
+}
+main#form form input {
+  height: 2rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  border: none;
+  border-radius: 0.25rem;
+}
+main#form form > input,
+main#form form > label {
+  flex: auto;
+  margin-top: 1.25rem;
+}
+main#form form > label {
+  display: flex;
+  flex-direction: column;
+}
+main#form form > input {
+  width: 100%;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  color: #18181b;
+  background: #5dc4a7;
+}
+main#form form > label > input {
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}

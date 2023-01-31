@@ -1,14 +1,27 @@
 import os
 from .__init__ import app
+from .auth import Authentication
 from flask_cors import cross_origin
 from .utils import responser, set_files
 from .data import data_groups, data_expenses
 from .enums import enums_headers, enums_folders
-from flask import request, render_template, send_from_directory
+from flask_login import login_required, login_user, current_user
+from flask import request, render_template, send_from_directory, redirect, url_for
 
 output_folder = enums_folders.get_folder_prop("output", "value")
 secret_download_key = enums_headers.get_header_prop("download_secret", "key")
 secret_download_value = enums_headers.get_header_prop("download_secret", "value")
+
+
+@app.route("/login", methods=["POST"])
+@cross_origin()
+def login():
+    username = request.form.get("username")
+    password = request.form.get("password")
+    if Authentication.check(username, password):
+        user = Authentication(username)
+        login_user(user)
+    return redirect(url_for("index"))
 
 
 @app.route("/")
@@ -19,12 +32,14 @@ def index():
 
 @app.route("/groups", methods=["GET"])
 @cross_origin()
+@login_required
 def groups():
     return data_groups()
 
 
 @app.route("/expenses", methods=["POST"])
 @cross_origin()
+@login_required
 def expenses():
     parameter = request.get_json()
     csv = parameter.get("csv", False)
@@ -47,6 +62,7 @@ def expenses():
 
 @app.route("/download")
 @cross_origin()
+@login_required
 def download():
     path = os.path.join(os.getcwd(), output_folder)
     os.makedirs(path, exist_ok=True)
@@ -62,5 +78,6 @@ def download():
 
 @app.route("/download/<filename>")
 @cross_origin()
+@login_required
 def download_file(filename):
     return send_from_directory(output_folder, filename)

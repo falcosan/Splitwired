@@ -270,97 +270,95 @@ export default function Home() {
     return { label: key, name: key, value, ...state };
   });
   return (
-    <section className="min-h-screen p-5 bg-zinc-900">
-      <div className="container mx-auto">
-        {downloads.length ? (
-          <div>
-            <span className="block mb-2.5 text-slate-300">Downloads</span>
-            <ul
-              className="p-2.5 overflow-y-auto rounded bg-slate-200"
-              dangerouslySetInnerHTML={{ __html: downloads }}
-            />
-          </div>
-        ) : null}
-        <span className="block mt-5 font-semibold text-slate-300">
-          {query.searched}
-        </span>
-        <form
-          onSubmit={getData}
-          className="flex flex-col items-start space-y-5 mt-5"
-        >
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {Object.values(selects).map((select, index) => (
-              <Select
-                {...select}
-                key={index}
-                className="min-w-[200px]"
-                getSelectValue={(value) =>
-                  setParameters({ ...parameters, [select.parameter]: value })
-                }
-              />
-            ))}
-          </div>
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {inputs.map((input) => (
-              <Input
-                className={`justify-self-start self-start ${
-                  input.type == null || /text|number/.test(input.type)
-                    ? "w-full min-w-[200px]"
-                    : "w-32"
-                }`}
-                key={input.name}
-                {...input}
-                getInputValue={(value) =>
-                  setParameters({
-                    ...parameters,
-                    [input.name]: value,
-                  })
-                }
-              />
-            ))}
-          </div>
-          <Input
-            className="self-end p-2.5 rounded border-2 hover:bg-opacity-80 border-slate-200 text-zinc-900 bg-[#5dc4a7]"
-            type="submit"
-            value="Expenses"
+    <div className="container mx-auto">
+      {downloads.length ? (
+        <div>
+          <span className="block mb-2.5 text-slate-300">Downloads</span>
+          <ul
+            className="p-2.5 overflow-y-auto rounded bg-slate-200"
+            dangerouslySetInnerHTML={{ __html: downloads }}
           />
-        </form>
-        {data.length ? (
-          <span className="block mt-5 text-slate-300">Average {average} €</span>
-        ) : null}
-        <span className="block mt-5 text-lg font-semibold text-slate-300">
-          {data.length || status ? query.current : "No query"}
+        </div>
+      ) : null}
+      <span className="block mt-5 font-semibold text-slate-300">
+        {query.searched}
+      </span>
+      <form
+        onSubmit={getData}
+        className="flex flex-col items-start space-y-5 mt-5"
+      >
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {Object.values(selects).map((select, index) => (
+            <Select
+              {...select}
+              key={index}
+              className="min-w-[200px]"
+              getSelectValue={(value) =>
+                setParameters({ ...parameters, [select.parameter]: value })
+              }
+            />
+          ))}
+        </div>
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {inputs.map((input) => (
+            <Input
+              className={`justify-self-start self-start ${
+                input.type == null || /text|number/.test(input.type)
+                  ? "w-full min-w-[200px]"
+                  : "w-32"
+              }`}
+              key={input.name}
+              {...input}
+              getInputValue={(value) =>
+                setParameters({
+                  ...parameters,
+                  [input.name]: value,
+                })
+              }
+            />
+          ))}
+        </div>
+        <Input
+          className="self-end p-2.5 rounded border-2 hover:bg-opacity-80 border-slate-200 text-zinc-900 bg-[#5dc4a7]"
+          type="submit"
+          value="Expenses"
+        />
+      </form>
+      {data.length ? (
+        <span className="block mt-5 text-slate-300">Average {average} €</span>
+      ) : null}
+      <span className="block mt-5 text-lg font-semibold text-slate-300">
+        {data.length || status ? query.current : "No query"}
+      </span>
+      <hr className="mt-5 border-slate-600" />
+      {status ? (
+        <span className="block w-full mt-10 text-center text-lg font-semibold text-slate-300">
+          {status}
         </span>
-        <hr className="mt-5 border-slate-600" />
-        {status ? (
-          <span className="block w-full mt-10 text-center text-lg font-semibold text-slate-300">
-            {status}
-          </span>
-        ) : expenses.length ? (
-          <>
-            <div className="overflow-x-auto">
-              <Table className="w-full mt-10" data={expenses} />
-            </div>
-          </>
-        ) : null}
-        {chart.length && !status ? (
-          <>
-            <hr className="mt-10 border-slate-600" />
-            <div className="overflow-x-auto">
-              {Array.from({ length: chart.length }, (_, i) => (
-                <Plot
-                  className="w-full mt-10 rounded overflow-hidden"
-                  key={i}
-                  data={chart[i].data}
-                  layout={chart[i].layout}
-                  config={chart[i].config}
-                  useResizeHandler
-                />
-              ))}
-            </div>
-          </>
-        ) : null}
-      </div>
-    </section>
+      ) : expenses.length ? (
+        <>
+          <div className="overflow-x-auto">
+            <Table className="w-full mt-10" data={expenses} />
+          </div>
+        </>
+      ) : null}
+      {chart.length && !status ? (
+        <>
+          <hr className="mt-10 border-slate-600" />
+          <div className="overflow-x-auto">
+            {Array.from({ length: chart.length }, (_, i) => (
+              <Plot
+                className="w-full mt-10 rounded overflow-hidden"
+                key={i}
+                data={chart[i].data}
+                layout={chart[i].layout}
+                config={chart[i].config}
+                useResizeHandler
+              />
+            ))}
+          </div>
+        </>
+      ) : null}
+    </div>
   );
 }
