@@ -6,12 +6,32 @@
       rel="shortcut icon"
       href="{{ url_for('static', filename='favicon.ico') }}"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Splitwired</title>
   </head>
   <body>
     <noscript>No JavaScript no party.</noscript>
+    {% if current_user.is_authenticated %}
     <main id="root"></main>
     <script src="{{url_for('static', filename='bundle.js')}}"></script>
+    {% else %}
+    <main id="form">
+      <form action="login" method="POST">
+        <label>
+          Username
+          <input type="text" name="username" id="username" required />
+        </label>
+        <label>
+          Password
+          <input type="password" name="password" id="password" required />
+        </label>
+        <input type="submit" name="submit" value="login" />
+      </form>
+    </main>
+    {% endif %}
   </body>
 </html>

@@ -7,11 +7,15 @@ class Users(metaclass=Singleton):
         self.dan = {
             "id": config("ID_DAN_USER"),
             "name": "Daniele Falchetti",
+            "username": config("USERNAME_DAN_USER"),
+            "password": config("PASSWORD_DAN_USER"),
             "filepath": "dd",
         }
         self.ago = {
             "id": config("ID_AGO_USER"),
             "name": "Agostina Dimaio",
+            "username": config("USERNAME_AGO_USER"),
+            "password": config("PASSWORD_AGO_USER"),
             "filepath": "ago",
         }
 
@@ -40,7 +44,7 @@ class Headers(metaclass=Singleton):
     def __init__(self):
         self.download_secret = {
             "key": "secret",
-            "value": config("HEADER_DOWNLOAD_SECRET"),
+            "value": config("SECRET_HEADER_DOWNLOAD"),
         }
 
     def get_header_prop(self, group: str, key: str):
