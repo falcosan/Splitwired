@@ -1,7 +1,7 @@
 {
   "theme_color": "#18181b",
   "background_color": "#5dc4a7",
-  "display": "minimal-ui",
+  "display": "standalone",
   "scope": "/",
   "start_url": "/",
   "name": "Splitwired",
