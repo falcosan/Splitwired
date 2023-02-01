@@ -23,4 +23,6 @@ export default {
       .then((res) => res.json())
       .then((res) => res)
       .catch((err) => err),
+  getLogout: () =>
+    fetch("/logout", { method: "POST" }).then(() => window.location.reload()),
 };

@@ -17,6 +17,7 @@ main#form {
   color: #e2e8f0;
 }
 main#form form {
+  width: 17rem;
   display: flex;
   flex-direction: column;
   color: #e2e8f0;

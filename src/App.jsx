@@ -235,6 +235,7 @@ export default function Home() {
         } else setStatus("Error");
       });
   };
+  const getLogout = () => api.getLogout();
   const selects = {
     groups: { label: "Group", options: groups, parameter: "group" },
     categories: {
@@ -274,8 +275,16 @@ export default function Home() {
   });
   return (
     <div className="container mx-auto">
+      <div className="flex">
+        <Input
+          className="p-2.5 font-semibold rounded border-2 hover:bg-opacity-80 border-slate-200 text-zinc-900 bg-[#5dc4a7]"
+          type="submit"
+          onClick={getLogout}
+          value="Logout"
+        />
+      </div>
       {downloads.length ? (
-        <div>
+        <div className="mt-5">
           <span className="block mb-2.5 text-slate-300">Downloads</span>
           <ul
             className="p-2.5 overflow-y-auto rounded bg-slate-200"

@@ -5,8 +5,15 @@ from flask_cors import cross_origin
 from .utils import responser, set_files
 from .data import data_groups, data_expenses
 from .enums import enums_headers, enums_folders
-from flask_login import login_required, login_user
-from flask import request, render_template, send_from_directory, redirect, url_for
+from flask_login import login_required, login_user, logout_user
+from flask import (
+    request,
+    url_for,
+    redirect,
+    make_response,
+    render_template,
+    send_from_directory,
+)
 
 output_folder = enums_folders.get_folder_prop("output", "value")
 secret_download_key = enums_headers.get_header_prop("download_secret", "key")
@@ -28,6 +35,16 @@ def login():
         user = Authentication(username)
         login_user(user)
     return redirect(url_for("index"))
+
+
+@app.route("/logout", methods=["POST"])
+@cross_origin()
+@login_required
+def logout():
+    logout_user()
+    response = make_response("", 204)
+    response.headers["Refresh"] = "0; url=/"
+    return response
 
 
 @app.route("/sw.js")
