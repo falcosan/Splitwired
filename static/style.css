@@ -55,3 +55,9 @@ main#form form > label > input {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
 }
+input,
+input:focus,
+input[type="text"],
+input[type="number"] {
+  font-size: 16px;
+}
