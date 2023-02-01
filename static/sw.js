@@ -1,4 +1,4 @@
-const CACHE_VERSION = 10;
+const CACHE_VERSION = 1;
 const CURRENT_CACHE = `main-${CACHE_VERSION}`;
 const cacheFiles = [
   "static/index.html",
@@ -45,6 +45,8 @@ const fromCache = (request) =>
 const update = (request) =>
   caches.open(CURRENT_CACHE).then((cache) => {
     if (
+      request.method === "GET" &&
+      request.url.startsWith("http") &&
       !request.url.includes("extension") &&
       !request.url.startsWith("chrome-extension")
     ) {
@@ -53,7 +55,7 @@ const update = (request) =>
   });
 self.addEventListener("fetch", (evt) => {
   evt.respondWith(
-    fromNetwork(evt.request, 10000).catch(() => fromCache(evt.request))
+    fromNetwork(evt.request, 5000).catch(() => fromCache(evt.request))
   );
   evt.waitUntil(update(evt.request));
 });
