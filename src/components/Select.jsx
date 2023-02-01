@@ -17,11 +17,7 @@ export default function Select(props) {
       onChange={handleChange}
       ref={selectRef}
     >
-      {props.label ? (
-        <option key={null} value={null}>
-          - {props.label} -
-        </option>
-      ) : null}
+      {props.label ? <option value="">- {props.label} -</option> : null}
       {props.options.map((option, index) => (
         <option key={option?.id ?? index} value={option?.id ?? index}>
           {option?.name ?? index}

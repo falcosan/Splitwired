@@ -16,8 +16,8 @@ export default function Input(props) {
         <span className="w-full capitalize text-slate-300">{props.label}</span>
       )}
       <input
-        className={`w-full rounded px-2 py-1 cursor-pointer placeholder:capitalize ${
-          /text|number/.test(props.type) ? "h-full" : null
+        className={`rounded px-2 py-1 cursor-pointer placeholder:capitalize ${
+          /text|number/.test(props.type) ? "w-full h-full" : null
         }`}
         ref={inputRef}
         max={props.max}
