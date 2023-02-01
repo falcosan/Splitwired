@@ -233,6 +233,8 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "
             "showlegend": False,
             "margin": dict(l=50, r=50, b=100, t=100),
         }
+        if chart == "bar":
+            layout["yaxis"] = dict(tickvals=[])
         config = {
             "autosizable": True,
             "toImageButtonOptions": {
