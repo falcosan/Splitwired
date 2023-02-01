@@ -116,7 +116,6 @@ export default function Home() {
         });
     } else return table;
   }, [data, parameters.category]);
-
   const query = useMemo(() => {
     function builderQuery(version) {
       const params = {
