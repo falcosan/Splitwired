@@ -337,9 +337,8 @@ def generate_expense(
         dd.append(dd_d)
         if chart:
             dc.append(dc_d)
-    da_d = number_to_decimal(dt_d / len(df))
     if chart:
         dc = generate_chart(dc, chart_type=chart, filename=filename)
     if csv:
-        get_csv(df, filename, ("average", da_d))
-    return {"table": df, "data": dd, "chart": dc, "average": da_d}
+        get_csv(df, filename, ("average", number_to_decimal(dt_d / len(df))))
+    return {"table": df, "data": dd, "chart": dc}

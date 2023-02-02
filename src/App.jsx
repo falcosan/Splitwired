@@ -24,12 +24,11 @@ export default function Home() {
   };
   const [status, setStatus] = useState("");
   const [downloads, setDownloads] = useState("");
-  const [{ data, table, chart, groups, average }, setData] = useState({
+  const [{ data, table, chart, groups }, setData] = useState({
     data: [],
     table: [],
     chart: [],
     groups: [],
-    average: 0,
   });
   const [parameters, setParameters] = useState({
     personal: true,
@@ -195,6 +194,21 @@ export default function Home() {
     currentYear.current,
     currentMonth.current,
   ]);
+  const info = useMemo(() => {
+    if (expenses.length) {
+      const total = expenses[expenses.length - 1][properties.total];
+      return {
+        total,
+        average: (+total / expenses.length).toLocaleString("en", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+          useGrouping: false,
+        }),
+      };
+    } else {
+      return null;
+    }
+  }, [expenses]);
   useEffect(() => {
     setParameters({
       ...parameters,
@@ -204,7 +218,7 @@ export default function Home() {
   useLayoutEffect(() => {
     Promise.all([api.getGroups(), api.getDownloads()]).then(
       async ([groups, downloads]) => {
-        setData({ data, table, chart, groups, average });
+        setData({ data, table, chart, groups });
         setDownloads(downloads);
       }
     );
@@ -216,12 +230,12 @@ export default function Home() {
     currentGroup.current = parameters.group;
     currentMonth.current = parameters.month;
     currentPersonal.current = parameters.personal;
-    setData({ data: [], table: [], chart: [], groups, average });
+    setData({ data: [], table: [], chart: [], groups });
     api
       .getExpanses(importFilter(parameters, ["category", "csv"], false))
-      .then(({ data, table, chart, average }) => {
+      .then(({ data, table, chart }) => {
         if (data) {
-          if (table && chart) setData({ data, table, chart, groups, average });
+          if (table && chart) setData({ data, table, chart, groups });
           setStatus(data.length ? "" : "No expenses");
           if (data.length && parameters.csv) {
             api
@@ -292,7 +306,7 @@ export default function Home() {
           />
         </div>
       ) : null}
-      <span className="block mt-5 font-semibold text-slate-300">
+      <span className="block mt-5 text-lg font-semibold text-slate-300">
         {query.searched}
       </span>
       <form
@@ -336,8 +350,15 @@ export default function Home() {
           value="Expenses"
         />
       </form>
-      {data.length ? (
-        <span className="block mt-5 text-slate-300">Average {average} €</span>
+      {info ? (
+        <>
+          <span className="block mt-5 text-slate-300">
+            Total {info.total} €
+          </span>
+          <span className="block mt-5 text-slate-300">
+            Average {info.average} €
+          </span>
+        </>
       ) : null}
       <span className="block mt-5 text-lg font-semibold text-slate-300">
         {data.length || status ? query.current : ""}
