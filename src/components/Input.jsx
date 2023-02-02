@@ -16,17 +16,18 @@ export default function Input(props) {
         <span className="w-full capitalize text-slate-300">{props.label}</span>
       )}
       <input
-        className={`rounded px-2 py-1 cursor-pointer placeholder:capitalize ${
+        className={`rounded px-2 py-1 placeholder:capitalize ${
           /text|number/.test(props.type) ? "w-full h-full" : null
-        }`}
+        } ${!props.disabled ? "cursor-pointer" : null}`}
         ref={inputRef}
         max={props.max}
         min={props.min}
         onChange={handleChange}
-        value={props.type !== "checkbox" ? props.value ?? "" : undefined}
-        checked={props.type == "checkbox" ? props.value ?? "" : undefined}
+        disabled={props.disabled}
         type={props.type ?? "text"}
         placeholder={props.name ?? ""}
+        value={props.type !== "checkbox" ? props.value ?? "" : undefined}
+        checked={props.type == "checkbox" ? props.value ?? "" : undefined}
       />
     </label>
   );

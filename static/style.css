@@ -9,36 +9,36 @@ body {
 main {
   padding: 1.25rem;
 }
-main#form {
+main#login {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 10rem;
   color: #e2e8f0;
 }
-main#form form {
+main#login form {
   width: 17rem;
   display: flex;
   flex-direction: column;
   color: #e2e8f0;
 }
-main#form form input {
+main#login form input {
   height: 2rem;
   padding-top: 0;
   padding-bottom: 0;
   border: none;
   border-radius: 0.25rem;
 }
-main#form form > input,
-main#form form > label {
+main#login form > input,
+main#login form > label {
   flex: auto;
   margin-top: 1.25rem;
 }
-main#form form > label {
+main#login form > label {
   display: flex;
   flex-direction: column;
 }
-main#form form > input {
+main#login form > input {
   width: 100%;
   cursor: pointer;
   border: 1px solid #e2e8f0;
@@ -47,10 +47,10 @@ main#form form > input {
   background: #5dc4a7;
   transition: opacity 0.2s;
 }
-main#form form > input:hover {
+main#login form > input:hover {
   opacity: 0.9;
 }
-main#form form > label > input {
+main#login form > label > input {
   margin-top: 0.5rem;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
