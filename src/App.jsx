@@ -43,7 +43,6 @@ export default function Home() {
   const currentMonth = useRef(parameters.month);
   const currentGroup = useRef(parameters.category);
   const currentPersonal = useRef(parameters.personal);
-  useRemovesNullClass();
   const properties = useMemo(() => {
     let idKey;
     let totalKey;
@@ -216,12 +215,14 @@ export default function Home() {
     });
   }, [categories]);
   useLayoutEffect(() => {
-    Promise.all([api.getGroups(), api.getDownloads()]).then(
-      async ([groups, downloads]) => {
+    setStatus("Loading");
+    Promise.all([api.getGroups(), api.getDownloads()])
+      .then(([groups, downloads]) => {
         setData({ data, table, chart, groups });
         setDownloads(downloads);
-      }
-    );
+        setStatus("Ready");
+      })
+      .catch(() => setStatus("Error"));
   }, []);
   const getData = (e) => {
     e.preventDefault();
@@ -287,6 +288,7 @@ export default function Home() {
     }
     return { value, name: key, ...state };
   });
+  useRemovesNullClass();
   return (
     <div className="container mx-auto">
       <div className="flex">
@@ -345,8 +347,13 @@ export default function Home() {
           ))}
         </div>
         <Input
-          className="self-end p-2.5 font-semibold rounded border-2 hover:bg-opacity-80 border-slate-200 text-zinc-900 bg-[#5dc4a7]"
+          className={`self-end p-2.5 font-semibold rounded border-2 border-slate-200 text-zinc-900 ${
+            status.toLowerCase() === "loading"
+              ? "bg-slate-200"
+              : "hover:bg-opacity-80 bg-[#5dc4a7]"
+          }`}
           type="submit"
+          disabled={status.toLowerCase() === "loading"}
           value="Expenses"
         />
       </form>
