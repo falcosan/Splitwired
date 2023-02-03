@@ -310,12 +310,12 @@ export default function Home() {
             dangerouslySetInnerHTML={{ __html: downloads }}
           />
         ) : (
-          <span className="block mx-auto text-lg font-semibold text-slate-300 ">
+          <span className="block mx-auto text-[16px] font-semibold text-slate-300 ">
             Downloads
           </span>
         )}
       </div>
-      <span className="block mt-5 text-lg font-semibold text-slate-300">
+      <span className="block mt-5 text-[16px] font-semibold text-slate-300">
         {query.searched}
       </span>
       <form
@@ -374,12 +374,12 @@ export default function Home() {
           </span>
         </>
       ) : null}
-      <span className="block mt-5 text-lg font-semibold text-slate-300">
+      <span className="block mt-5 text-[16px] font-semibold text-slate-300">
         {data.length || status ? query.current : ""}
       </span>
       <hr className="mt-5 border-slate-600" />
       {status ? (
-        <span className="block w-full mt-10 text-center text-lg font-semibold text-slate-300">
+        <span className="block w-full mt-10 text-center text-[16px] font-semibold text-slate-300">
           {status}
         </span>
       ) : expenses.length ? (
