@@ -1,9 +1,9 @@
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 const CURRENT_CACHE = `main-${CACHE_VERSION}`;
 const cacheFiles = [
-  "static/index.html",
-  "static/style.css",
   "static/bundle.js",
+  "static/index.html",
+  "static/assets/style/style.css",
 ];
 self.addEventListener("activate", (evt) =>
   evt.waitUntil(
