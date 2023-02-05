@@ -1,7 +1,6 @@
 const CACHE_VERSION = 2;
 const CURRENT_CACHE = `main-${CACHE_VERSION}`;
 const cacheFiles = [
-  "static/bundle.js",
   "static/index.html",
   "static/assets/style/style.css",
 ];
