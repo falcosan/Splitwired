@@ -1,4 +1,4 @@
-const CACHE_VERSION = 2;
+const CACHE_VERSION = 3;
 const CURRENT_CACHE = `main-${CACHE_VERSION}`;
 const cacheFiles = [
   "static/index.html",
