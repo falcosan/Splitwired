@@ -33,7 +33,7 @@ export default function Home() {
   const [parameters, setParameters] = useState({
     personal: true,
     csv: false,
-    month: null,
+    month: String(new Date().getMonth() + 1),
     year: String(max.year),
     group: null,
     chart: ["pie", "bar"],
