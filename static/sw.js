@@ -1,7 +1,6 @@
 const CACHE_VERSION = 3;
 const CURRENT_CACHE = `main-${CACHE_VERSION}`;
 const cacheFiles = [
-  "static/index.html",
   "static/assets/style/style.css",
 ];
 self.addEventListener("activate", (evt) =>
