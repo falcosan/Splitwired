@@ -245,9 +245,9 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "
         data = [
             content[chart]["type"](
                 **{
-                    key: value
-                    for key, value in content[chart].items()
-                    if key != "filename" and key != "type" and key != "title"
+                    k: v
+                    for k, v in content[chart].items()
+                    if k != "filename" and k != "type" and k != "title"
                 }
             )
         ]
@@ -295,7 +295,6 @@ def generate_expense(
     sorted_expenses.sort(
         key=lambda expense: datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ")
     )
-
     for i, expense in enumerate(sorted_expenses):
         users_list = expense.getUsers()
         unique_user_list = get_unique_user_list(users_list)
@@ -340,5 +339,6 @@ def generate_expense(
     if chart:
         dc = generate_chart(dc, chart_type=chart, filename=filename)
     if csv:
-        get_csv(df, filename, ("average", number_to_decimal(dt_d / len(df))))
+        d_df = list(map(lambda obj: {k: v for k, v in obj.items() if k != "id"}, df))
+        get_csv(d_df, filename, ("average", number_to_decimal(dt_d / len(d_df))))
     return {"table": df, "data": dd, "chart": dc}
