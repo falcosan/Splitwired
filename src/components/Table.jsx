@@ -24,7 +24,7 @@ export default function Table(props) {
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <th key={header.id}>
+              <th className="text-left" key={header.id}>
                 {header.isPlaceholder
                   ? null
                   : flexRender(

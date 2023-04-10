@@ -103,7 +103,7 @@ export default function Home() {
             filters[index][parameters.personal ? "user_cost" : "cost"]
           );
           return {
-            ...item,
+            ...importFilter(item, properties.id, false),
             [properties.number]: index + 1,
             [properties.total]: total.toLocaleString("en", {
               minimumFractionDigits: 2,
@@ -112,7 +112,7 @@ export default function Home() {
             }),
           };
         });
-    } else return table;
+    } else return table.map(item => importFilter(item, properties.id, false));
   }, [data, parameters.category]);
   const query = useMemo(() => {
     function builderQuery(version) {

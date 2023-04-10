@@ -202,7 +202,7 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "
     content = {
         "pie": {
             "type": go.Pie,
-            "title": f"Pie chart {filename}" if filename else "Pie chart",
+            "title": f"Percentage - {filename}" if filename else "Pie chart",
             "filename": f"pie_chart_{filename}" if filename else "pie_chart",
             "labels": get_data("name"),
             "values": get_data("cost"),
@@ -213,7 +213,7 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "
         },
         "bar": {
             "type": go.Bar,
-            "title": f"Bar chart {filename}" if filename else "Bar chart",
+            "title": f"Quantity - {filename}" if filename else "Bar chart",
             "filename": f"bar_chart_{filename}" if filename else "bar_chart",
             "y": list(map(lambda d: get_data("name").count(d), get_data("name"))),
             "x": get_data("name"),
@@ -307,13 +307,13 @@ def generate_expense(
                 dt_d = dt_d + number_to_decimal(expense.getCost())
         df_d = {
             "1: Number": i + 1,
-            "2: Id": expense.getId(),
-            "3: Description": expense.getDescription(),
-            "4: Date": date_to_format(expense.getDate()),
-            "5: Category": expense.getCategory().getName(),
-            "6: Cost": number_to_decimal(expense.getCost()),
-            "7: Total": dt_d,
-            "8: Currency": expense.getCurrencyCode(),
+            "2: Description": expense.getDescription(),
+            "3: Date": date_to_format(expense.getDate()),
+            "4: Category": expense.getCategory().getName(),
+            "5: Cost": number_to_decimal(expense.getCost()),
+            "6: Total": dt_d,
+            "7: Currency": expense.getCurrencyCode(),
+            "id": expense.getId(),
         }
         dd_d = {
             "id": expense.getId(),
