@@ -10,14 +10,14 @@ export default function Input(props) {
       onClick={props.onClick}
       className={`flex items-center cursor-pointer ${props.className ?? null} ${
         props.type !== "checkbox" ? "flex-col" : "space-x-2.5"
-      } ${/text|number/.test(props.type) ? "h-8" : null}`}
+      } ${!/checkbox|button|submit/.test(props.type) ? "h-8" : null}`}
     >
-      {props.label && props.type != null && !/text|number/.test(props.type) && (
+      {props.label && props.type != null && /checkbox|button|submit/.test(props.type) && (
         <span className="w-full capitalize text-slate-300">{props.label}</span>
       )}
       <input
         className={`rounded px-2 py-1 placeholder:capitalize ${
-          /text|number/.test(props.type) ? "w-full h-full" : null
+          !/checkbox|button|submit/.test(props.type) ? "w-full h-full" : null
         } ${!props.disabled ? "cursor-pointer" : null}`}
         ref={inputRef}
         max={props.max}

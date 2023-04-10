@@ -1,6 +1,7 @@
 env/
 __pycache__
 node_modules
+.vscode
 .env
 .DS_Store
 *.csv
