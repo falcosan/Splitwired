@@ -73,6 +73,7 @@ def expenses():
     chart = parameter.get("chart", False)
     category = parameter.get("category", None)
     personal = parameter.get("personal", False)
+    print(category)
     return data_expenses(
         csv=csv,
         year=year,

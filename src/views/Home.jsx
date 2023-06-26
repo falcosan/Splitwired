@@ -224,7 +224,7 @@ export default function Home() {
       })
       .catch(() => setStatus("Error"));
   }, []);
-  const getData = (e) => {
+  const getData = async (e) => {
     e.preventDefault();
     setStatus("Loading");
     currentYear.current = parameters.year;
@@ -232,16 +232,16 @@ export default function Home() {
     currentMonth.current = parameters.month;
     currentPersonal.current = parameters.personal;
     setData({ data: [], table: [], chart: [], groups });
-    api
+   await api
       .getExpanses(importFilter(parameters, ["category", "csv"], false))
-      .then(({ data, table, chart }) => {
+      .then(async ({ data, table, chart }) => {
         if (data) {
           if (table && chart) setData({ data, table, chart, groups });
           setStatus(data.length ? "" : "No expenses");
           if (data.length && parameters.csv) {
-            api
+           await api
               .getExpanses(parameters)
-              .then(() => api.getDownloads().then((res) => setDownloads(res)));
+              .then(async () => await api.getDownloads().then((res) => setDownloads(res)));
           }
           setParameters({
             ...parameters,
@@ -250,7 +250,7 @@ export default function Home() {
         } else setStatus("Error");
       });
   };
-  const getLogout = () => api.getLogout();
+  const getLogout = async () => await api.getLogout();
   const selects = {
     groups: { label: "Group", options: groups, parameter: "group" },
     categories: {
