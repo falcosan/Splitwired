@@ -2,14 +2,15 @@ from re import sub
 import pandas as pd
 from decimal import Decimal
 from json import dumps, loads
-from datetime import datetime
 from calendar import monthrange
 from splitwise import Splitwise
 from flask import make_response
 import plotly.graph_objects as go
+from datetime import datetime, date
 from flask_login import current_user
 from requests import Request, Response
-from .enums import enums_groups, enums_users, enums_folders
+from .enums import enums_groups, enums_folders
+from currency_converter import CurrencyConverter
 
 
 def serializer(data, to_json=False):
@@ -78,6 +79,30 @@ def set_files(files: list):
             enumerate(files),
         )
     )
+
+
+def set_currency_conversion(
+    amount: int,
+    curr_from: str,
+    conv_date: tuple = None,
+):
+    c = CurrencyConverter(decimal=True, fallback_on_wrong_date=True)
+    conversion = c.convert(amount, curr_from, "EUR", date=date(*conv_date))
+    return str(conversion)
+
+
+def costs_conversions(cost: str, context: dict):
+    currency = context.getCurrencyCode()
+    if cost and currency.lower() != "eur":
+        if isinstance(cost, str):
+            cost = float(cost)
+        conv_date = datetime.strptime(context.getDate(), "%Y-%m-%dT%H:%M:%SZ")
+        cost = set_currency_conversion(
+            amount=cost,
+            curr_from=currency,
+            conv_date=(conv_date.year, conv_date.month, conv_date.day),
+        )
+    return cost
 
 
 def get_user_name(user: type):
@@ -298,20 +323,24 @@ def generate_expense(
     for i, expense in enumerate(sorted_expenses):
         users_list = expense.getUsers()
         unique_user_list = get_unique_user_list(users_list)
-        if expense.getCost().replace(".", "", 1).isdigit():
+        cost = costs_conversions(expense.getCost(), expense)
+        if cost.replace(".", "", 1).isdigit():
             if personal:
                 for user in unique_user_list:
-                    dt_d = dt_d + number_to_decimal(user.getOwedShare())
+                    user_cost = costs_conversions(user.getOwedShare(), expense)
+                    dt_d = dt_d + number_to_decimal(user_cost)
             else:
-                dt_d = dt_d + number_to_decimal(expense.getCost())
+                dt_d = dt_d + number_to_decimal(cost)
         df_d = {
             "1: Number": i + 1,
             "2: Description": expense.getDescription(),
             "3: Date": date_to_format(expense.getDate()),
             "4: Category": expense.getCategory().getName(),
-            "5: Cost": number_to_decimal(expense.getCost()),
+            "5: Cost": number_to_decimal(cost),
             "6: Total": dt_d,
-            "7: Currency": expense.getCurrencyCode(),
+            "7: Currency": f"{expense.getCurrencyCode()} > EUR"
+            if expense.getCurrencyCode().lower() != "eur"
+            else expense.getCurrencyCode(),
             "id": expense.getId(),
         }
         dd_d = {
@@ -320,18 +349,19 @@ def generate_expense(
                 "name": expense.getCategory().getName(),
                 "id": expense.getCategory().getId(),
             },
-            "cost": number_to_decimal(expense.getCost()),
+            "cost": number_to_decimal(cost),
         }
         dc_d = {
             "name": expense.getCategory().getName(),
-            "cost": number_to_decimal(expense.getCost()) if not personal else None,
+            "cost": number_to_decimal(cost) if not personal else None,
             "date": date_to_format(expense.getDate()),
         }
         for user in unique_user_list if personal else users_list:
-            df_d[get_user_name(user)] = number_to_decimal(user.getOwedShare())
-            dd_d["user_cost"] = number_to_decimal(user.getOwedShare())
+            user_cost = costs_conversions(user.getOwedShare(), expense)
+            df_d[get_user_name(user)] = number_to_decimal(user_cost)
+            dd_d["user_cost"] = number_to_decimal(user_cost)
             if personal:
-                dc_d["cost"] = number_to_decimal(user.getOwedShare())
+                dc_d["cost"] = number_to_decimal(user_cost)
         df.append(df_d)
         dd.append(dd_d)
         if chart:
