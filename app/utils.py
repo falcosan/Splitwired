@@ -351,6 +351,7 @@ def generate_expense(
             "6: Total": dt_d,
             "7: Currency": f"{expense.getCurrencyCode()} > EUR"
             if expense.getCurrencyCode().lower() != "eur"
+            and cf.environment.lower() == "development"
             else expense.getCurrencyCode(),
             "id": expense.getId(),
         }
