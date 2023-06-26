@@ -7,3 +7,4 @@ node_modules
 *.csv
 .tool-versions
 bundle.js
+*.zip

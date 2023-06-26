@@ -9,7 +9,7 @@
     "upgrade": "pip freeze --local | grep -v '^\\-e' | cut -d = -f 1  | xargs -n1 pip install -U",
     "dev": "webpack --config webpack.config.js --watch",
     "build": "webpack --config webpack.config.js",
-    "server": "gunicorn --timeout 15 --keep-alive 5 --log-level debug app:app"
+    "server": "flask run"
   },
   "repository": {
     "type": "git",

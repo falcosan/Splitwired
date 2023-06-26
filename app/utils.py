@@ -1,5 +1,7 @@
 from re import sub
 import pandas as pd
+import os.path as op
+import urllib.request
 from decimal import Decimal
 from json import dumps, loads
 from calendar import monthrange
@@ -10,7 +12,7 @@ from datetime import datetime, date
 from flask_login import current_user
 from requests import Request, Response
 from .enums import enums_groups, enums_folders
-from currency_converter import CurrencyConverter
+from currency_converter import CurrencyConverter, ECB_URL
 
 
 def serializer(data, to_json=False):
@@ -86,8 +88,14 @@ def set_currency_conversion(
     curr_from: str,
     conv_date: tuple = None,
 ):
+    output_folder = enums_folders.get_folder_prop("output", "value")
+    filename = f"{output_folder}/currencies_{date.today():%Y%m%d}.zip"
+    if not op.isfile(filename):
+        urllib.request.urlretrieve(ECB_URL, filename)
     c = CurrencyConverter(
-        decimal=True, fallback_on_wrong_date=True, fallback_on_missing_rate=True
+        filename,
+        fallback_on_wrong_date=True,
+        fallback_on_missing_rate=True,
     )
     conversion = c.convert(amount, curr_from, "EUR", date=date(*conv_date))
     return str(conversion)

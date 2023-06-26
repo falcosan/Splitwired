@@ -90,7 +90,9 @@ def expenses():
 def download():
     path = os.path.join(os.getcwd(), output_folder)
     os.makedirs(path, exist_ok=True)
-    files = set_files(os.listdir(output_folder))
+    files = [
+        f for f in set_files(os.listdir(output_folder)) if f["name"].endswith(".csv")
+    ]
     response = render_template("templates/download.html", files=files)
     return responser(
         request=request,
