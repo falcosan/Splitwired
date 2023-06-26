@@ -2,9 +2,7 @@
 # exit on error
 set -o errexit
 
-npm install
-npm run build
+yarn
+yarn build
 pip install --upgrade pip
 pip install --upgrade -r requirements.txt
-npm run server
-
