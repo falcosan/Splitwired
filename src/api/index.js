@@ -1,19 +1,19 @@
-import DOMPurify from "dompurify";
+import { sanitize } from "isomorphic-dompurify";
 export default {
-  getGroups: () =>
-    fetch("/groups")
+  getGroups: async () =>
+   await fetch("/groups")
       .then((res) => res.json())
       .then((res) => res)
       .catch((err) => err),
-  getDownloads: () =>
-    fetch("/download", {
+  getDownloads: async () =>
+   await fetch("/download", {
       headers: { secret: process.env.SECRET_HEADER_DOWNLOAD },
     })
       .then((res) => res.text())
-      .then((res) => DOMPurify.sanitize(res))
+      .then((res) => sanitize(res))
       .catch((err) => err),
-  getExpanses: (parameters) =>
-    fetch("/expenses", {
+  getExpanses: async (parameters) =>
+   await fetch("/expenses", {
       method: "POST",
       body: JSON.stringify(parameters),
       headers: new Headers({
@@ -23,6 +23,6 @@ export default {
       .then((res) => res.json())
       .then((res) => res)
       .catch((err) => err),
-  getLogout: () =>
-    fetch("/logout", { method: "POST" }).then(() => window.location.reload()),
+  getLogout: async () =>
+   await fetch("/logout", { method: "POST" }).then(() => window.location.reload()),
 };
