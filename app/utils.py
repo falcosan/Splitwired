@@ -7,12 +7,13 @@ from json import dumps, loads
 from calendar import monthrange
 from splitwise import Splitwise
 from flask import make_response
+from .config import config as cf
 import plotly.graph_objects as go
 from datetime import datetime, date
 from flask_login import current_user
 from requests import Request, Response
 from .enums import enums_groups, enums_folders
-from currency_converter import CurrencyConverter
+from currency_converter import CurrencyConverter, ECB_URL
 
 
 def serializer(data, to_json=False):
@@ -89,7 +90,9 @@ def set_currency_conversion(
     conv_date: tuple = None,
 ):
     output_folder = enums_folders.get_folder_prop("output", "value")
-    filename = f"{output_folder}/currencies.csv"
+    filename = f"{output_folder}/currencies.zip"
+    if not op.isfile(filename):
+        urllib.request.urlretrieve(ECB_URL, filename)
     c = CurrencyConverter(
         filename,
         fallback_on_wrong_date=True,
@@ -101,7 +104,7 @@ def set_currency_conversion(
 
 def costs_conversions(cost: str, context: dict):
     currency = context.getCurrencyCode()
-    if cost and currency.lower() != "eur":
+    if cost and currency.lower() != "eur" and cf.environment.lower() == "development":
         if isinstance(cost, str):
             cost = float(cost)
         conv_date = datetime.strptime(context.getDate(), "%Y-%m-%dT%H:%M:%SZ")
