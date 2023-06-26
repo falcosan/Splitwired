@@ -86,7 +86,9 @@ def set_currency_conversion(
     curr_from: str,
     conv_date: tuple = None,
 ):
-    c = CurrencyConverter(decimal=True, fallback_on_wrong_date=True)
+    c = CurrencyConverter(
+        decimal=True, fallback_on_wrong_date=True, fallback_on_missing_rate=True
+    )
     conversion = c.convert(amount, curr_from, "EUR", date=date(*conv_date))
     return str(conversion)
 
