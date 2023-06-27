@@ -86,9 +86,9 @@ def set_currency_conversion(
     curr_from: str,
     conv_date: date,
 ):
-    symbol = f"{curr_from}EUR=X"
+    ticker = f"{curr_from}EUR=X"
     latest_data = si.get_data(
-        symbol, start_date=conv_date, end_date=conv_date + timedelta(days=1)
+        ticker=ticker, start_date=conv_date, end_date=conv_date + timedelta(days=1)
     )
     latest_price = latest_data.iloc[-1].close
     return str(latest_price * amount)
