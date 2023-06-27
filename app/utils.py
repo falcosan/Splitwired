@@ -1,19 +1,16 @@
 from re import sub
 import pandas as pd
-import os.path as op
-import urllib.request
 from decimal import Decimal
 from json import dumps, loads
 from calendar import monthrange
 from splitwise import Splitwise
 from flask import make_response
-from .config import config as cf
+import yahoo_fin.stock_info as si
 import plotly.graph_objects as go
-from datetime import datetime, date
 from flask_login import current_user
 from requests import Request, Response
 from .enums import enums_groups, enums_folders
-from currency_converter import CurrencyConverter, ECB_URL
+from datetime import datetime, date, timedelta
 
 
 def serializer(data, to_json=False):
@@ -87,31 +84,26 @@ def set_files(files: list):
 def set_currency_conversion(
     amount: int,
     curr_from: str,
-    conv_date: tuple = None,
+    conv_date: date,
 ):
-    output_folder = enums_folders.get_folder_prop("output", "value")
-    filename = f"{output_folder}/currencies.zip"
-    if not op.isfile(filename):
-        urllib.request.urlretrieve(ECB_URL, filename)
-    c = CurrencyConverter(
-        filename,
-        fallback_on_wrong_date=True,
-        fallback_on_missing_rate=True,
+    symbol = f"{curr_from}EUR=X"
+    latest_data = si.get_data(
+        symbol, start_date=conv_date, end_date=conv_date + timedelta(days=1)
     )
-    conversion = c.convert(amount, curr_from, "EUR", date=date(*conv_date))
-    return str(conversion)
+    latest_price = latest_data.iloc[-1].close
+    return str(latest_price * amount)
 
 
 def costs_conversions(cost: str, context: dict):
     currency = context.getCurrencyCode()
-    if cost and currency.lower() != "eur" and cf.environment.lower() == "development":
+    if cost and currency.lower() != "eur":
         if isinstance(cost, str):
             cost = float(cost)
         conv_date = datetime.strptime(context.getDate(), "%Y-%m-%dT%H:%M:%SZ")
         cost = set_currency_conversion(
             amount=cost,
             curr_from=currency,
-            conv_date=(conv_date.year, conv_date.month, conv_date.day),
+            conv_date=conv_date,
         )
     return cost
 
@@ -351,7 +343,6 @@ def generate_expense(
             "6: Total": dt_d,
             "7: Currency": f"{expense.getCurrencyCode()} > EUR"
             if expense.getCurrencyCode().lower() != "eur"
-            and cf.environment.lower() == "development"
             else expense.getCurrencyCode(),
             "id": expense.getId(),
         }
