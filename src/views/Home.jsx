@@ -23,6 +23,7 @@ export default function Home() {
     month: 12,
   };
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
   const [downloads, setDownloads] = useState("");
   const [{ data, table, chart, groups }, setData] = useState({
     data: [],
@@ -112,7 +113,7 @@ export default function Home() {
             }),
           };
         });
-    } else return table.map(item => importFilter(item, properties.id, false));
+    } else return table.map((item) => importFilter(item, properties.id, false));
   }, [data, parameters.category]);
   const query = useMemo(() => {
     function builderQuery(version) {
@@ -215,12 +216,14 @@ export default function Home() {
     });
   }, [categories]);
   useLayoutEffect(() => {
+    setLoading(true);
     setStatus("Loading");
     Promise.all([api.getGroups(), api.getDownloads()])
       .then(([groups, downloads]) => {
         setData({ data, table, chart, groups });
         setDownloads(downloads);
         setStatus("Ready");
+        setLoading(false);
       })
       .catch(() => setStatus("Error"));
   }, []);
@@ -232,18 +235,21 @@ export default function Home() {
     currentMonth.current = parameters.month;
     currentPersonal.current = parameters.personal;
     setData({ data: [], table: [], chart: [], groups });
-   await api
+    await api
       .getExpanses(importFilter(parameters, ["category", "csv"], false))
       .then(async ({ data, table, chart }) => {
         if (data) {
           if (table && chart) setData({ data, table, chart, groups });
           setStatus(data.length ? "" : "No expenses");
           if (data.length && parameters.csv) {
-            setStatus("Downloading");
-          await api
-            .getExpanses(parameters)
-            .then(async () => await api.getDownloads().then((res) => setDownloads(res)))
-            .finally(()=> setStatus(""))
+            setLoading(true);
+            await api
+              .getExpanses(parameters)
+              .then(
+                async () =>
+                  await api.getDownloads().then((res) => setDownloads(res))
+              )
+              .finally(() => setLoading(false));
           }
           setParameters({
             ...parameters,
@@ -303,21 +309,31 @@ export default function Home() {
       </div>
       <div
         className={`relative flex mt-5 overflow-hidden rounded ${
-          downloads.length ? null : "p-2.5 border-4 border-dashed"
+          downloads.length ? null : "border-4 border-dashed"
         }`}
       >
-        {status.toLowerCase() === "downloading" && <div className="absolute w-full h-full flex items-center justify-center inset-0 bg-opacity-70 bg-gray-600">
-          <span className="text-xl font-bold text-white">{status}</span>
-        </div>}
+        {loading && (
+          <div
+            className={`${
+              downloads.length ? "absolute inset-0" : "p-2.5"
+            } w-full h-full flex items-center justify-center bg-opacity-70 bg-gray-600`}
+          >
+            <span className="text-[16px] font-semibold text-slate-300">
+              Loading
+            </span>
+          </div>
+        )}
         {downloads.length ? (
           <ul
             className="w-full p-2.5 overflow-y-auto rounded bg-slate-300"
             dangerouslySetInnerHTML={{ __html: downloads }}
           />
         ) : (
-          <span className="block mx-auto text-[16px] font-semibold text-slate-300 ">
-            Downloads
-          </span>
+          !loading && (
+            <span className="block p-2.5 mx-auto text-[16px] font-semibold text-slate-300">
+              Downloads
+            </span>
+          )
         )}
       </div>
       <span className="block mt-5 text-[16px] font-semibold text-slate-300">
