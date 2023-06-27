@@ -60,7 +60,7 @@ def set_dates(month: int = None, year: int = None):
     if dated_after and dated_after.date() > datetime.now().date():
         raise ValueError("Selected date is about the future")
     if month:
-        dated_name = dated_after.strftime("_%d-%m-%Y")
+        dated_name = dated_after.strftime("_%m-%Y")
     elif year:
         dated_name = dated_after.strftime("_%Y")
     else:

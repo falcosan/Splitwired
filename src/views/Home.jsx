@@ -239,9 +239,11 @@ export default function Home() {
           if (table && chart) setData({ data, table, chart, groups });
           setStatus(data.length ? "" : "No expenses");
           if (data.length && parameters.csv) {
-           await api
-              .getExpanses(parameters)
-              .then(async () => await api.getDownloads().then((res) => setDownloads(res)));
+            setStatus("Downloading");
+          await api
+            .getExpanses(parameters)
+            .then(async () => await api.getDownloads().then((res) => setDownloads(res)))
+            .finally(()=> setStatus(""))
           }
           setParameters({
             ...parameters,
@@ -300,10 +302,13 @@ export default function Home() {
         />
       </div>
       <div
-        className={`flex mt-5 ${
-          downloads.length ? null : "rounded p-2.5 border-4 border-dashed"
+        className={`relative flex mt-5 overflow-hidden rounded ${
+          downloads.length ? null : "p-2.5 border-4 border-dashed"
         }`}
       >
+        {status.toLowerCase() === "downloading" && <div className="absolute w-full h-full flex items-center justify-center inset-0 bg-opacity-70 bg-gray-600">
+          <span className="text-xl font-bold text-white">{status}</span>
+        </div>}
         {downloads.length ? (
           <ul
             className="w-full p-2.5 overflow-y-auto rounded bg-slate-300"

@@ -65,13 +65,20 @@ def data_expenses(
                 dated_after=dated_after,
                 dated_before=dated_before,
             )
+        filename = ""
+        if expense_name:
+            filename = expense_name
+        if category_name:
+            filename = f"{filename}{category_name}"
+        if dated_name:
+            filename = f"{filename}{dated_name}"
         return generate_expense(
             csv=csv,
             chart=chart,
             expenses=expenses,
             personal=personal,
             category=category,
-            filename=f"{expense_name}{category_name}{dated_name}",
+            filename=filename,
         )
     except ValueError as error:
         return TypeError(error)
