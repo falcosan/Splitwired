@@ -82,7 +82,7 @@ def set_files(files: list):
 
 
 def set_currency_conversion(
-    amount: int,
+    amount: float,
     curr_from: str,
     conv_date: date,
 ):
