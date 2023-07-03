@@ -1,11 +1,11 @@
 from re import sub
 import pandas as pd
+import yfinance as yf
 from decimal import Decimal
 from json import dumps, loads
 from calendar import monthrange
 from splitwise import Splitwise
 from flask import make_response
-import yahoo_fin.stock_info as si
 import plotly.graph_objects as go
 from flask_login import current_user
 from requests import Request, Response
@@ -87,11 +87,11 @@ def set_currency_conversion(
     conv_date: date,
 ):
     ticker = f"{curr_from}EUR=X"
-    latest_data = si.get_data(
-        ticker=ticker, start_date=conv_date, end_date=conv_date + timedelta(days=1)
+    currency_data = yf.download(
+        ticker, start=conv_date, end=conv_date + timedelta(days=1)
     )
-    latest_price = latest_data.iloc[-1].close
-    return str(latest_price * amount)
+    exchange_rate = currency_data["Close"][-1]
+    return str(exchange_rate * amount)
 
 
 def costs_conversions(cost: str, context: dict):
