@@ -90,7 +90,7 @@ def set_currency_conversion(
     currency_data = yf.Ticker(ticker).history(
         start=conv_date, end=conv_date + timedelta(days=1)
     )
-    if currency_data.empty:
+    if currency_data["Close"].last_valid_index() is None:
         return set_currency_conversion(
             amount, curr_from, conv_date=conv_date - timedelta(days=1)
         )
