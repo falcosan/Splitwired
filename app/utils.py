@@ -129,7 +129,15 @@ def get_unique_user_list(arr: list):
 
 
 def get_user_paid(arr):
-    user = next((user for user in arr if user.getPaidShare() != "0.0"), None)
+    def check_amount(amount):
+        try:
+            control = int(float(amount)) != 0
+        except ValueError:
+            control = abs(amount) >= 0.0001
+        else:
+            return control
+
+    user = next((user for user in arr if check_amount(user.getPaidShare())), None)
     return get_user_name(user)
 
 
