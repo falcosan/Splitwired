@@ -1,4 +1,4 @@
-export const importFilter = (data, filters, rule, strict = false) => {
+export const importFilter = (data, filters, rule) => {
   const filterFn = (k) => {
     if (Array.isArray(filters)) {
       return rule ? filters.every((filter) => k === filter) : filters.every((filter) => k !== filter);
