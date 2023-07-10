@@ -1,3 +1,4 @@
+import logging
 from re import sub
 import pandas as pd
 import yfinance as yf
@@ -11,6 +12,8 @@ from flask_login import current_user
 from requests import Request, Response
 from .enums import enums_groups, enums_folders
 from datetime import datetime, date, timedelta
+
+logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 
 
 def serializer(data, to_json=False):
@@ -87,10 +90,10 @@ def set_currency_conversion(
     conv_date: date,
 ):
     ticker = f"{curr_from}EUR=X"
-    currency_data = yf.Ticker(ticker).history(
-        start=conv_date, end=conv_date + timedelta(days=1)
+    currency_data = yf.download(
+        ticker, start=conv_date, end=conv_date + timedelta(days=1), progress=False
     )
-    if currency_data["Close"].last_valid_index() is None:
+    if currency_data.empty:
         return set_currency_conversion(
             amount, curr_from, conv_date=conv_date - timedelta(days=1)
         )
