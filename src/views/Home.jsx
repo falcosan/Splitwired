@@ -104,7 +104,7 @@ export default function Home() {
             filters[index][parameters.personal ? "user_cost" : "cost"]
           );
           return {
-            ...importFilter(item, properties.id, false),
+            ...importFilter(item, properties.id, false, true),
             [properties.number]: index + 1,
             [properties.total]: total.toLocaleString("en", {
               minimumFractionDigits: 2,
@@ -113,7 +113,10 @@ export default function Home() {
             }),
           };
         });
-    } else return table.map((item) => importFilter(item, properties.id, false));
+    } else
+      return table.map((item) =>
+        importFilter(item, properties.id, false, true)
+      );
   }, [data, parameters.category]);
   const query = useMemo(() => {
     function builderQuery(version) {

@@ -25,7 +25,7 @@ export default function Table(props) {
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
               <th
-                className="p-2.5 align-baseline whitespace-pre-wrap text-left"
+                className="p-1 align-baseline whitespace-pre-wrap text-left"
                 key={header.id}
               >
                 {header.isPlaceholder
