@@ -128,6 +128,11 @@ def get_unique_user_list(arr: list):
     )
 
 
+def get_user_paid(arr):
+    user = next((user for user in arr if user.getPaidShare() != "0.0"), None)
+    return get_user_name(user)
+
+
 def get_home_expense(limit: int = 9999):
     group_id: int = int(enums_groups.get_group_prop("first", "id"))
     expense_name: str = enums_groups.get_group_prop("first", "name")
@@ -332,6 +337,7 @@ def generate_expense(
     )
     for i, expense in enumerate(sorted_expenses):
         users_list = expense.getUsers()
+        user_paid = get_user_paid(users_list)
         unique_user_list = get_unique_user_list(users_list)
         cost = costs_conversions(expense.getCost(), expense)
         if cost.replace(".", "", 1).isdigit():
@@ -342,15 +348,16 @@ def generate_expense(
             else:
                 dt_d = dt_d + number_to_decimal(cost)
         df_d = {
-            "1: Number": i + 1,
-            "2: Description": expense.getDescription(),
-            "3: Date": date_to_format(expense.getDate()),
-            "4: Category": expense.getCategory().getName(),
-            "5: Cost": number_to_decimal(cost),
-            "6: Total": dt_d,
-            "7: Currency": f"{expense.getCurrencyCode()} > EUR"
+            "1:\nNumber": i + 1,
+            "2:\nDescription": expense.getDescription(),
+            "3:\nDate": date_to_format(expense.getDate()),
+            "4:\nCategory": expense.getCategory().getName(),
+            "5:\nCost": number_to_decimal(cost),
+            "6:\nTotal": dt_d,
+            "7:\nCurrency": f"{expense.getCurrencyCode()} > EUR"
             if expense.getCurrencyCode().lower() != "eur"
             else expense.getCurrencyCode(),
+            "8:\nPaid by": user_paid,
             "id": expense.getId(),
         }
         dd_d = {
