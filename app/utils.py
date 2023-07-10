@@ -93,7 +93,7 @@ def set_currency_conversion(
     currency_data = yf.download(
         ticker, start=conv_date, end=conv_date + timedelta(days=1), progress=False
     )
-    if currency_data.empty:
+    if currency_data.empty or currency_data["Close"].size == 0:
         return set_currency_conversion(
             amount, curr_from, conv_date=conv_date - timedelta(days=1)
         )
