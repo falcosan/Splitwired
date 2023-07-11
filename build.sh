@@ -5,4 +5,4 @@ set -o errexit
 yarn
 yarn build
 pip install --upgrade pip
-pip install $(grep -vE "pip-autoremove" requirements.txt)
+pip install -r $(grep -vE "pip-autoremove" requirements.txt)
