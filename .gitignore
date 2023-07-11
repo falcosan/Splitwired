@@ -6,5 +6,5 @@ node_modules
 .DS_Store
 *.csv
 .tool-versions
-bundle.js
+/static/bundle.*
 *.zip

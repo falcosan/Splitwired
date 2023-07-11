@@ -8,7 +8,7 @@
     "freeze": "pip freeze > requirements.txt",
     "upgrade": "pip freeze --local | grep -v '^\\-e' | cut -d = -f 1  | xargs -n1 pip install -U",
     "dev": "webpack --config webpack.config.js --watch",
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --mode production",
     "server": "flask run"
   },
   "repository": {
@@ -36,8 +36,10 @@
     "@babel/preset-env": "^7.22.5",
     "@babel/preset-react": "^7.22.5",
     "babel-loader": "^9.1.2",
+    "compression-webpack-plugin": "^10.0.0",
     "css-loader": "^6.8.1",
     "dotenv-webpack": "^8.0.1",
+    "image-minimizer-webpack-plugin": "^3.8.3",
     "postcss": "^8.4.24",
     "postcss-loader": "^7.3.3",
     "postcss-preset-env": "^8.5.1",
