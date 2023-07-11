@@ -72,12 +72,21 @@ def set_dates(month: int = None, year: int = None):
 
 
 def set_files(files: list):
+    def extract_data(data):
+        file = data.split(";")
+        full_path = file[1]
+        date_part = full_path.split("date")
+        name = file[0]
+        date, extension = date_part[1].split(".")
+        return (name, date, extension)
+
     return list(
         map(
             lambda file: {
                 "index": str(file[0] + 1),
-                "name": file[1],
-                "date": datetime.now().date().strftime("%d-%m-%Y"),
+                "name": extract_data(file[1])[0],
+                "date": extract_data(file[1])[1],
+                "extension": extract_data(file[1])[2],
             },
             enumerate(files),
         )
@@ -212,9 +221,14 @@ def get_categories(categories: list, category: int = None) -> list:
     return category_found if category != None else categories_all
 
 
-def get_csv(data: list, filepath: str, additional_data: tuple = None):
+def generate_csv(data: list, filepath: str, additional_data: tuple = None):
     cleaned_path = sub("([A-Z]\w+$)", "\\1", filepath).lower()
-    filename = f"{cleaned_path}.csv" if not ".csv" in cleaned_path else cleaned_path
+    today = datetime.now().date().strftime("%d-%m-%Y")
+    filename = (
+        f"{cleaned_path};date{today}.csv"
+        if not ".csv" in f"{cleaned_path};date{today}"
+        else cleaned_path
+    )
     output_folder = enums_folders.get_folder_prop("output", "value")
     data_frame_principal = pd.DataFrame(data)
     data_frame_additional = None
@@ -395,5 +409,5 @@ def generate_expense(
         dc = generate_chart(dc, chart_type=chart, filename=filename)
     if csv:
         d_df = list(map(lambda obj: {k: v for k, v in obj.items() if k != "id"}, df))
-        get_csv(d_df, filename, ("average", number_to_decimal(dt_d / len(d_df))))
+        generate_csv(d_df, filename, ("average", number_to_decimal(dt_d / len(d_df))))
     return {"table": df, "data": dd, "chart": dc}
