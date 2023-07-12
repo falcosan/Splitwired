@@ -66,6 +66,7 @@ module.exports = () => {
             [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
           },
         },
+        deleteOriginalAssets: env.ENVIRONMENT !== 'development'
       }),
     ],
   };

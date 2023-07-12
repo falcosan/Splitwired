@@ -1,5 +1,6 @@
 import os
 from .__init__ import app
+from .config import config as cf
 from .auth import Authentication
 from flask_cors import cross_origin
 from .utils import responser, set_files
@@ -23,7 +24,7 @@ secret_download_value = enums_headers.get_header_prop("download_secret", "value"
 @app.route("/")
 @cross_origin()
 def index():
-    return render_template("index.html")
+    return render_template("index.html", environment=cf.environment)
 
 
 @app.route("/login", methods=["POST"])

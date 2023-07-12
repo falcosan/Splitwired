@@ -21,10 +21,10 @@
     <noscript>No JavaScript no party</noscript>
     {% if current_user.is_authenticated %}
     <main id="root"></main>
-    {% if config['ENV'] == 'production' %}
-    <script src="{{url_for('static', filename='bundle.js.br')}}"></script>
-    {% else %}
+    {% if environment == 'development' %}
     <script src="{{url_for('static', filename='bundle.js')}}"></script>
+    {% else %}
+    <script src="{{url_for('static', filename='bundle.js.br')}}"></script>
     {% endif %}
     <script>
       if ("serviceWorker" in navigator) {
