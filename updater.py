@@ -19,8 +19,8 @@ async def get_pypi_latest_version(package: Package) -> tuple[Package, Package]:
 async def fetch_all_latest_packages(
     packages: Iterable[Package],
 ) -> list[tuple[Package, Package]]:
-    coro = (get_pypi_latest_version(package) for package in packages)
-    new_packages = await asyncio.gather(*coro)
+    fetch_list = (get_pypi_latest_version(package) for package in packages)
+    new_packages = await asyncio.gather(*fetch_list)
     return [(old, new) for old, new in new_packages if old.version != new.version]
 
 

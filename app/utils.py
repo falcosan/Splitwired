@@ -100,7 +100,7 @@ def set_currency_conversion(
 ):
     ticker = f"{curr_from}EUR=X"
     currency_data = yf.Ticker(ticker).history(
-        period="1d", start=conv_date, end=conv_date + timedelta(days=1), repair=True
+        period="1d", start=conv_date, end=conv_date + timedelta(days=1)
     )
     if currency_data.empty or currency_data["Close"].size == 0:
         return set_currency_conversion(
