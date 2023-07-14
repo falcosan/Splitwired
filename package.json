@@ -6,6 +6,7 @@
   "scripts": {
     "init": "pip install --upgrade --no-cache-dir -r requirements.txt",
     "freeze": "pip freeze > requirements.txt",
+    "upgrade": "python updater.py requirements.txt",
     "dev": "webpack --config webpack.config.js --watch",
     "build": "webpack --mode production",
     "server": "flask run"
