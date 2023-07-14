@@ -99,8 +99,8 @@ def set_currency_conversion(
     conv_date: date,
 ):
     ticker = f"{curr_from}EUR=X"
-    currency_data = yf.download(
-        ticker, start=conv_date, end=conv_date + timedelta(days=1), progress=False
+    currency_data = yf.Ticker(ticker).history(
+        period="1d", start=conv_date, end=conv_date + timedelta(days=1), repair=True
     )
     if currency_data.empty or currency_data["Close"].size == 0:
         return set_currency_conversion(
