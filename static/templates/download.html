@@ -2,7 +2,7 @@
 <li class="mb-2.5 last:mb-0 rounded hover:bg-opacity-80 bg-[#5dc4a7]">
   <a
     class="block py-2.5 px-4 font-semibold text-zinc-900"
-    href="{{ url_for('download_file', filename=file.name) }}"
+    href="{{ url_for('download_file', filename=file.path) }}"
   >
     <div class="flex justify-between">
       <span class="text-xs break-all">{{ file.name }}</span>

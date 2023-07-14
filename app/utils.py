@@ -73,16 +73,14 @@ def set_dates(month: int = None, year: int = None):
 
 def set_files(files: list):
     def extract_data(data):
-        file = data.split(";")
-        full_path = file[1]
-        date_part = full_path.split("date")
-        name = file[0]
-        date, extension = date_part[1].split(".")
+        name, file = data.split("_downloaded_")
+        date, extension = file.split(".")
         return (name, date, extension)
 
     return list(
         map(
             lambda file: {
+                "path": file[1],
                 "index": str(file[0] + 1),
                 "name": extract_data(file[1])[0],
                 "date": extract_data(file[1])[1],
@@ -207,10 +205,22 @@ def get_categories(categories: list, category: int = None) -> list:
         categories_all.append(original_category)
         sub_categories = original_category.getSubcategories()
         if sub_categories and len(sub_categories):
-            for sub_category in sub_categories:
-                if not len(sub_category.getSubcategories()):
-                    del sub_category.subcategories
-                categories_all.append(sub_category)
+            for original_sub_category in sub_categories:
+                if not len(original_sub_category.getSubcategories()):
+                    del original_sub_category.subcategories
+
+                class sub_category:
+                    def __init__(self):
+                        self.id = original_sub_category.getId()
+                        self.name = f"{original_category.getName()}-{original_sub_category.getName()}"
+
+                    def getId(self):
+                        return self.id
+
+                    def getName(self):
+                        return self.name
+
+                categories_all.append(sub_category())
         del original_category.subcategories
     if category != None:
         category_found = next(
@@ -225,8 +235,8 @@ def generate_csv(data: list, filepath: str, additional_data: tuple = None):
     cleaned_path = sub("([A-Z]\w+$)", "\\1", filepath).lower()
     today = datetime.now().date().strftime("%d-%m-%Y")
     filename = (
-        f"{cleaned_path};date{today}.csv"
-        if not ".csv" in f"{cleaned_path};date{today}"
+        f"{cleaned_path}_downloaded_{today}.csv"
+        if not ".csv" in f"{cleaned_path}_downloaded_{today}"
         else cleaned_path
     )
     output_folder = enums_folders.get_folder_prop("output", "value")
