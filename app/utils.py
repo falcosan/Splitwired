@@ -237,7 +237,7 @@ def generate_csv(data: list, filepath: str, additional_data: tuple = None):
     filename = (
         f"{cleaned_path}_downloaded_{today}.csv"
         if not ".csv" in f"{cleaned_path}_downloaded_{today}"
-        else cleaned_path
+        else f"{cleaned_path}_downloaded_{today}"
     )
     output_folder = enums_folders.get_folder_prop("output", "value")
     data_frame_principal = pd.DataFrame(data)
