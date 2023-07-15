@@ -138,11 +138,10 @@ def get_unique_user_list(arr: list):
 def get_user_paid(arr):
     def check_amount(amount):
         try:
-            control = int(float(amount)) != 0
+            control = float(amount) > 0
         except ValueError:
             control = abs(amount) >= 0.0001
-        else:
-            return control
+        return control
 
     user = next((user for user in arr if check_amount(user.getPaidShare())), None)
     return get_user_name(user)
@@ -254,7 +253,11 @@ def generate_csv(data: list, filepath: str, additional_data: tuple = None):
 
     df = pd.concat([data_frame_principal, data_frame_additional], ignore_index=True)
     return df.to_csv(
-        path_or_buf=f"{output_folder}/{filename}", index=False, header=True, sep=";"
+        sep=";",
+        index=False,
+        header=True,
+        float_format="%.0f",
+        path_or_buf=f"{output_folder}/{filename}",
     )
 
 
