@@ -51,7 +51,7 @@ if __name__ == "__main__":
     current_packages = list(read_packages(args.filename))
     latest_packages = asyncio.run(fetch_all_latest_packages(current_packages))
     if not latest_packages:
-        print("Everything upto date.")
+        print("Everything up to date.")
         exit(0)
     print(placeholder.format(name="NAME", old_ver="OLD_VER", new_ver="NEW_VER"))
     for old, new in latest_packages:

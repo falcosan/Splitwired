@@ -104,7 +104,7 @@ def set_currency_conversion(
         return set_currency_conversion(
             amount, curr_from, conv_date=conv_date - timedelta(days=1)
         )
-    exchange_rate = currency_data["Close"][-1]
+    exchange_rate = currency_data["Close"].iloc[-1]
     return str(exchange_rate * amount)
 
 
