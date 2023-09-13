@@ -41,7 +41,8 @@ def data_expenses(
         )
     else:
         category_name = ""
-    dated_after, dated_before, dated_name = set_dates(month, year)
+    date = (month, year)
+    dated_after, dated_before, dated_name = set_dates(date[0], date[1])
     try:
         if personal:
             (expenses, expense_name) = get_personal_expense(
@@ -74,6 +75,7 @@ def data_expenses(
             filename = f"{filename}{dated_name}"
         return generate_expense(
             csv=csv,
+            date=date,
             chart=chart,
             expenses=expenses,
             personal=personal,

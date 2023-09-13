@@ -335,6 +335,7 @@ def generate_chart(data, chart_type: str or list[str] = "pie", filename: str = "
 
 def generate_expense(
     csv: bool,
+    date: tuple,
     expenses: list,
     filename: str or None,
     category: int = None,
@@ -422,5 +423,9 @@ def generate_expense(
         dc = generate_chart(dc, chart_type=chart, filename=filename)
     if csv:
         d_df = list(map(lambda obj: {k: v for k, v in obj.items() if k != "id"}, df))
-        generate_csv(d_df, filename, ("average", number_to_decimal(dt_d / len(d_df))))
+        generate_csv(
+            d_df,
+            filename,
+            ("average", number_to_decimal(dt_d / (monthrange(date[1], date[0])[1]))),
+        )
     return {"table": df, "data": dd, "chart": dc}

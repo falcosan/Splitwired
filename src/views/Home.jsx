@@ -200,9 +200,14 @@ export default function Home() {
   const info = useMemo(() => {
     if (expenses.length) {
       const total = expenses[expenses.length - 1][properties.total];
+      const monthDays = new Date(
+        +currentYear.current,
+        +currentMonth.current,
+        0
+      ).getDate();
       return {
         total,
-        average: (+total / expenses.length).toLocaleString("en", {
+        average: (+total / monthDays).toLocaleString("en", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
           useGrouping: false,
@@ -211,7 +216,7 @@ export default function Home() {
     } else {
       return null;
     }
-  }, [expenses]);
+  }, [expenses, currentYear.current, currentMonth.current]);
   useEffect(() => {
     setParameters({
       ...parameters,
