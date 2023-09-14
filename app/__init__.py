@@ -5,6 +5,7 @@ from decouple import config
 
 app = Flask(__name__, template_folder="../static", static_folder="../static")
 app.secret_key = config("SECRET_APP")
+app.json.sort_keys = False
 CORS(app)
 
 from .routes import *

@@ -399,7 +399,7 @@ export default function Home() {
             Total {info.total} €
           </span>
           <span className="block mt-5 text-slate-300">
-            Average {info.average} €
+            Monthly average {info.average} €
           </span>
         </>
       ) : null}

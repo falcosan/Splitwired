@@ -384,16 +384,19 @@ def generate_expense(
             else:
                 dt_d = dt_d + number_to_decimal(cost)
         df_d = {
-            "1:\nNumber": i + 1,
-            "2:\nDescription": expense.getDescription(),
-            "3:\nDate": date_to_format(expense.getDate()),
-            "4:\nCategory": expense.getCategory().getName(),
-            "5:\nCost": number_to_decimal(cost),
-            "6:\nTotal": dt_d,
-            "7:\nCurrency": f"{expense.getCurrencyCode()} > EUR"
+            "Number": i + 1,
+            "Description": expense.getDescription(),
+            "Date": date_to_format(expense.getDate()),
+            "Category": expense.getCategory().getName(),
+            "Cost": number_to_decimal(cost),
+            "Total": dt_d,
+            "Average": number_to_decimal(
+                dt_d / datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ").day
+            ),
+            "Currency": f"{expense.getCurrencyCode()} > EUR"
             if expense.getCurrencyCode().lower() != "eur"
             else expense.getCurrencyCode(),
-            "8:\nPaid by": user_paid,
+            "Paid by": user_paid,
             "id": expense.getId(),
         }
         dd_d = {
@@ -426,6 +429,9 @@ def generate_expense(
         generate_csv(
             d_df,
             filename,
-            ("average", number_to_decimal(dt_d / (monthrange(date[1], date[0])[1]))),
+            (
+                "monthly average",
+                number_to_decimal(dt_d / (monthrange(date[1], date[0])[1])),
+            ),
         )
     return {"table": df, "data": dd, "chart": dc}
