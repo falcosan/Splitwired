@@ -12,7 +12,7 @@ export default {
       .then((res) => res.text())
       .then((res) => sanitize(res))
       .catch((err) => err),
-  getExpanses: async (parameters) =>
+  getExpenses: async (parameters) =>
    await fetch("/expenses", {
       method: "POST",
       body: JSON.stringify(parameters),

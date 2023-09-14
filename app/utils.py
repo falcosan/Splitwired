@@ -426,12 +426,12 @@ def generate_expense(
         dc = generate_chart(dc, chart_type=chart, filename=filename)
     if csv:
         d_df = list(map(lambda obj: {k: v for k, v in obj.items() if k != "id"}, df))
+        average_date = (
+            datetime.now().day
+            if datetime(date[1], date[0], 1).month == datetime.now().month
+            else monthrange(date[1], date[0])[1]
+        )
         generate_csv(
-            d_df,
-            filename,
-            (
-                "monthly average",
-                number_to_decimal(dt_d / (monthrange(date[1], date[0])[1])),
-            ),
+            d_df, filename, ("average", number_to_decimal(dt_d / average_date))
         )
     return {"table": df, "data": dd, "chart": dc}

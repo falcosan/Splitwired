@@ -199,18 +199,23 @@ export default function Home() {
   ]);
   const info = useMemo(() => {
     if (expenses.length) {
+      let averageDate;
+      const now = new Date();
+      const date = [+currentYear.current, +currentMonth.current];
+      const inputDate = new Date(date[0], date[1] - 1, 1);
       const total = expenses[expenses.length - 1][properties.total];
-      const monthDays = new Date(
-        +currentYear.current,
-        +currentMonth.current,
-        0
-      ).getDate();
+      if (inputDate.getMonth() === now.getMonth()) {
+        averageDate = now.getDate();
+      } else {
+        const lastDayOfMonth = new Date(date[0], date[1], 0);
+        averageDate = lastDayOfMonth.getDate();
+      }
       return {
         total,
-        average: (+total / monthDays).toLocaleString("en", {
+        average: (+total / averageDate).toLocaleString("en", {
+          useGrouping: false,
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-          useGrouping: false,
         }),
       };
     } else {
@@ -244,7 +249,7 @@ export default function Home() {
     currentPersonal.current = parameters.personal;
     setData({ data: [], table: [], chart: [], groups });
     await api
-      .getExpanses(importFilter(parameters, ["category", "csv"], false))
+      .getExpenses(importFilter(parameters, ["category", "csv"], false))
       .then(async ({ data, table, chart }) => {
         if (data) {
           if (table && chart) setData({ data, table, chart, groups });
@@ -252,7 +257,7 @@ export default function Home() {
           if (data.length && parameters.csv) {
             setLoading(true);
             await api
-              .getExpanses(parameters)
+              .getExpenses(parameters)
               .then(
                 async () =>
                   await api.getDownloads().then((res) => setDownloads(res))
@@ -390,7 +395,7 @@ export default function Home() {
           }`}
           type="submit"
           disabled={status.toLowerCase() === "loading"}
-          value="Expenses"
+          value="Calculate"
         />
       </form>
       {info ? (
@@ -399,7 +404,7 @@ export default function Home() {
             Total {info.total} €
           </span>
           <span className="block mt-5 text-slate-300">
-            Monthly average {info.average} €
+            Average {info.average} €
           </span>
         </>
       ) : null}

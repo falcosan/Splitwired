@@ -6,7 +6,7 @@ export const useMutationObserver = (node, callback, options) => {
     const observer = new MutationObserver(callback);
     if (targetNode) observer.observe(targetNode, options);
     return () => observer.disconnect();
-  }, [node, callback, options]);
+  }, [node, callback(), options]);
 };
 
 export const useRemovesNullClass = () => {
