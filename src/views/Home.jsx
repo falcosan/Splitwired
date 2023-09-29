@@ -199,20 +199,33 @@ export default function Home() {
   ]);
   const info = useMemo(() => {
     if (expenses.length) {
-      let averageDate;
       const now = new Date();
+      let averageDivider = expenses.length;
       const date = [+currentYear.current, +currentMonth.current];
-      const inputDate = new Date(date[0], date[1] - 1, 1);
       const total = expenses[expenses.length - 1][properties.total];
-      if (inputDate.getMonth() === now.getMonth()) {
-        averageDate = now.getDate();
-      } else {
-        const lastDayOfMonth = new Date(date[0], date[1], 0);
-        averageDate = lastDayOfMonth.getDate();
+      if (date[0] && date[1]) {
+        const inputDate = new Date(date[0], date[1] - 1, 1);
+        if (inputDate.getMonth() === now.getMonth()) {
+          averageDivider = now.getDate();
+        } else {
+          const lastDayOfMonth = new Date(date[0], date[1], 0);
+          averageDivider = lastDayOfMonth.getDate();
+        }
+      } else if (date[0]) {
+        averageDivider = new Date(data[0], 1, 29).getDate() === 29 ? 366 : 365;
+      } else if (expenses[0]["Date"]) {
+        const start_year = new Date(expenses[0]["Date"]).getFullYear();
+        const end_year = new Date(
+          expenses[expenses.length - 1]["Date"]
+        ).getFullYear();
+        const start_date = new Date(start_year, 0, 1);
+        const end_date = new Date(end_year, 11, 31);
+        const difference = end_date - start_date;
+        averageDivider = difference / (1000 * 60 * 60 * 24);
       }
       return {
         total,
-        average: (+total / averageDate).toLocaleString("en", {
+        average: (+total / averageDivider).toLocaleString("en", {
           useGrouping: false,
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,

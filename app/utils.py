@@ -4,12 +4,12 @@ import pandas as pd
 import yfinance as yf
 from decimal import Decimal
 from json import dumps, loads
-from calendar import monthrange
 from splitwise import Splitwise
 from flask import make_response
 import plotly.graph_objects as go
 from flask_login import current_user
 from requests import Request, Response
+from calendar import monthrange, isleap
 from .enums import enums_groups, enums_folders
 from datetime import datetime, date, timedelta
 
@@ -390,9 +390,6 @@ def generate_expense(
             "Category": expense.getCategory().getName(),
             "Cost": number_to_decimal(cost),
             "Total": dt_d,
-            "Average": number_to_decimal(
-                dt_d / datetime.strptime(expense.getDate(), "%Y-%m-%dT%H:%M:%SZ").day
-            ),
             "Currency": f"{expense.getCurrencyCode()} > EUR"
             if expense.getCurrencyCode().lower() != "eur"
             else expense.getCurrencyCode(),
@@ -426,12 +423,24 @@ def generate_expense(
         dc = generate_chart(dc, chart_type=chart, filename=filename)
     if csv:
         d_df = list(map(lambda obj: {k: v for k, v in obj.items() if k != "id"}, df))
-        average_date = (
-            datetime.now().day
-            if datetime(date[1], date[0], 1).month == datetime.now().month
-            else monthrange(date[1], date[0])[1]
-        )
+        year = date[1]
+        month = date[0]
+        average_divider = len(d_df)
+        if year and month:
+            if datetime(year, month, 1).month == datetime.now().month:
+                average_divider = datetime.now().day
+            else:
+                average_divider = monthrange(year, month)[1]
+        elif year:
+            average_divider = 366 if isleap(year) else 365
+        elif len(df and df[0]["Date"]):
+            start_year = datetime.strptime(df[0]["Date"], "%d %B %Y").year
+            end_year = datetime.strptime(df[-1]["Date"], "%d %B %Y").year
+            start_date = datetime(start_year, 1, 1)
+            end_date = datetime(end_year, 12, 31)
+            difference = end_date - start_date
+            average_divider = difference.days
         generate_csv(
-            d_df, filename, ("average", number_to_decimal(dt_d / average_date))
+            d_df, filename, ("average", number_to_decimal(dt_d / average_divider))
         )
     return {"table": df, "data": dd, "chart": dc}
