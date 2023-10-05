@@ -1,11 +1,11 @@
-from .__init__ import app
+from app import flask_app
 from .utils import serializer
 from .enums import enums_users
 from flask import redirect, url_for
 from flask_login import UserMixin, LoginManager
 
 login_manager = LoginManager()
-login_manager.init_app(app)
+login_manager.init_app(flask_app)
 
 
 class Authentication(UserMixin):

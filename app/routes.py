@@ -1,5 +1,5 @@
 import os
-from .__init__ import app
+from app import flask_app
 from .config import config as cf
 from .auth import Authentication
 from flask_cors import cross_origin
@@ -21,13 +21,13 @@ secret_download_key = enums_headers.get_header_prop("download_secret", "key")
 secret_download_value = enums_headers.get_header_prop("download_secret", "value")
 
 
-@app.route("/")
+@flask_app.route("/")
 @cross_origin()
 def index():
     return render_template("index.html", environment=cf.environment)
 
 
-@app.route("/login", methods=["POST"])
+@flask_app.route("/login", methods=["POST"])
 @cross_origin()
 def login():
     username = request.form.get("username")
@@ -38,7 +38,7 @@ def login():
     return redirect(url_for("index"))
 
 
-@app.route("/logout", methods=["POST"])
+@flask_app.route("/logout", methods=["POST"])
 @cross_origin()
 @login_required
 def logout():
@@ -48,21 +48,21 @@ def logout():
     return response
 
 
-@app.route("/sw.js")
+@flask_app.route("/sw.js")
 @cross_origin()
 @login_required
 def sw():
-    return app.send_static_file("sw.js")
+    return flask_app.send_static_file("sw.js")
 
 
-@app.route("/groups", methods=["GET"])
+@flask_app.route("/groups", methods=["GET"])
 @cross_origin()
 @login_required
 def groups():
     return data_groups()
 
 
-@app.route("/expenses", methods=["POST"])
+@flask_app.route("/expenses", methods=["POST"])
 @cross_origin()
 @login_required
 def expenses():
@@ -85,7 +85,7 @@ def expenses():
     )
 
 
-@app.route("/download")
+@flask_app.route("/download")
 @cross_origin()
 @login_required
 def download():
@@ -101,7 +101,7 @@ def download():
     )
 
 
-@app.route("/download/<filename>")
+@flask_app.route("/download/<filename>")
 @cross_origin()
 @login_required
 def download_file(filename):
