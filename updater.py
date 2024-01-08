@@ -1,6 +1,7 @@
 import asyncio, argparse, json, re, io
 from collections import namedtuple
 from typing import Iterable
+from subprocess import call
 import urllib.request
 
 Package = namedtuple("Package", ["name", "version", "raw"])
@@ -60,6 +61,7 @@ if __name__ == "__main__":
         print(
             placeholder.format(name=new.name, old_ver=old.version, new_ver=new.version)
         )
+        call("pip install --upgrade " + new.name, shell=True)
     if args.update:
         with open(args.filename.name, mode="w", encoding="utf_8", newline="\n") as f:
             f.writelines([raw + "\n" for *_, raw in current_packages])
