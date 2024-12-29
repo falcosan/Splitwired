@@ -25,8 +25,10 @@ export default function Home() {
     category: null,
     chart: ["pie", "bar"],
     monthYear: `${max.year}-${String(new Date().getMonth() + 1).padStart(2, '0')}`,
+    year: new Date().getFullYear(),
   });
 
+  const currentYear = useRef(parameters.year);
   const currentMonthYear = useRef(parameters.monthYear);
   const currentGroup = useRef(parameters.group);
   const currentPersonal = useRef(parameters.personal);
@@ -45,19 +47,18 @@ export default function Home() {
   }, [table]);
 
   const categoryCheck = useMemo(() => {
-    return Boolean(parameters.personal) === Boolean(currentPersonal.current) &&
-      (parameters.personal || String(parameters.group) === String(currentGroup.current));
+    return Boolean(parameters.personal) === Boolean(currentPersonal.current) && (parameters.personal || String(parameters.group) === String(currentGroup.current));
   }, [parameters.group, parameters.personal, currentGroup, currentPersonal]);
 
   const categories = useMemo(() => {
-    if (data.length && categoryCheck && parameters.monthYear === currentMonthYear.current) {
+    if (data.length && categoryCheck && (parameters.monthYear === currentMonthYear.current || currentYear.current)) {
       return data
         .map((item) => item.category)
         .filter((v, i, a) => a.findIndex((v2) => v2.id === v.id) === i)
         .sort((a, b) => a.name.localeCompare(b.name));
     }
     return [];
-  }, [data, categoryCheck, parameters.monthYear]);
+  }, [data, categoryCheck, parameters.monthYear, parameters.year]);
 
   const expenses = useMemo(() => {
     if (!parameters.category) {
@@ -67,19 +68,16 @@ export default function Home() {
     const categoryItem = categories.find(
       (item) => String(item.id) === String(parameters.category)
     );
+
     const filteredData = categoryItem
-      ? data.filter((item) => item.category.name === categoryItem.name)
+      ? data.filter((item) => item.category.name === categoryItem.name) 
       : data;
 
     let total = 0;
     return table
-      .filter((item) =>
-        filteredData.map((dataItem) => dataItem.id).includes(item[properties.id])
-      )
+      .filter((item) => filteredData.map((dataItem) => dataItem.id).includes(item[properties.id]))
       .map((item, index) => {
-        total += Number(
-          filteredData[index][parameters.personal ? "user_cost" : "cost"]
-        );
+        total += Number(filteredData[index][parameters.personal ? "user_cost" : "cost"]);
         return {
           ...importFilter(item, properties.id, false, true),
           [properties.number]: index + 1,
@@ -96,33 +94,31 @@ export default function Home() {
     const buildQuery = (version) => {
       const params = {
         ...(version === "static" && {
-          monthYear: currentMonthYear.current,
           group: currentGroup.current,
           category: parameters.category,
+          year: currentYear.current,
           personal: currentPersonal.current,
+          monthYear: currentMonthYear.current,
         }),
         ...(version === "dynamic" && {
-          monthYear: parameters.monthYear,
           group: parameters.group,
           category: parameters.category,
           personal: parameters.personal,
+          year: parameters.year,
+          monthYear: parameters.monthYear,
         }),
       };
 
-      const group = params.personal
-        ? "Personal"
-        : params.group
-        ? groups.find((g) => String(g.id) === String(params.group))?.name || ""
-        : "Home";
+      const group = params.personal 
+        ? "Personal" 
+        : params.group 
+          ? groups.find((g) => String(g.id) === String(params.group))?.name || "" 
+          : "Home";
 
-      const category =
-        params.category &&
+      const category = params.category && 
         (version === "dynamic" ? parameters.csv && categoryCheck : true)
-          ? ` - ${
-              categories.find((c) => String(c.id) === String(params.category))
-                ?.name || ""
-            }`
-          : "";
+        ? ` - ${categories.find((c) => String(c.id) === String(params.category))?.name || ""}`
+        : "";
 
       let dateString = "";
       if (params.monthYear) {
@@ -130,6 +126,8 @@ export default function Home() {
         const selectedDate = new Date(year, month - 1);
         const monthName = selectedDate.toLocaleString("en", { month: "long" });
         dateString = ` - ${monthName} - ${year}`;
+      } else if (params.year) {
+        dateString = ` - ${params.year}`;
       } else {
         dateString = " - All time";
       }
@@ -145,10 +143,9 @@ export default function Home() {
 
   const info = useMemo(() => {
     if (!expenses.length) return null;
-
     const total = expenses[expenses.length - 1][properties.total];
-
     let averageDivider;
+
     if (parameters.monthYear) {
       const [year, month] = parameters.monthYear.split('-');
       const date = new Date(year, month - 1);
@@ -158,6 +155,13 @@ export default function Home() {
       } else {
         const lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
         averageDivider = lastDayOfMonth.getDate();
+      }
+    } else if (parameters.year) {
+      const selectedYear = new Date().getFullYear();
+      if (parameters.year === selectedYear) {
+        averageDivider = new Date().getDate() + new Date().getMonth() * 30;
+      } else {
+        averageDivider = 365;
       }
     } else {
       const firstExpense = new Date(expenses[0].Date);
@@ -173,7 +177,7 @@ export default function Home() {
         maximumFractionDigits: 2,
       }),
     };
-  }, [expenses, parameters.monthYear]);
+  }, [expenses, parameters.monthYear, parameters.year]);
 
   useEffect(() => {
     setParameters((prevParams) => ({
@@ -199,6 +203,7 @@ export default function Home() {
     e.preventDefault();
     setStatus("Loading");
     currentMonthYear.current = parameters.monthYear;
+    currentYear.current = parameters.year;
     currentGroup.current = parameters.group;
     currentPersonal.current = parameters.personal;
 
@@ -211,6 +216,8 @@ export default function Home() {
         const [year, month] = parameters.monthYear.split('-');
         requestParams.year = year;
         requestParams.month = month;
+      } else if (parameters.year) {
+        requestParams.year = parameters.year;
       }
 
       const { data, table, chart } = await api.getExpenses(requestParams);
@@ -250,6 +257,7 @@ export default function Home() {
     importFilter(parameters, ["group", "chart", "category"], false)
   ).map(([key, value]) => {
     const state = { label: key, type: "", target: "", max: null, min: null };
+
     switch (key.toLowerCase()) {
       case "personal":
       case "csv":
@@ -263,7 +271,14 @@ export default function Home() {
         state.min = `${min.year}-01`;
         state.max = `${max.year}-12`;
         break;
+      case "year":
+        state.type = "number";
+        state.target = "value";
+        state.min = min.year;
+        state.max = max.year;
+        break;
     }
+
     return { value, name: key, ...state };
   });
 
@@ -337,12 +352,8 @@ export default function Home() {
               }`}
               key={input.name}
               {...input}
-              getInputValue={(value) =>
-                setParameters((prevParams) => ({
-                  ...prevParams,
-                  [input.name]: value,
-                }))
-              }
+              disabled={input.name === 'year' ? !!parameters.monthYear : false}
+              getInputValue={(value) => setParameters((prevParams) => ({ ...prevParams, [input.name]: value }))}
             />
           ))}
         </div>
