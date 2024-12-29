@@ -47,11 +47,11 @@ export default function Home() {
   }, [table]);
 
   const categoryCheck = useMemo(() => {
-    return Boolean(parameters.personal) === Boolean(currentPersonal.current) && (parameters.personal || String(parameters.group) === String(currentGroup.current));
+    return Boolean(parameters.personal) === Boolean(currentPersonal.current) && String(parameters.group) === String(currentGroup.current);
   }, [parameters.group, parameters.personal, currentGroup, currentPersonal]);
 
   const categories = useMemo(() => {
-    if (data.length && categoryCheck && (parameters.monthYear === currentMonthYear.current || currentYear.current)) {
+    if (data.length && categoryCheck && parameters.monthYear === currentMonthYear.current && parameters.year === currentYear.current) {
       return data
         .map((item) => item.category)
         .filter((v, i, a) => a.findIndex((v2) => v2.id === v.id) === i)
@@ -334,10 +334,7 @@ export default function Home() {
               key={index}
               className="min-w-[200px]"
               getSelectValue={(value) =>
-                setParameters((prevParams) => ({
-                  ...prevParams,
-                  [select.parameter]: value,
-                }))
+                setParameters((prevParams) => ({ ...prevParams, [select.parameter]: value }))
               }
             />
           ))}
@@ -353,7 +350,9 @@ export default function Home() {
               key={input.name}
               {...input}
               disabled={input.name === 'year' ? !!parameters.monthYear : false}
-              getInputValue={(value) => setParameters((prevParams) => ({ ...prevParams, [input.name]: value }))}
+              getInputValue={(value) => 
+                setParameters((prevParams) => ({ ...prevParams, [input.name]: value }))
+              }
             />
           ))}
         </div>
