@@ -9,8 +9,9 @@ module.exports = () => {
     mode: env.ENVIRONMENT ?? "production",
     entry: "./src/index.js",
     output: {
-      filename: "bundle.js",
       path: path.resolve(__dirname, "static"),
+      filename:
+        env.ENVIRONMENT === "production" ? "bundle.js" : "bundle.dev.js",
     },
     resolve: {
       extensions: [".js", ".jsx"],

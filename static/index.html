@@ -21,7 +21,11 @@
     <noscript>No JavaScript no party</noscript>
     {% if current_user.is_authenticated %}
     <main id="root"></main>
-    <script src="{{ url_for('static', filename='bundle.js')}}"></script>
+    {% if environment == 'development' %}
+    <script src="{{url_for('static', filename='bundle.dev.js')}}"></script>
+    {% else %}
+    <script src="{{url_for('static', filename='bundle.js')}}"></script>
+    {% endif %}
     <script>
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("../sw.js");
