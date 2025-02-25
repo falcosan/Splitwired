@@ -6,6 +6,6 @@ node_modules
 .DS_Store
 *.csv
 .tool-versions
-/static/bundle.*
+/static/bundle.js.LICENSE.txt
 *.zip
 package-lock.json
