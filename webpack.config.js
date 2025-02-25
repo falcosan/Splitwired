@@ -1,9 +1,7 @@
-const path = require('path');
-const zlib = require('zlib');
+const path = require("path");
 const dotenv = require("dotenv");
 const Dotenv = require("dotenv-webpack");
-const CompressionPlugin = require('compression-webpack-plugin');
-const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 
 module.exports = () => {
   const env = { ...process.env, ...dotenv.config().parsed };
@@ -49,24 +47,11 @@ module.exports = () => {
           implementation: ImageMinimizerPlugin.imageminMinify,
           options: {
             plugins: [
-              ['jpegtran', { progressive: true }],
-              ['optipng', { optimizationLevel: 5 }],
+              ["jpegtran", { progressive: true }],
+              ["optipng", { optimizationLevel: 5 }],
             ],
           },
-        }
-      }),
-      new CompressionPlugin({
-        filename: '[path][base].br',
-        algorithm: 'brotliCompress',
-        test: /\.(js|css|html|svg)$/,
-        threshold: 10240,
-        minRatio: 0.8,
-        compressionOptions: {
-          params: {
-            [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
-          },
         },
-        deleteOriginalAssets: env.ENVIRONMENT !== 'development'
       }),
     ],
   };
