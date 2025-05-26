@@ -325,7 +325,6 @@ export default function Home() {
   });
   useRemovesNullClass();
 
-  // Grouping selects and inputs for FormComponent
   const formSelects = {
     groups: { label: "Group", options: groups, parameter: "group" },
     categories: {

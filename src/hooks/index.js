@@ -18,3 +18,5 @@ export const useRemovesNullClass = () => {
   }, []);
   useMutationObserver("html", handler, { attributes: true, subtree: true });
 };
+
+export { useExpenses } from "./useExpenses";
