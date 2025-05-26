@@ -10,7 +10,7 @@ import { buildQueryString } from "@/utils/queryBuilder";
 
 const Header = memo(({ onLogout }) => (
   <div className="flex justify-between items-center mb-6">
-    <h1 className="text-3xl font-bold text-slate-200">Expense Tracker</h1>
+    <h1 className="text-3xl font-bold text-slate-200">Splitwired</h1>
     <button
       className="px-4 py-2 font-semibold rounded-lg border-2 hover:bg-opacity-80 border-slate-300 text-zinc-900 bg-[#5dc4a7] transition-colors"
       onClick={onLogout}
@@ -149,7 +149,11 @@ const ImprovedHome = () => {
 
         <ExpensesTable expenses={expenses} status={status} />
 
-        <ChartsComponent chart={data.chart} status={status} />
+        <ChartsComponent
+          chart={data.chart}
+          status={status}
+          expenses={expenses}
+        />
       </div>
     </div>
   );

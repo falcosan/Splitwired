@@ -15,13 +15,13 @@ const MemoizedSummaryComponent = memo(({ info }) => {
           <p className="text-lg font-medium text-slate-300 mb-2">
             Total Expenses:
           </p>
-          <p className="text-3xl font-bold text-blue-400">${total}</p>
+          <p className="text-3xl font-bold text-blue-400">€{total}</p>
         </div>
         <div className="p-6 bg-slate-700 rounded-lg shadow">
           <p className="text-lg font-medium text-slate-300 mb-2">
             Average Expense:
           </p>
-          <p className="text-3xl font-bold text-green-400">${average}</p>
+          <p className="text-3xl font-bold text-green-400">€{average}</p>
         </div>
       </div>
     </div>

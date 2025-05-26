@@ -110,16 +110,47 @@ export const useExpenses = () => {
   ]);
 
   const summaryInfo = useMemo(() => {
-    if (expenses.length) {
-      const total = expenses.reduce((acc, expense) => {
-        const costKey = parameters.personal ? "user_cost" : "cost";
-        const matchingData = data.data.find(
-          (item) => item.id === expense[properties.id]
+    if (data.data.length > 0) {
+      const costKey = parameters.personal ? "user_cost" : "cost";
+
+      let filteredData = data.data;
+      if (parameters.category) {
+        const found = categories.find(
+          (item) => String(item.id) === String(parameters.category)
         );
-        return acc + (matchingData ? Number(matchingData[costKey]) : 0);
+        if (found) {
+          filteredData = data.data.filter(
+            (item) => item.category.name === found.name
+          );
+        }
+      }
+
+      const total = filteredData.reduce((acc, item) => {
+        return acc + Number(item[costKey] || 0);
       }, 0);
 
-      const averageDivider = parameters.personal ? 1 : data.groups.length || 1;
+      const now = new Date();
+      let averageDivider = 1;
+
+      if (parameters.personal) {
+        const currentMonth = parseInt(parameters.month);
+        const currentYear = parseInt(parameters.year);
+
+        if (currentMonth && currentYear) {
+          const inputDate = new Date(currentYear, currentMonth - 1, 1);
+          if (
+            inputDate.getFullYear() === now.getFullYear() &&
+            inputDate.getMonth() === now.getMonth()
+          ) {
+            averageDivider = now.getDate();
+          } else {
+            const lastDayOfMonth = new Date(currentYear, currentMonth, 0);
+            averageDivider = lastDayOfMonth.getDate();
+          }
+        }
+      } else {
+        averageDivider = data.groups.length || 1;
+      }
 
       return {
         total: total.toLocaleString("en", {
@@ -135,7 +166,15 @@ export const useExpenses = () => {
       };
     }
     return null;
-  }, [expenses, parameters.personal, data.groups, data.data, properties.id]);
+  }, [
+    data.data,
+    data.groups,
+    parameters.personal,
+    parameters.category,
+    parameters.month,
+    parameters.year,
+    categories,
+  ]);
   const initializeData = useCallback(async () => {
     setLoading(true);
     setStatus("Loading");
