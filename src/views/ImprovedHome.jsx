@@ -9,16 +9,16 @@ import { useExpenses, useRemovesNullClass } from "@/hooks";
 import { buildQueryString } from "@/utils/queryBuilder";
 
 const Header = memo(({ onLogout }) => (
-  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 p-4 sm:p-6 bg-slate-800 rounded-lg shadow-lg border border-slate-700">
+  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 p-4 md:p-6 bg-slate-800 rounded-lg shadow-lg border border-slate-700">
     <div className="flex items-center gap-3">
-      <h1 className="text-2xl sm:text-3xl font-bold text-slate-200">
+      <h1 className="text-2xl md:text-3xl font-bold text-slate-200">
         Splitwired
       </h1>
     </div>
     <button
-      className="px-4 py-2 sm:px-6 sm:py-3 font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 
+      className="px-4 py-2 md:px-6 md:py-3 font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 
                  bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl 
-                 flex items-center gap-2 w-full sm:w-auto justify-center text-sm sm:text-base"
+                 flex items-center gap-2 w-full md:w-auto justify-center text-sm md:text-base"
       onClick={onLogout}
     >
       Logout
@@ -52,11 +52,11 @@ const ExpensesTable = memo(({ expenses, status }) => {
   if (status || expenses.length === 0) return null;
 
   return (
-    <div className="mt-6 bg-slate-800 rounded-lg p-4 sm:p-6 shadow-lg overflow-hidden">
-      <h3 className="text-lg sm:text-xl font-semibold text-slate-200 mb-4 sm:mb-6">
+    <div className="mt-6 bg-slate-800 rounded-lg p-4 md:p-6 shadow-lg overflow-hidden">
+      <h3 className="text-lg md:text-xl font-semibold text-slate-200 mb-4 md:mb-6">
         Expenses
       </h3>
-      <div className="overflow-x-auto -mx-4 sm:mx-0">
+      <div className="overflow-x-auto -mx-4 md:mx-0">
         <div className="inline-block min-w-full align-middle">
           <Table className="w-full min-w-[600px]" data={expenses} />
         </div>
@@ -130,19 +130,19 @@ const ImprovedHome = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 max-w-7xl">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8 max-w-7xl">
         <Header onLogout={handleLogout} />
 
         <DownloadsComponent downloads={downloads} loading={loading} />
 
         <div className="mt-6">
-          <div className="bg-slate-800 rounded-lg p-4 sm:p-6 border border-slate-700 mb-6">
+          <div className="bg-slate-800 rounded-lg p-4 md:p-6 border border-slate-700 mb-6">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-xs sm:text-sm font-medium text-slate-400 uppercase tracking-wide">
+              <span className="text-xs md:text-sm font-medium text-slate-400 uppercase tracking-wide">
                 Current Filter
               </span>
             </div>
-            <span className="block text-base sm:text-lg font-semibold text-slate-200 break-words">
+            <span className="block text-base md:text-lg font-semibold text-slate-200 break-words">
               {queryStrings.current}
             </span>
           </div>

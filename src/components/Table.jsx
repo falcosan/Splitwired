@@ -29,7 +29,7 @@ export default function Table(props) {
           <tr key={headerGroup.id} className="border-b border-slate-600">
             {headerGroup.headers.map((header) => (
               <th
-                className="px-2 py-2 sm:px-4 sm:py-3 align-baseline whitespace-nowrap text-left font-semibold uppercase tracking-wide text-xs sm:text-sm"
+                className="px-2 py-2 md:px-4 md:py-3 align-baseline whitespace-nowrap text-left font-semibold uppercase tracking-wide text-xs md:text-sm"
                 key={header.id}
               >
                 {header.isPlaceholder
@@ -53,11 +53,11 @@ export default function Table(props) {
           >
             {row.getVisibleCells().map((cell) => (
               <td
-                className="px-2 py-2 sm:px-4 sm:py-3 text-slate-300 text-xs sm:text-sm whitespace-nowrap"
+                className="px-2 py-2 md:px-4 md:py-3 text-slate-300 text-xs md:text-sm whitespace-nowrap"
                 key={cell.id}
               >
                 <div
-                  className="truncate max-w-[120px] sm:max-w-none"
+                  className="truncate max-w-[120px] md:max-w-none"
                   title={String(
                     flexRender(cell.column.columnDef.cell, cell.getContext())
                   )}
