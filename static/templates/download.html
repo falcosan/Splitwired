@@ -1,18 +1,16 @@
 {% for file in files|sort(attribute='name') %}
 <li class="mb-2 md:mb-3 last:mb-0">
   <a
-    class="flex flex-col xs:flex-row xs:items-center xs:justify-between p-3 md:p-4 bg-slate-600 hover:bg-slate-500 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md gap-2 xs:gap-3"
+    class="flex flex-wrap p-3 md:p-4 bg-slate-600 hover:bg-slate-500 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md gap-2 sm:gap-3"
     href="{{ url_for('download_file', filename=file.path) }}"
   >
-    <div class="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+    <div class="flex flex-auto items-center">
       <span
         class="text-slate-200 group-hover:text-white font-medium text-sm md:text-base break-all"
         >{{ file.name }}</span
       >
     </div>
-    <div
-      class="flex items-center justify-between xs:justify-end gap-2 xs:ml-3 flex-shrink-0"
-    >
+    <div class="flex items-center justify-between gap-2 mx-auto">
       <span
         class="text-xs font-medium text-slate-400 group-hover:text-slate-300 bg-slate-700 px-2 py-1 rounded whitespace-nowrap"
       >

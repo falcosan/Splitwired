@@ -129,49 +129,43 @@ const ImprovedHome = () => {
   useRemovesNullClass();
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8 max-w-7xl">
-        <Header onLogout={handleLogout} />
+    <div className="container mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8 max-w-7xl">
+      <Header onLogout={handleLogout} />
 
-        <DownloadsComponent downloads={downloads} loading={loading} />
+      <DownloadsComponent downloads={downloads} loading={loading} />
 
-        <div className="mt-6">
-          <div className="bg-slate-800 rounded-lg p-4 md:p-6 border border-slate-700 mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xs md:text-sm font-medium text-slate-400 uppercase tracking-wide">
-                Current Filter
-              </span>
-            </div>
-            <span className="block text-base md:text-lg font-semibold text-slate-200 break-words">
-              {queryStrings.current}
+      <div className="mt-6">
+        <div className="bg-slate-800 rounded-lg p-4 md:p-6 border border-slate-700 mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs md:text-sm font-medium text-slate-400 uppercase tracking-wide">
+              Current Filter
             </span>
           </div>
-
-          <FormComponent
-            parameters={parameters}
-            onParameterChange={handleParameterChange}
-            onDateChange={handleDateChange}
-            onSubmit={handleFormSubmit}
-            status={status}
-            groups={data.groups}
-            categories={categories}
-            min={min}
-            max={max}
-          />
+          <span className="block text-base md:text-lg font-semibold text-slate-200 break-words">
+            {queryStrings.current}
+          </span>
         </div>
 
-        <MemoizedSummaryComponent info={summaryInfo} />
-
-        <StatusDisplay status={status} query={queryStrings.current} />
-
-        <ExpensesTable expenses={expenses} status={status} />
-
-        <ChartsComponent
-          chart={data.chart}
+        <FormComponent
+          parameters={parameters}
+          onParameterChange={handleParameterChange}
+          onDateChange={handleDateChange}
+          onSubmit={handleFormSubmit}
           status={status}
-          expenses={expenses}
+          groups={data.groups}
+          categories={categories}
+          min={min}
+          max={max}
         />
       </div>
+
+      <MemoizedSummaryComponent info={summaryInfo} />
+
+      <StatusDisplay status={status} query={queryStrings.current} />
+
+      <ExpensesTable expenses={expenses} status={status} />
+
+      <ChartsComponent chart={data.chart} status={status} expenses={expenses} />
     </div>
   );
 };
