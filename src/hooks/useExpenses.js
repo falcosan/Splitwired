@@ -16,11 +16,10 @@ export const useExpenses = () => {
     groups: [],
   });
   const [parameters, setParameters] = useState({
-    personal: true,
     csv: false,
     month: String(new Date().getMonth() + 1),
     year: String(max.year),
-    group: null,
+    group: "personal",
     chart: ["pie", "bar"],
     category: null,
   });
@@ -28,8 +27,8 @@ export const useExpenses = () => {
   const currentState = useRef({
     year: parameters.year,
     month: parameters.month,
-    group: parameters.category,
-    personal: parameters.personal,
+    group: parameters.group,
+    category: parameters.category,
   });
 
   const properties = useMemo(() => {
@@ -46,12 +45,8 @@ export const useExpenses = () => {
   }, [data.table]);
 
   const categoryCheck = useMemo(() => {
-    return Boolean(parameters.personal)
-      ? Boolean(parameters.personal) === Boolean(currentState.current.personal)
-      : Boolean(parameters.personal) ===
-          Boolean(currentState.current.personal) &&
-          String(parameters.group) === String(currentState.current.group);
-  }, [parameters.group, parameters.personal]);
+    return String(parameters.group) === String(currentState.current.group);
+  }, [parameters.group]);
 
   const categories = useMemo(() => {
     if (
@@ -68,6 +63,8 @@ export const useExpenses = () => {
     return [];
   }, [data.data, categoryCheck, parameters.year, parameters.month]);
   const expenses = useMemo(() => {
+    const isPersonal = parameters.group === "personal";
+
     if (!parameters.category) {
       return data.table.map((item) =>
         importFilter(item, properties.id, false, true)
@@ -87,9 +84,7 @@ export const useExpenses = () => {
         filters.map((item) => item.id).includes(item[properties.id])
       )
       .map((item, index) => {
-        total += Number(
-          filters[index][parameters.personal ? "user_cost" : "cost"]
-        );
+        total += Number(filters[index][isPersonal ? "user_cost" : "cost"]);
         return {
           ...importFilter(item, properties.id, false, true),
           [properties.number]: index + 1,
@@ -104,14 +99,15 @@ export const useExpenses = () => {
     data.data,
     data.table,
     parameters.category,
-    parameters.personal,
+    parameters.group,
     categories,
     properties,
   ]);
 
   const summaryInfo = useMemo(() => {
     if (data.data.length > 0) {
-      const costKey = parameters.personal ? "user_cost" : "cost";
+      const isPersonal = parameters.group === "personal";
+      const costKey = isPersonal ? "user_cost" : "cost";
 
       let filteredData = data.data;
       if (parameters.category) {
@@ -132,7 +128,7 @@ export const useExpenses = () => {
       const now = new Date();
       let averageDivider = 1;
 
-      if (parameters.personal) {
+      if (isPersonal) {
         const currentMonth = parseInt(parameters.month);
         const currentYear = parseInt(parameters.year);
 
@@ -169,7 +165,7 @@ export const useExpenses = () => {
   }, [
     data.data,
     data.groups,
-    parameters.personal,
+    parameters.group,
     parameters.category,
     parameters.month,
     parameters.year,
@@ -202,7 +198,7 @@ export const useExpenses = () => {
         year: searchParams.year,
         month: searchParams.month,
         group: searchParams.group,
-        personal: searchParams.personal,
+        category: searchParams.category,
       };
 
       setData((prev) => ({ ...prev, data: [], table: [], chart: [] }));

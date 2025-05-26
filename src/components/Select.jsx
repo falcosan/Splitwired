@@ -7,6 +7,7 @@ const Select = ({
   label,
   options = [],
   className = "",
+  hasDefault = false,
   ...props
 }) => {
   if (!options.length) return null;
@@ -25,9 +26,11 @@ const Select = ({
                    transition-all duration-200 cursor-pointer hover:border-slate-500 text-sm md:text-base"
         {...props}
       >
-        <option value="" className="bg-slate-700 text-slate-400">
-          - Select {label || "Option"} -
-        </option>
+        {!hasDefault && (
+          <option value="" className="bg-slate-700 text-slate-400">
+            - Select {label || "Option"} -
+          </option>
+        )}
         {options.map((option, index) => (
           <option
             key={option?.id ?? index}

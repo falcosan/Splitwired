@@ -14,6 +14,11 @@ const FormComponent = ({
   min,
   max,
 }) => {
+  const enhancedGroups = [
+    { id: "personal", name: "Personal" },
+    { id: "home", name: "Home" },
+    ...groups,
+  ];
   const handleInputChange = useCallback(
     (e) => {
       const { name, value } = e.target;
@@ -59,16 +64,15 @@ const FormComponent = ({
             maxYear={max.year}
           />
 
-          {groups.length > 0 && (
-            <Select
-              name="group"
-              value={parameters.group || ""}
-              label="Group"
-              options={groups}
-              onChange={handleSelectChange}
-              className="h-fit"
-            />
-          )}
+          <Select
+            name="group"
+            value={parameters.group || "personal"}
+            label="Group"
+            options={enhancedGroups}
+            onChange={handleSelectChange}
+            className="h-fit"
+            hasDefault={true}
+          />
         </div>
 
         {categories.length > 0 && (
@@ -82,14 +86,6 @@ const FormComponent = ({
         )}
 
         <div className="grid md:grid-cols-2 gap-4 md:gap-6">
-          <Input
-            name="personal"
-            label="Personal Expenses"
-            type="checkbox"
-            checked={parameters.personal}
-            onChange={handleInputChange}
-          />
-
           <Input
             name="csv"
             label="Export to CSV"

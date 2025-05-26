@@ -5,15 +5,16 @@ export const buildQueryString = (
   min,
   max
 ) => {
-  const { year, month, group, category, personal } = params;
+  const { year, month, group, category } = params;
 
   const getGroupName = () => {
-    if (personal) return "Personal";
+    if (group === "personal") return "Personal";
+    if (group === "home") return "Home";
     if (group) {
       const found = groups.find((g) => String(g.id) === String(group));
       return found ? found.name : "";
     }
-    return "Home";
+    return "Personal"; // Default fallback
   };
 
   const getCategoryName = () => {

@@ -33,12 +33,6 @@ const StatusDisplay = memo(({ status, query }) => {
 
   return (
     <div className="mt-6 p-4 rounded-lg bg-slate-800">
-      {query && (
-        <span className="block text-lg font-semibold text-slate-300 mb-2">
-          {query}
-        </span>
-      )}
-      <hr className="my-3 border-slate-600" />
       <p className="text-center text-lg font-semibold text-slate-300">
         {status}
       </p>
