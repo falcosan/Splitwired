@@ -29,7 +29,6 @@ pandas==2.2.3
 pathspec==0.12.1
 peewee==3.18.1
 pip==25.1.1
-pip-autoremove==0.10.0
 platformdirs==4.3.8
 plotly==6.1.1
 protobuf==6.31.0
