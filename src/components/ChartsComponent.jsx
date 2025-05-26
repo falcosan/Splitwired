@@ -15,11 +15,16 @@ const ChartsComponent = ({ chart, status, expenses = [] }) => {
   }
 
   return (
-    <div className="mt-6 bg-slate-800 rounded-lg p-6 shadow-lg">
-      <h3 className="text-xl font-semibold text-slate-200 mb-4">Charts</h3>
-      <div className="grid gap-4 md:grid-cols-2">
+    <div className="mt-6 bg-slate-800 rounded-lg p-4 sm:p-6 shadow-lg">
+      <h3 className="text-lg sm:text-xl font-semibold text-slate-200 mb-4 sm:mb-6">
+        Charts
+      </h3>
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
         {chart.map((figure, index) => (
-          <div key={index} className="p-4 bg-slate-700 rounded shadow">
+          <div
+            key={index}
+            className="p-3 sm:p-4 bg-slate-700 rounded-lg shadow min-h-0"
+          >
             <Plot
               data={figure.data}
               layout={{
@@ -27,10 +32,16 @@ const ChartsComponent = ({ chart, status, expenses = [] }) => {
                 paper_bgcolor: "rgba(0,0,0,0)",
                 plot_bgcolor: "rgba(0,0,0,0)",
                 font: { color: "#e2e8f0" },
+                margin: { l: 40, r: 20, t: 40, b: 40 },
+                autosize: true,
               }}
               useResizeHandler
-              className="w-full h-full"
-              config={{ displayModeBar: false }}
+              className="w-full"
+              style={{ height: "300px", minHeight: "250px" }}
+              config={{
+                displayModeBar: false,
+                responsive: true,
+              }}
             />
           </div>
         ))}

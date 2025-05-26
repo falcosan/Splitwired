@@ -20,9 +20,9 @@ const Select = ({
         name={name}
         value={value}
         onChange={onChange}
-        className="rounded-lg px-4 py-3 bg-slate-700 border border-slate-600 text-slate-200 
+        className="rounded-lg px-3 py-2 sm:px-4 sm:py-3 bg-slate-700 border border-slate-600 text-slate-200 
                    focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 focus:outline-none
-                   transition-all duration-200 cursor-pointer hover:border-slate-500"
+                   transition-all duration-200 cursor-pointer hover:border-slate-500 text-sm sm:text-base"
         {...props}
       >
         <option value="" className="bg-slate-700 text-slate-400">

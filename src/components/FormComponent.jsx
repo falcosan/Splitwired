@@ -41,13 +41,13 @@ const FormComponent = ({
   const isLoading = status === "Loading";
 
   return (
-    <div className="bg-slate-800 rounded-lg p-6 shadow-lg border border-slate-700">
-      <h2 className="text-2xl font-semibold text-slate-200 mb-6 flex items-center gap-2">
+    <div className="bg-slate-800 rounded-lg p-4 md:p-6 shadow-lg border border-slate-700">
+      <h2 className="text-xl md:text-2xl font-semibold text-slate-200 mb-4 md:mb-6 flex items-center gap-2">
         Filter Options
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6">
           <DatePicker
             value={{
               month: parameters.month,
@@ -81,7 +81,7 @@ const FormComponent = ({
           />
         )}
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6">
           <Input
             name="personal"
             label="Personal Expenses"

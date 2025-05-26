@@ -9,44 +9,18 @@ import { useExpenses, useRemovesNullClass } from "@/hooks";
 import { buildQueryString } from "@/utils/queryBuilder";
 
 const Header = memo(({ onLogout }) => (
-  <div className="flex justify-between items-center mb-8 p-6 bg-slate-800 rounded-lg shadow-lg border border-slate-700">
+  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 p-4 sm:p-6 bg-slate-800 rounded-lg shadow-lg border border-slate-700">
     <div className="flex items-center gap-3">
-      <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-          />
-        </svg>
-      </div>
-      <h1 className="text-3xl font-bold text-slate-200">Splitwired</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-slate-200">
+        Splitwired
+      </h1>
     </div>
     <button
-      className="px-6 py-3 font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 
+      className="px-4 py-2 sm:px-6 sm:py-3 font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 
                  bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl 
-                 flex items-center gap-2"
+                 flex items-center gap-2 w-full sm:w-auto justify-center text-sm sm:text-base"
       onClick={onLogout}
     >
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-        />
-      </svg>
       Logout
     </button>
   </div>
@@ -78,10 +52,14 @@ const ExpensesTable = memo(({ expenses, status }) => {
   if (status || expenses.length === 0) return null;
 
   return (
-    <div className="mt-6 bg-slate-800 rounded-lg p-6 shadow-lg overflow-hidden">
-      <h3 className="text-xl font-semibold text-slate-200 mb-4">Expenses</h3>
-      <div className="overflow-x-auto">
-        <Table className="w-full" data={expenses} />
+    <div className="mt-6 bg-slate-800 rounded-lg p-4 sm:p-6 shadow-lg overflow-hidden">
+      <h3 className="text-lg sm:text-xl font-semibold text-slate-200 mb-4 sm:mb-6">
+        Expenses
+      </h3>
+      <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <div className="inline-block min-w-full align-middle">
+          <Table className="w-full min-w-[600px]" data={expenses} />
+        </div>
       </div>
     </div>
   );
@@ -151,33 +129,20 @@ const ImprovedHome = () => {
   useRemovesNullClass();
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 max-w-7xl">
         <Header onLogout={handleLogout} />
 
         <DownloadsComponent downloads={downloads} loading={loading} />
 
         <div className="mt-6">
-          <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 mb-6">
-            <div className="flex items-center gap-2 mb-2">
-              <svg
-                className="w-5 h-5 text-blue-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span className="text-sm font-medium text-slate-400 uppercase tracking-wide">
+          <div className="bg-slate-800 rounded-lg p-4 sm:p-6 border border-slate-700 mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xs sm:text-sm font-medium text-slate-400 uppercase tracking-wide">
                 Current Filter
               </span>
             </div>
-            <span className="block text-lg font-semibold text-slate-200">
+            <span className="block text-base sm:text-lg font-semibold text-slate-200 break-words">
               {queryStrings.current}
             </span>
           </div>
