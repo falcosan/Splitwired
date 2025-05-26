@@ -1,10 +1,11 @@
 import api from "@/api";
-import Plot from "react-plotly.js";
-import Input from "@/components/Input";
 import Table from "@/components/Table";
-import Select from "@/components/Select";
 import { importFilter } from "@/utils/import";
 import { useRemovesNullClass } from "@/hooks";
+import FormComponent from "@/components/FormComponent";
+import ChartsComponent from "@/components/ChartsComponent";
+import SummaryComponent from "@/components/SummaryComponent";
+import DownloadsComponent from "@/components/DownloadsComponent";
 import React, {
   useState,
   useMemo,
@@ -323,136 +324,102 @@ export default function Home() {
     return { value, name: key, ...state };
   });
   useRemovesNullClass();
+
+  // Grouping selects and inputs for FormComponent
+  const formSelects = {
+    groups: { label: "Group", options: groups, parameter: "group" },
+    categories: {
+      label: "Category",
+      options: categories,
+      parameter: "category",
+    },
+  };
+
+  const formInputs = Object.entries(
+    importFilter(parameters, ["group", "chart", "category"], false)
+  ).map(([key, value]) => {
+    const state = { label: key, type: "", target: "", max: null, min: null };
+    switch (key.toLowerCase()) {
+      case "personal":
+        state.type = "checkbox";
+        state.target = "checked";
+        break;
+      case "csv":
+        state.type = "checkbox";
+        state.target = "checked";
+        state.label = key.toUpperCase();
+        break;
+      case "month":
+        state.min = min.month;
+        state.max = max.month;
+        state.type = "number";
+        state.target = "value";
+        break;
+      case "year":
+        state.min = min.year;
+        state.max = max.year;
+        state.type = "number";
+        state.target = "value";
+        break;
+    }
+    return { value, name: key, ...state };
+  });
+
   return (
     <div className="container mx-auto">
       <div className="flex">
-        <Input
+        <input
           className="p-2.5 font-semibold rounded border-2 hover:bg-opacity-80 border-slate-300 text-zinc-900 bg-[#5dc4a7]"
           type="submit"
           onClick={getLogout}
           value="Logout"
         />
       </div>
-      <div
-        className={`relative flex mt-5 overflow-hidden rounded ${
-          downloads.length ? null : "border-4 border-dashed"
-        }`}
-      >
-        {loading && (
-          <div
-            className={`${
-              downloads.length ? "absolute inset-0" : "p-2.5"
-            } w-full h-full flex items-center justify-center bg-opacity-70 bg-gray-600`}
-          >
-            <span className="text-[16px] font-semibold text-slate-300">
-              Loading
-            </span>
-          </div>
-        )}
-        {downloads.length ? (
-          <ul
-            className="w-full p-2.5 overflow-y-auto rounded bg-slate-300"
-            dangerouslySetInnerHTML={{ __html: downloads }}
-          />
-        ) : (
-          !loading && (
-            <span className="block p-2.5 mx-auto text-[16px] font-semibold text-slate-300">
-              Downloads
-            </span>
-          )
-        )}
-      </div>
-      <span className="block mt-5 text-[16px] font-semibold text-slate-300">
-        {query.searched}
-      </span>
-      <form
-        onSubmit={getData}
-        className="flex flex-col items-start space-y-5 mt-5"
-      >
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {Object.values(selects).map((select, index) => (
-            <Select
-              {...select}
-              key={index}
-              className="min-w-[200px]"
-              getSelectValue={(value) =>
-                setParameters({ ...parameters, [select.parameter]: value })
-              }
-            />
-          ))}
-        </div>
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {inputs.map((input) => (
-            <Input
-              className={`justify-self-start self-start ${
-                input.type == null || /text|number/.test(input.type)
-                  ? "w-full min-w-[200px]"
-                  : "w-32"
-              }`}
-              key={input.name}
-              {...input}
-              getInputValue={(value) =>
-                setParameters({
-                  ...parameters,
-                  [input.name]: value,
-                })
-              }
-            />
-          ))}
-        </div>
-        <Input
-          className={`self-end p-2.5 font-semibold rounded border-2 border-slate-300 text-zinc-900 ${
-            status.toLowerCase() === "loading"
-              ? "bg-slate-300"
-              : "hover:bg-opacity-80 bg-[#5dc4a7]"
-          }`}
-          type="submit"
-          disabled={status.toLowerCase() === "loading"}
-          value="Calculate"
-        />
-      </form>
-      {info ? (
-        <>
-          <span className="block mt-5 text-slate-300">
-            Total {info.total} €
-          </span>
-          <span className="block mt-5 text-slate-300">
-            Average {info.average} €
-          </span>
-        </>
-      ) : null}
-      <span className="block mt-5 text-[16px] font-semibold text-slate-300">
-        {data.length || status ? query.current : ""}
-      </span>
-      <hr className="mt-5 border-slate-600" />
-      {status ? (
-        <span className="block w-full mt-10 text-center text-[16px] font-semibold text-slate-300">
-          {status}
+
+      <DownloadsComponent downloads={downloads} loading={loading} />
+
+      <div className="mt-5">
+        <h2 className="text-2xl font-semibold text-slate-200 mb-3">
+          Filter Options
+        </h2>
+        <span className="block text-[16px] font-semibold text-slate-300 mb-3">
+          {query.searched}
         </span>
-      ) : expenses.length ? (
-        <>
-          <div className="overflow-x-auto">
-            <Table className="w-full mt-10" data={expenses} />
+        <FormComponent
+          parameters={parameters}
+          setParameters={setParameters}
+          status={status}
+          getData={getData}
+          selects={formSelects}
+          inputs={formInputs}
+        />
+      </div>
+
+      <SummaryComponent info={info} />
+
+      <div className="mt-5">
+        {(data.length > 0 || status) && (
+          <>
+            <span className="block text-[16px] font-semibold text-slate-300">
+              {query.current}
+            </span>
+            <hr className="my-3 border-slate-600" />
+          </>
+        )}
+
+        {status && status !== "Loading" && status !== "Ready" && (
+          <p className="w-full my-4 text-center text-[16px] font-semibold text-slate-300">
+            {status}
+          </p>
+        )}
+
+        {!status && expenses.length > 0 && (
+          <div className="overflow-x-auto mt-4">
+            <Table className="w-full" data={expenses} />
           </div>
-        </>
-      ) : null}
-      {chart.length && !status ? (
-        <>
-          <hr className="mt-10 border-slate-600" />
-          <div className="overflow-x-auto">
-            {Array.from({ length: chart.length }, (_, i) => (
-              <Plot
-                className="w-full mt-10 rounded overflow-hidden"
-                key={i}
-                data={chart[i].data}
-                layout={chart[i].layout}
-                config={chart[i].config}
-                useResizeHandler
-              />
-            ))}
-          </div>
-        </>
-      ) : null}
+        )}
+        <ChartsComponent chart={chart} status={status} />
+      </div>
     </div>
   );
 }
