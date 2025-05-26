@@ -53,16 +53,22 @@ const DatePicker = ({
   };
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
+    <div className={`flex flex-col gap-3 ${className}`}>
       <label className="text-slate-300 font-medium capitalize">{label}</label>
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <select
           value={selectedMonth}
           onChange={handleMonthChange}
-          className="flex-1 rounded px-3 py-2 border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+          className="flex-1 rounded-lg px-4 py-3 bg-slate-700 border border-slate-600 text-slate-200 
+                     focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 focus:outline-none
+                     transition-all duration-200 cursor-pointer hover:border-slate-500"
         >
           {months.map((month) => (
-            <option key={month.value} value={month.value}>
+            <option
+              key={month.value}
+              value={month.value}
+              className="bg-slate-700 text-slate-200"
+            >
               {month.label}
             </option>
           ))}
@@ -70,10 +76,16 @@ const DatePicker = ({
         <select
           value={selectedYear}
           onChange={handleYearChange}
-          className="w-24 rounded px-3 py-2 border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+          className="w-28 rounded-lg px-4 py-3 bg-slate-700 border border-slate-600 text-slate-200 
+                     focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 focus:outline-none
+                     transition-all duration-200 cursor-pointer hover:border-slate-500"
         >
           {years.map((year) => (
-            <option key={year} value={year}>
+            <option
+              key={year}
+              value={year}
+              className="bg-slate-700 text-slate-200"
+            >
               {year}
             </option>
           ))}

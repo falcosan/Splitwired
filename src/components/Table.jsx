@@ -19,13 +19,17 @@ export default function Table(props) {
     getCoreRowModel: getCoreRowModel(),
   });
   return (
-    <table className={`overflow-hidden rounded ${props.className ?? null}`}>
-      <thead className="bg-slate-800 text-slate-300">
+    <table
+      className={`overflow-hidden rounded-lg shadow-lg ${
+        props.className ?? null
+      }`}
+    >
+      <thead className="bg-slate-700 text-slate-200">
         {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id}>
+          <tr key={headerGroup.id} className="border-b border-slate-600">
             {headerGroup.headers.map((header) => (
               <th
-                className="p-1 align-baseline whitespace-pre-wrap text-left"
+                className="px-4 py-3 align-baseline whitespace-pre-wrap text-left font-semibold uppercase tracking-wide text-sm"
                 key={header.id}
               >
                 {header.isPlaceholder
@@ -39,11 +43,16 @@ export default function Table(props) {
           </tr>
         ))}
       </thead>
-      <tbody>
-        {table.getRowModel().rows.map((row) => (
-          <tr key={row.id}>
+      <tbody className="divide-y divide-slate-600">
+        {table.getRowModel().rows.map((row, index) => (
+          <tr
+            key={row.id}
+            className={`hover:bg-slate-700 transition-colors ${
+              index % 2 === 0 ? "bg-slate-800" : "bg-slate-750"
+            }`}
+          >
             {row.getVisibleCells().map((cell) => (
-              <td className="p-1 bg-zinc-600 text-slate-300" key={cell.id}>
+              <td className="px-4 py-3 text-slate-300 text-sm" key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>
             ))}

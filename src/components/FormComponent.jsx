@@ -41,8 +41,8 @@ const FormComponent = ({
   const isLoading = status === "Loading";
 
   return (
-    <div className="bg-slate-800 rounded-lg p-6 shadow-lg">
-      <h2 className="text-2xl font-semibold text-slate-200 mb-4">
+    <div className="bg-slate-800 rounded-lg p-6 shadow-lg border border-slate-700">
+      <h2 className="text-2xl font-semibold text-slate-200 mb-6 flex items-center gap-2">
         Filter Options
       </h2>
 
@@ -102,11 +102,11 @@ const FormComponent = ({
           type="submit"
           disabled={isLoading}
           className={`
-            w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors
+            w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 transform
             ${
               isLoading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-200"
+                ? "bg-slate-600 text-slate-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 active:scale-95 text-white shadow-lg hover:shadow-xl"
             }
           `}
         >

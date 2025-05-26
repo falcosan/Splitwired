@@ -25,19 +25,23 @@ const Input = ({
   };
 
   const inputClasses = `
-    rounded px-3 py-2 border transition-colors
-    ${disabled ? "bg-gray-100 cursor-not-allowed" : "cursor-pointer"}
-    ${type === "checkbox" ? "w-4 h-4" : "w-full"}
+    rounded-lg transition-all duration-200
+    ${disabled ? "bg-slate-600 cursor-not-allowed text-slate-500" : ""}
     ${
-      type !== "checkbox"
-        ? "border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-        : ""
+      type === "checkbox"
+        ? "w-5 h-5 text-blue-600 bg-slate-700 border-slate-600 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+        : `w-full px-4 py-3 bg-slate-700 border border-slate-600 text-slate-200 placeholder-slate-400 
+         focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 focus:outline-none`
     }
   `.trim();
 
   const labelClasses = `
-    flex items-center gap-2 font-medium text-slate-300
-    ${type === "checkbox" ? "flex-row cursor-pointer" : "flex-col"}
+    flex gap-3 font-medium text-slate-300
+    ${
+      type === "checkbox"
+        ? "flex-row items-center cursor-pointer hover:text-slate-200"
+        : "flex-col"
+    }
     ${className}
   `.trim();
 
