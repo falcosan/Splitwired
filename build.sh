@@ -7,7 +7,7 @@ set -o pipefail
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 
 print_status() {
@@ -33,12 +33,12 @@ if [[ ! -f "requirements.txt" ]]; then
 fi
 
 print_status "Installing frontend dependencies..."
-if command -v yarn &> /dev/null; then
-    yarn install --frozen-lockfile
+if command -v npm &> /dev/null; then
+    npm install
     print_status "Building frontend assets..."
-    yarn build
+    npm run build
 else
-    print_error "Yarn is not installed. Please install yarn first."
+    print_error "npm is not installed. Please install npm first."
     exit 1
 fi
 
