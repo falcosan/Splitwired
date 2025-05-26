@@ -129,8 +129,10 @@ export const useExpenses = () => {
       let averageDivider = 1;
 
       if (isPersonal) {
-        const currentMonth = parseInt(parameters.month);
-        const currentYear = parseInt(parameters.year);
+        const currentMonth = parameters.month
+          ? parseInt(parameters.month)
+          : null;
+        const currentYear = parameters.year ? parseInt(parameters.year) : null;
 
         if (currentMonth && currentYear) {
           const inputDate = new Date(currentYear, currentMonth - 1, 1);
@@ -142,6 +144,22 @@ export const useExpenses = () => {
           } else {
             const lastDayOfMonth = new Date(currentYear, currentMonth, 0);
             averageDivider = lastDayOfMonth.getDate();
+          }
+        } else if (currentYear && !currentMonth) {
+          const isCurrentYear = currentYear === now.getFullYear();
+          if (isCurrentYear) {
+            const startOfYear = new Date(currentYear, 0, 1);
+            averageDivider =
+              Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
+          } else {
+            const isLeapYear =
+              (currentYear % 4 === 0 && currentYear % 100 !== 0) ||
+              currentYear % 400 === 0;
+            averageDivider = isLeapYear ? 366 : 365;
+          }
+        } else {
+          if (filteredData.length > 0) {
+            averageDivider = Math.max(30, filteredData.length);
           }
         }
       } else {
@@ -204,12 +222,20 @@ export const useExpenses = () => {
       setData((prev) => ({ ...prev, data: [], table: [], chart: [] }));
 
       try {
+        const apiParams = { ...searchParams };
+        if (!apiParams.month || apiParams.month === "") {
+          delete apiParams.month;
+        }
+        if (!apiParams.year || apiParams.year === "") {
+          delete apiParams.year;
+        }
+
         const {
           data: expenseData,
           table,
           chart,
         } = await api.getExpenses(
-          importFilter(searchParams, ["category", "csv"], false)
+          importFilter(apiParams, ["category", "csv"], false)
         );
 
         if (expenseData) {
@@ -221,7 +247,7 @@ export const useExpenses = () => {
           if (expenseData.length && searchParams.csv) {
             setLoading(true);
             try {
-              await api.getExpenses(searchParams);
+              await api.getExpenses(apiParams);
               const newDownloads = await api.getDownloads();
               setDownloads(newDownloads);
             } finally {

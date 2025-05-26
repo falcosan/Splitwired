@@ -9,14 +9,13 @@ const DatePicker = ({
   className = "",
 }) => {
   const currentDate = new Date();
-  const selectedMonth = value?.month
-    ? parseInt(value.month)
-    : currentDate.getMonth() + 1;
-  const selectedYear = value?.year
-    ? parseInt(value.year)
-    : currentDate.getFullYear();
+  const selectedMonth =
+    value?.month != null ? value.month : currentDate.getMonth() + 1;
+  const selectedYear =
+    value?.year != null ? value.year : currentDate.getFullYear();
 
   const months = [
+    { value: "", label: "All months" },
     { value: 1, label: "January" },
     { value: 2, label: "February" },
     { value: 3, label: "March" },
@@ -31,23 +30,28 @@ const DatePicker = ({
     { value: 12, label: "December" },
   ];
 
-  const years = [];
+  const years = [{ value: "", label: "All time" }];
   for (let year = minYear; year <= maxYear; year++) {
-    years.push(year);
+    years.push({ value: year, label: year.toString() });
   }
 
   const handleMonthChange = (e) => {
+    // Don't allow month changes when "All time" is selected
+    if (selectedYear === "") return;
+
     const month = e.target.value;
     onChange({
       month: month,
-      year: selectedYear.toString(),
+      year: selectedYear || "",
     });
   };
 
   const handleYearChange = (e) => {
     const year = e.target.value;
+    // If "All time" is selected, set month to "All months" as well
+    const month = year === "" ? "" : selectedMonth || "";
     onChange({
-      month: selectedMonth.toString(),
+      month: month,
       year: year,
     });
   };
@@ -59,9 +63,13 @@ const DatePicker = ({
         <select
           value={selectedMonth}
           onChange={handleMonthChange}
-          className="flex-1 rounded-lg px-3 py-2 md:px-4 md:py-3 bg-slate-700 border border-slate-600 text-slate-200 
-                     focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 focus:outline-none
-                     transition-all duration-200 cursor-pointer hover:border-slate-500 text-sm md:text-base"
+          disabled={selectedYear === ""}
+          className={`flex-1 rounded-lg px-3 py-2 md:px-4 md:py-3 border text-sm md:text-base transition-all duration-200 focus:outline-none
+                     ${
+                       selectedYear === ""
+                         ? "bg-slate-600 border-slate-500 text-slate-400 cursor-not-allowed"
+                         : "bg-slate-700 border-slate-600 text-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 cursor-pointer hover:border-slate-500"
+                     }`}
         >
           {months.map((month) => (
             <option
@@ -82,11 +90,11 @@ const DatePicker = ({
         >
           {years.map((year) => (
             <option
-              key={year}
-              value={year}
+              key={year.value || "all"}
+              value={year.value}
               className="bg-slate-700 text-slate-200"
             >
-              {year}
+              {year.label}
             </option>
           ))}
         </select>

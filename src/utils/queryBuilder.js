@@ -14,7 +14,7 @@ export const buildQueryString = (
       const found = groups.find((g) => String(g.id) === String(group));
       return found ? found.name : "";
     }
-    return "Personal"; // Default fallback
+    return "Personal";
   };
 
   const getCategoryName = () => {
@@ -26,17 +26,28 @@ export const buildQueryString = (
   };
 
   const getMonthName = () => {
-    if (month && month >= min.month && month <= max.month) {
+    // Don't show month info when year is "All time"
+    if (year === "" || !year) {
+      return "";
+    }
+
+    if (month && month !== "" && month >= min.month && month <= max.month) {
       const date = new Date();
       date.setMonth(month - 1);
       return ` - ${date.toLocaleString("en", { month: "long" })}`;
+    }
+    if (month === "" || !month) {
+      return " - All months";
     }
     return "";
   };
 
   const getYearString = () => {
-    if (year && +year >= min.year && +year <= max.year) {
+    if (year && year !== "" && +year >= min.year && +year <= max.year) {
       return ` - ${year}`;
+    }
+    if (year === "" || !year) {
+      return " - All time";
     }
     return "";
   };
