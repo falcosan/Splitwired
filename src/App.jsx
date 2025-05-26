@@ -1,6 +1,6 @@
 import React from "react";
-import ImprovedHome from "./views/ImprovedHome";
+import Home from "./views/Home";
 
 export default function App() {
-  return <ImprovedHome />;
+  return <Home />;
 }
