@@ -21,7 +21,7 @@ const Select = ({
         value={value}
         onChange={onChange}
         className="rounded-lg px-3 py-2 md:px-4 md:py-3 bg-slate-700 border border-slate-600 text-slate-200 
-                   focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 focus:outline-none
+                   focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 focus:outline-none
                    transition-all duration-200 cursor-pointer hover:border-slate-500 text-sm md:text-base"
         {...props}
       >

@@ -106,7 +106,7 @@ const FormComponent = ({
             ${
               isLoading
                 ? "bg-slate-600 text-slate-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 active:scale-95 text-white shadow-lg hover:shadow-xl"
+                : "bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-lg hover:shadow-xl"
             }
           `}
         >

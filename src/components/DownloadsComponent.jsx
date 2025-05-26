@@ -5,7 +5,7 @@ const DownloadsComponent = ({ downloads, loading }) => {
     return (
       <div className="mt-6 p-4 bg-slate-800 rounded-lg shadow-lg">
         <div className="flex items-center gap-2">
-          <div className="animate-spin h-4 w-4 border-2 border-blue-400 border-t-transparent rounded-full"></div>
+          <div className="animate-spin h-4 w-4 border-2 border-emerald-400 border-t-transparent rounded-full"></div>
           <p className="text-slate-300">Loading downloads...</p>
         </div>
       </div>

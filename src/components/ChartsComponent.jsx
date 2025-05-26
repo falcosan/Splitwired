@@ -16,7 +16,7 @@ const ChartsComponent = ({ chart, status, expenses = [] }) => {
 
   return (
     <div className="mt-6 bg-slate-800 rounded-lg p-4 md:p-6 shadow-lg">
-      <h3 className="text-lg md:text-xl font-semibold text-slate-200 mb-4 md:mb-6">
+      <h3 className="text-lg md:text-xl font-semibold text-slate-200 mb-4 md:mb-6 flex items-center gap-2">
         Charts
       </h3>
       <div className="grid gap-4 md:gap-6 lg:grid-cols-2">
