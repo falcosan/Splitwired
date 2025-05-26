@@ -1,6 +1,5 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import api from "@/api";
-import { importFilter } from "@/utils/import";
 
 export const useExpenses = () => {
   const min = { year: 2020, month: 1 };
@@ -17,9 +16,10 @@ export const useExpenses = () => {
   });
   const [parameters, setParameters] = useState({
     csv: false,
-    month: String(new Date().getMonth() + 1),
-    year: String(max.year),
-    group: "personal",
+    month: new Date().getMonth() + 1,
+    year: max.year,
+    group: null,
+    personal: true,
     chart: ["pie", "bar"],
     category: null,
   });
@@ -29,6 +29,7 @@ export const useExpenses = () => {
     month: parameters.month,
     group: parameters.group,
     category: parameters.category,
+    personal: parameters.personal,
   });
 
   const properties = useMemo(() => {
@@ -62,13 +63,15 @@ export const useExpenses = () => {
     }
     return [];
   }, [data.data, categoryCheck, parameters.year, parameters.month]);
+
   const expenses = useMemo(() => {
-    const isPersonal = parameters.group === "personal";
+    const isPersonal = parameters.personal;
 
     if (!parameters.category) {
-      return data.table.map((item) =>
-        importFilter(item, properties.id, false, true)
-      );
+      return data.table.map((item, index) => ({
+        ...item,
+        [properties.number || "number"]: index + 1,
+      }));
     }
 
     const found = categories.find(
@@ -86,9 +89,9 @@ export const useExpenses = () => {
       .map((item, index) => {
         total += Number(filters[index][isPersonal ? "user_cost" : "cost"]);
         return {
-          ...importFilter(item, properties.id, false, true),
-          [properties.number]: index + 1,
-          [properties.total]: total.toLocaleString("en", {
+          ...item,
+          [properties.number || "number"]: index + 1,
+          [properties.total || "total"]: total.toLocaleString("en", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
             useGrouping: false,
@@ -99,14 +102,14 @@ export const useExpenses = () => {
     data.data,
     data.table,
     parameters.category,
-    parameters.group,
+    parameters.personal,
     categories,
     properties,
   ]);
 
   const summaryInfo = useMemo(() => {
     if (data.data.length > 0) {
-      const isPersonal = parameters.group === "personal";
+      const isPersonal = parameters.personal;
       const costKey = isPersonal ? "user_cost" : "cost";
 
       let filteredData = data.data;
@@ -129,10 +132,8 @@ export const useExpenses = () => {
       let averageDivider = 1;
 
       if (isPersonal) {
-        const currentMonth = parameters.month
-          ? parseInt(parameters.month)
-          : null;
-        const currentYear = parameters.year ? parseInt(parameters.year) : null;
+        const currentMonth = parameters.month;
+        const currentYear = parameters.year;
 
         if (currentMonth && currentYear) {
           const inputDate = new Date(currentYear, currentMonth - 1, 1);
@@ -183,12 +184,25 @@ export const useExpenses = () => {
   }, [
     data.data,
     data.groups,
-    parameters.group,
+    parameters.personal,
     parameters.category,
     parameters.month,
     parameters.year,
     categories,
   ]);
+
+  const buildApiPayload = useCallback((searchParams) => {
+    return {
+      personal: searchParams.personal || false,
+      month: searchParams.month || null,
+      year: searchParams.year || null,
+      group: searchParams.group || null,
+      chart: searchParams.chart || ["pie", "bar"],
+      category: searchParams.category || null,
+      csv: searchParams.csv || false,
+    };
+  }, []);
+
   const initializeData = useCallback(async () => {
     setLoading(true);
     setStatus("Loading");
@@ -217,26 +231,19 @@ export const useExpenses = () => {
         month: searchParams.month,
         group: searchParams.group,
         category: searchParams.category,
+        personal: searchParams.personal,
       };
 
       setData((prev) => ({ ...prev, data: [], table: [], chart: [] }));
 
       try {
-        const apiParams = { ...searchParams };
-        if (!apiParams.month || apiParams.month === "") {
-          delete apiParams.month;
-        }
-        if (!apiParams.year || apiParams.year === "") {
-          delete apiParams.year;
-        }
+        const apiPayload = buildApiPayload(searchParams);
 
         const {
           data: expenseData,
           table,
           chart,
-        } = await api.getExpenses(
-          importFilter(apiParams, ["category", "csv"], false)
-        );
+        } = await api.getExpenses(apiPayload);
 
         if (expenseData) {
           if (table && chart) {
@@ -247,7 +254,8 @@ export const useExpenses = () => {
           if (expenseData.length && searchParams.csv) {
             setLoading(true);
             try {
-              await api.getExpenses(apiParams);
+              const csvPayload = { ...apiPayload, csv: true };
+              await api.getExpenses(csvPayload);
               const newDownloads = await api.getDownloads();
               setDownloads(newDownloads);
             } finally {
@@ -265,22 +273,32 @@ export const useExpenses = () => {
         setStatus("Error");
       }
     },
-    [parameters]
+    [parameters, buildApiPayload]
   );
 
   const updateParameters = useCallback((updates) => {
-    setParameters((prev) => ({ ...prev, ...updates }));
+    setParameters((prev) => {
+      const newParams = { ...prev, ...updates };
+
+      if (updates.hasOwnProperty("group")) {
+        newParams.personal =
+          updates.group === "personal" || updates.group === null;
+      }
+
+      return newParams;
+    });
   }, []);
 
   const handleDateChange = useCallback(
     (dateValue) => {
       updateParameters({
-        month: dateValue.month,
-        year: dateValue.year,
+        month: dateValue.month === "" ? null : parseInt(dateValue.month),
+        year: dateValue.year === "" ? null : parseInt(dateValue.year),
       });
     },
     [updateParameters]
   );
+
   useEffect(() => {
     if (parameters.category) {
       setParameters((prev) => ({ ...prev, category: null }));

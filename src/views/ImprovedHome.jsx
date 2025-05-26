@@ -99,7 +99,17 @@ const ImprovedHome = () => {
 
   const handleParameterChange = useCallback(
     (name, value) => {
-      setParameters({ [name]: value });
+      if (name === "group") {
+        if (value === "personal") {
+          setParameters({ group: null, personal: true });
+        } else if (value === "home") {
+          setParameters({ group: "home", personal: false });
+        } else {
+          setParameters({ group: value, personal: false });
+        }
+      } else {
+        setParameters({ [name]: value });
+      }
     },
     [setParameters]
   );

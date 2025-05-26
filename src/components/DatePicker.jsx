@@ -9,10 +9,8 @@ const DatePicker = ({
   className = "",
 }) => {
   const currentDate = new Date();
-  const selectedMonth =
-    value?.month != null ? value.month : currentDate.getMonth() + 1;
-  const selectedYear =
-    value?.year != null ? value.year : currentDate.getFullYear();
+  const selectedMonth = value?.month || "";
+  const selectedYear = value?.year || "";
 
   const months = [
     { value: "", label: "All months" },
@@ -36,23 +34,20 @@ const DatePicker = ({
   }
 
   const handleMonthChange = (e) => {
-    // Don't allow month changes when "All time" is selected
-    if (selectedYear === "") return;
-
     const month = e.target.value;
     onChange({
-      month: month,
-      year: selectedYear || "",
+      month: month === "" ? null : parseInt(month),
+      year: selectedYear === "" ? null : selectedYear,
     });
   };
 
   const handleYearChange = (e) => {
     const year = e.target.value;
-    // If "All time" is selected, set month to "All months" as well
-    const month = year === "" ? "" : selectedMonth || "";
+    const month =
+      year === "" ? null : selectedMonth === "" ? null : selectedMonth;
     onChange({
       month: month,
-      year: year,
+      year: year === "" ? null : parseInt(year),
     });
   };
 
@@ -63,10 +58,10 @@ const DatePicker = ({
         <select
           value={selectedMonth}
           onChange={handleMonthChange}
-          disabled={selectedYear === ""}
+          disabled={selectedYear === "" || selectedYear === null}
           className={`flex-1 rounded-lg px-3 py-2 md:px-4 md:py-3 border text-sm md:text-base transition-all duration-200 focus:outline-none
                      ${
-                       selectedYear === ""
+                       selectedYear === "" || selectedYear === null
                          ? "bg-slate-600 border-slate-500 text-slate-400 cursor-not-allowed"
                          : "bg-slate-700 border-slate-600 text-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 cursor-pointer hover:border-slate-500"
                      }`}

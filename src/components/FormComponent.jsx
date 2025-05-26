@@ -19,10 +19,20 @@ const FormComponent = ({
     { id: "home", name: "Home" },
     ...groups,
   ];
+
+  const getCurrentGroupValue = () => {
+    if (parameters.personal) return "personal";
+    if (parameters.group === "home") return "home";
+    if (parameters.group && parameters.group !== "personal")
+      return parameters.group;
+    return "personal";
+  };
+
   const handleInputChange = useCallback(
     (e) => {
-      const { name, value } = e.target;
-      onParameterChange(name, value);
+      const { name, value, type, checked } = e.target;
+      const finalValue = type === "checkbox" ? checked : value;
+      onParameterChange(name, finalValue);
     },
     [onParameterChange]
   );
@@ -55,8 +65,8 @@ const FormComponent = ({
         <div className="grid md:grid-cols-2 gap-4 md:gap-6">
           <DatePicker
             value={{
-              month: parameters.month,
-              year: parameters.year,
+              month: parameters.month || "",
+              year: parameters.year || "",
             }}
             onChange={onDateChange}
             label="Select Month & Year"
@@ -66,7 +76,7 @@ const FormComponent = ({
 
           <Select
             name="group"
-            value={parameters.group || "personal"}
+            value={getCurrentGroupValue()}
             label="Group"
             options={enhancedGroups}
             onChange={handleSelectChange}
@@ -90,10 +100,11 @@ const FormComponent = ({
             name="csv"
             label="Export to CSV"
             type="checkbox"
-            checked={parameters.csv}
+            checked={parameters.csv || false}
             onChange={handleInputChange}
           />
         </div>
+
         <button
           type="submit"
           disabled={isLoading}
