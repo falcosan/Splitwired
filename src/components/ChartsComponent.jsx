@@ -19,7 +19,7 @@ const ChartsComponent = ({ chart, status, expenses = [] }) => {
       <h3 className="text-lg md:text-xl font-semibold text-slate-200 mb-4 md:mb-6 flex items-center gap-2">
         Charts
       </h3>
-      <div className="grid gap-4 md:gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 md:gap-6">
         {chart.map((figure, index) => (
           <div
             key={index}

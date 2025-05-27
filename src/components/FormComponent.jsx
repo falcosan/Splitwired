@@ -1,7 +1,7 @@
-import React, { useCallback } from "react";
-import DatePicker from "./DatePicker";
 import Input from "./Input";
 import Select from "./Select";
+import DatePicker from "./DatePicker";
+import React, { useCallback } from "react";
 
 const FormComponent = ({
   parameters,
