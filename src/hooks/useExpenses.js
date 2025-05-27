@@ -128,7 +128,27 @@ export const useExpenses = () => {
         return acc + Number(item[costKey] || 0);
       }, 0);
 
-      const averageDivider = filteredData.length || 1;
+      let endDate;
+
+      const currentDate = new Date();
+      const selectedYear = parameters.year || currentDate.getFullYear();
+      const selectedMonth = parameters.month || currentDate.getMonth() + 1;
+      const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+
+      if (
+        selectedYear === currentDate.getFullYear() &&
+        selectedMonth === currentDate.getMonth() + 1
+      ) {
+        endDate = currentDate;
+      } else {
+        endDate = new Date(selectedYear, selectedMonth, 0);
+      }
+
+      const timeDiff = endDate.getTime() - startDate.getTime();
+      const averageDivider = Math.max(
+        1,
+        Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1
+      );
 
       return {
         total: total.toLocaleString("en", {
