@@ -269,21 +269,21 @@ export const useExpenses = () => {
   }, [categories.length]);
 
   return {
-    status,
-    loading,
-    downloads,
-    data,
-    parameters,
-    expenses,
-    categories,
-    summaryInfo,
     min,
     max,
-    setParameters: updateParameters,
-    handleDateChange,
-    initializeData,
-    fetchExpenses,
+    data,
+    status,
+    loading,
+    expenses,
+    downloads,
+    categories,
+    parameters,
     properties,
+    summaryInfo,
+    fetchExpenses,
     categoryCheck,
+    initializeData,
+    handleDateChange,
+    setParameters: updateParameters,
   };
 };
