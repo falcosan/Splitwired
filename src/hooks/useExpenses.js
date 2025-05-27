@@ -91,10 +91,10 @@ export const useExpenses = () => {
         return {
           ...item,
           [properties.number || "number"]: index + 1,
-          [properties.total || "total"]: total.toLocaleString("en", {
+          [properties.total || "total"]: total.toLocaleString("es", {
+            useGrouping: false,
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-            useGrouping: false,
           }),
         };
       });
@@ -151,12 +151,12 @@ export const useExpenses = () => {
       );
 
       return {
-        total: total.toLocaleString("en", {
+        total: total.toLocaleString("es", {
+          useGrouping: false,
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-          useGrouping: false,
         }),
-        average: (total / averageDivider).toLocaleString("en", {
+        average: (total / averageDivider).toLocaleString("es", {
           useGrouping: false,
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
