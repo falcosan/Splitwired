@@ -128,40 +128,7 @@ export const useExpenses = () => {
         return acc + Number(item[costKey] || 0);
       }, 0);
 
-      const now = new Date();
-      let averageDivider = 1;
-
-      const currentYear = parameters.year;
-      const currentMonth = parameters.month;
-
-      if (currentMonth && currentYear) {
-        const inputDate = new Date(currentYear, currentMonth - 1, 1);
-        if (
-          inputDate.getFullYear() === now.getFullYear() &&
-          inputDate.getMonth() === now.getMonth()
-        ) {
-          averageDivider = now.getDate();
-        } else {
-          const lastDayOfMonth = new Date(currentYear, currentMonth, 0);
-          averageDivider = lastDayOfMonth.getDate();
-        }
-      } else if (currentYear && !currentMonth) {
-        const isCurrentYear = currentYear === now.getFullYear();
-        if (isCurrentYear) {
-          const startOfYear = new Date(currentYear, 0, 1);
-          averageDivider =
-            Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
-        } else {
-          const isLeapYear =
-            (currentYear % 4 === 0 && currentYear % 100 !== 0) ||
-            currentYear % 400 === 0;
-          averageDivider = isLeapYear ? 366 : 365;
-        }
-      } else {
-        if (filteredData.length > 0) {
-          averageDivider = Math.max(30, filteredData.length);
-        }
-      }
+      const averageDivider = filteredData.length || 1;
 
       return {
         total: total.toLocaleString("en", {
