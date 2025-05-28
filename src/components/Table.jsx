@@ -8,14 +8,16 @@ import {
 
 export default function Table(props) {
   const table = useReactTable({
-    columns: props.data.length
-      ? Object.keys(props.data[0]).map((key) =>
-          createColumnHelper().accessor(key, {
-            cell: (info) => info.getValue(),
-          })
-        )
-      : [],
     data: props.data,
+    columns: props.data.length
+      ? Object.keys(props.data[0])
+          .filter((key) => key.toLowerCase() !== "id")
+          .map((key) =>
+            createColumnHelper().accessor(key, {
+              cell: (info) => info.getValue(),
+            })
+          )
+      : [],
     getCoreRowModel: getCoreRowModel(),
   });
   return (
