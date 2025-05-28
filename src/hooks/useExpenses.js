@@ -20,7 +20,7 @@ export const useExpenses = () => {
     year: max.year,
     group: null,
     personal: true,
-    chart: ["pie", "bar"],
+    chart: ["pie"],
     category: null,
   });
 
