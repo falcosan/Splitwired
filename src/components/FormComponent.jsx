@@ -56,8 +56,8 @@ const FormComponent = ({
   const isLoading = status === "Loading";
 
   return (
-    <div className="bg-slate-800 rounded-lg p-4 md:p-6 shadow-lg border border-slate-700">
-      <h2 className="text-xl md:text-2xl font-semibold text-slate-200 mb-4 md:mb-6 flex items-center gap-2">
+    <div className="bg-stone-800 rounded-lg p-4 md:p-6 shadow-lg border border-stone-700">
+      <h2 className="text-xl md:text-2xl font-semibold text-stone-200 mb-4 md:mb-6 flex items-center gap-2">
         Filter Options
       </h2>
 
@@ -112,7 +112,7 @@ const FormComponent = ({
             w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 transform
             ${
               isLoading
-                ? "bg-slate-600 text-slate-400 cursor-not-allowed"
+                ? "bg-stone-600 text-stone-400 cursor-not-allowed"
                 : "bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-lg hover:shadow-xl"
             }
           `}

@@ -53,7 +53,7 @@ const DatePicker = ({
 
   return (
     <div className={`flex flex-col gap-3 ${className}`}>
-      <label className="text-slate-300 font-medium capitalize">{label}</label>
+      <label className="text-stone-300 font-medium capitalize">{label}</label>
       <div className="flex flex-col sm:flex-row gap-3">
         <select
           value={selectedMonth}
@@ -62,15 +62,15 @@ const DatePicker = ({
           className={`flex-1 rounded-lg px-3 py-2 md:px-4 md:py-3 border text-sm md:text-base transition-all duration-200 focus:outline-none
                      ${
                        selectedYear === "" || selectedYear === null
-                         ? "bg-slate-600 border-slate-500 text-slate-400 cursor-not-allowed"
-                         : "bg-slate-700 border-slate-600 text-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 cursor-pointer hover:border-slate-500"
+                         ? "bg-stone-600 border-stone-500 text-stone-400 cursor-not-allowed"
+                         : "bg-stone-700 border-stone-600 text-stone-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 cursor-pointer hover:border-stone-500"
                      }`}
         >
           {months.map((month) => (
             <option
               key={month.value}
               value={month.value}
-              className="bg-slate-700 text-slate-200"
+              className="bg-stone-700 text-stone-200"
             >
               {month.label}
             </option>
@@ -79,15 +79,15 @@ const DatePicker = ({
         <select
           value={selectedYear}
           onChange={handleYearChange}
-          className="sm:w-24 md:w-28 rounded-lg px-3 py-2 md:px-4 md:py-3 bg-slate-700 border border-slate-600 text-slate-200 
+          className="sm:w-24 md:w-28 rounded-lg px-3 py-2 md:px-4 md:py-3 bg-stone-700 border border-stone-600 text-stone-200 
                      focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 focus:outline-none
-                     transition-all duration-200 cursor-pointer hover:border-slate-500 text-sm md:text-base"
+                     transition-all duration-200 cursor-pointer hover:border-stone-500 text-sm md:text-base"
         >
           {years.map((year) => (
             <option
               key={year.value || "all"}
               value={year.value}
-              className="bg-slate-700 text-slate-200"
+              className="bg-stone-700 text-stone-200"
             >
               {year.label}
             </option>

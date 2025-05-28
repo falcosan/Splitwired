@@ -9,9 +9,9 @@ import React, { useLayoutEffect, useCallback, useMemo, memo } from "react";
 import MemoizedSummaryComponent from "@/components/MemoizedSummaryComponent";
 
 const Header = memo(({ onLogout }) => (
-  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 p-4 md:p-6 bg-slate-800 rounded-lg shadow-lg border border-slate-700">
+  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 p-4 md:p-6 bg-stone-800 rounded-lg shadow-lg border border-stone-700">
     <div className="flex items-center gap-3">
-      <h1 className="text-2xl md:text-3xl font-bold text-slate-200">
+      <h1 className="text-2xl md:text-3xl font-bold text-stone-200">
         Splitwired
       </h1>
     </div>
@@ -32,8 +32,8 @@ const StatusDisplay = memo(({ status, query }) => {
   if (!status || status === "Loading" || status === "Ready") return null;
 
   return (
-    <div className="mt-6 p-4 rounded-lg bg-slate-800">
-      <p className="text-center text-lg font-semibold text-slate-300">
+    <div className="mt-6 p-4 rounded-lg bg-stone-800">
+      <p className="text-center text-lg font-semibold text-stone-300">
         {status}
       </p>
     </div>
@@ -46,8 +46,8 @@ const ExpensesTable = memo(({ expenses, status }) => {
   if (status || expenses.length === 0) return null;
 
   return (
-    <div className="mt-6 bg-slate-800 rounded-lg p-4 md:p-6 shadow-lg overflow-hidden">
-      <h3 className="text-lg md:text-xl font-semibold text-slate-200 mb-4 md:mb-6 flex items-center gap-2">
+    <div className="mt-6 bg-stone-800 rounded-lg p-4 md:p-6 shadow-lg overflow-hidden">
+      <h3 className="text-lg md:text-xl font-semibold text-stone-200 mb-4 md:mb-6 flex items-center gap-2">
         Expenses
       </h3>
       <div className="overflow-x-auto -mx-4 md:mx-0">
@@ -135,21 +135,18 @@ const Home = () => {
   return (
     <div className="container mx-auto max-w-7xl">
       <Header onLogout={handleLogout} />
-
       <DownloadsComponent downloads={downloads} loading={loading} />
-
       <div className="mt-6">
-        <div className="bg-slate-800 rounded-lg p-4 md:p-6 border border-slate-700 mb-6">
+        <div className="bg-stone-800 rounded-lg p-4 md:p-6 border border-stone-700 mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs md:text-sm font-medium text-slate-400 uppercase tracking-wide">
+            <span className="text-xs md:text-sm font-medium text-stone-400 uppercase tracking-wide">
               Current Filter
             </span>
           </div>
-          <span className="block text-base md:text-lg font-semibold text-slate-200 break-words">
+          <span className="block text-base md:text-lg font-semibold text-stone-200 break-words">
             {queryStrings.current}
           </span>
         </div>
-
         <FormComponent
           parameters={parameters}
           onParameterChange={handleParameterChange}
@@ -162,13 +159,9 @@ const Home = () => {
           max={max}
         />
       </div>
-
       <MemoizedSummaryComponent info={summaryInfo} />
-
       <StatusDisplay status={status} query={queryStrings.current} />
-
       <ExpensesTable expenses={expenses} status={status} />
-
       <ChartsComponent chart={data.chart} status={status} expenses={expenses} />
     </div>
   );
