@@ -91,7 +91,7 @@ export const useExpenses = () => {
         return {
           ...item,
           [properties.number || "number"]: index + 1,
-          [properties.total || "total"]: total.toLocaleString("es", {
+          [properties.total || "total"]: total.toLocaleString("en", {
             useGrouping: false,
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
@@ -151,12 +151,12 @@ export const useExpenses = () => {
       );
 
       return {
-        total: total.toLocaleString("es", {
+        total: total.toLocaleString("en", {
           useGrouping: false,
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }),
-        average: (total / averageDivider).toLocaleString("es", {
+        average: (total / averageDivider).toLocaleString("en", {
           useGrouping: false,
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
