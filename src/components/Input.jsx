@@ -47,10 +47,7 @@ const Input = ({
 
   return (
     <label className={labelClasses}>
-      {label && type !== "checkbox" && (
-        <span className="capitalize">{label}</span>
-      )}
-
+      {label && type !== "checkbox" && <span>{label}</span>}
       <input
         name={name}
         type={type}
@@ -64,10 +61,7 @@ const Input = ({
         className={inputClasses}
         {...props}
       />
-
-      {label && type === "checkbox" && (
-        <span className="capitalize">{label}</span>
-      )}
+      {label && type === "checkbox" && <span>{label}</span>}
     </label>
   );
 };

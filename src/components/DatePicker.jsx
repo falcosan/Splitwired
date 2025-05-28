@@ -53,7 +53,7 @@ const DatePicker = ({
 
   return (
     <div className={`flex flex-col gap-3 ${className}`}>
-      <label className="text-stone-300 font-medium capitalize">{label}</label>
+      <label className="text-stone-300 font-medium">{label}</label>
       <div className="flex flex-col sm:flex-row gap-3">
         <select
           value={selectedMonth}

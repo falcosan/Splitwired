@@ -14,9 +14,7 @@ const Select = ({
 
   return (
     <div className={`flex flex-col gap-3 ${className}`}>
-      {label && (
-        <label className="text-stone-300 font-medium capitalize">{label}</label>
-      )}
+      {label && <label className="text-stone-300 font-medium">{label}</label>}
       <select
         name={name}
         value={value}
