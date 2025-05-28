@@ -128,27 +128,54 @@ export const useExpenses = () => {
         return acc + Number(item[costKey] || 0);
       }, 0);
 
-      let endDate;
-
+      let averageDivider;
       const currentDate = new Date();
-      const selectedYear = parameters.year || currentDate.getFullYear();
-      const selectedMonth = parameters.month || currentDate.getMonth() + 1;
-      const startDate = new Date(selectedYear, selectedMonth - 1, 1);
 
-      if (
-        selectedYear === currentDate.getFullYear() &&
-        selectedMonth === currentDate.getMonth() + 1
-      ) {
-        endDate = currentDate;
+      const isLeapYear = (year) => {
+        return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+      };
+
+      if (parameters.year && parameters.month) {
+        const selectedYear = parameters.year;
+        const selectedMonth = parameters.month;
+
+        if (
+          selectedYear === currentDate.getFullYear() &&
+          selectedMonth === currentDate.getMonth() + 1
+        ) {
+          averageDivider = currentDate.getDate();
+        } else {
+          const daysInMonth = new Date(
+            selectedYear,
+            selectedMonth,
+            0
+          ).getDate();
+          averageDivider = daysInMonth;
+        }
+      } else if (parameters.year && !parameters.month) {
+        averageDivider = isLeapYear(parameters.year) ? 366 : 365;
       } else {
-        endDate = new Date(selectedYear, selectedMonth, 0);
+        if (filteredData.length > 0 && data.table.length > 0) {
+          const tableData = data.table;
+          if (tableData.length > 0 && tableData[0].Date) {
+            const startYear = new Date(tableData[0].Date).getFullYear();
+            const endYear = new Date(
+              tableData[tableData.length - 1].Date
+            ).getFullYear();
+            const startDate = new Date(startYear, 0, 1);
+            const endDate = new Date(endYear, 11, 31);
+
+            const timeDiff = endDate.getTime() - startDate.getTime();
+            averageDivider = Math.ceil(timeDiff / (1000 * 3600 * 24));
+          } else {
+            averageDivider = filteredData.length || 1;
+          }
+        } else {
+          averageDivider = 1;
+        }
       }
 
-      const timeDiff = endDate.getTime() - startDate.getTime();
-      const averageDivider = Math.max(
-        1,
-        Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1
-      );
+      averageDivider = Math.max(1, averageDivider);
 
       return {
         total: total.toLocaleString("en", {

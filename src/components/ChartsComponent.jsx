@@ -6,10 +6,6 @@ const ChartsComponent = ({ chart, status, expenses = [] }) => {
     return <p className="text-red-500">Error loading chart data.</p>;
   }
 
-  if (status === "Loading") {
-    return <p className="text-gray-500 mt-4">Loading chart data...</p>;
-  }
-
   if (!chart || chart.length === 0 || expenses.length === 0) {
     return null;
   }

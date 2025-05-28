@@ -1,69 +1,29 @@
 import React from "react";
 
 const DownloadsComponent = ({ downloads, loading }) => {
-  if (loading) {
-    return (
-      <div className="mt-6 p-4 bg-stone-800 rounded-lg shadow-lg">
-        <div className="flex items-center gap-2">
-          <p className="text-stone-300">Loading downloads...</p>
-        </div>
+  return (
+    <div className="mt-6 bg-stone-800 rounded-lg shadow-lg overflow-hidden">
+      <div className="p-4 border-b border-stone-700">
+        <h2 className="text-xl font-semibold text-stone-200 flex items-center gap-2">
+          Downloads
+        </h2>
       </div>
-    );
-  }
-
-  if (!downloads || (Array.isArray(downloads) && downloads.length === 0)) {
-    return null;
-  }
-
-  if (typeof downloads === "string") {
-    return (
-      <div className="mt-6 bg-stone-800 rounded-lg shadow-lg overflow-hidden">
-        <div className="p-4 border-b border-stone-700">
-          <h2 className="text-xl font-semibold text-stone-200 flex items-center gap-2">
-            Downloads
-          </h2>
-        </div>
-        <div className="p-4 bg-stone-700">
+      <div className="p-4 bg-stone-700">
+        {loading ? (
+          <div className="p-4 rounded-lg bg-stone-800">
+            <p className="text-stone-400">Loading downloads...</p>
+          </div>
+        ) : downloads ? (
           <ul
-            className="space-y-0"
+            className="space-y-2 md:space-y-3"
             dangerouslySetInnerHTML={{ __html: downloads }}
           />
-        </div>
-      </div>
-    );
-  }
-
-  if (Array.isArray(downloads)) {
-    return (
-      <div className="mt-6 bg-stone-800 rounded-lg shadow-lg overflow-hidden">
-        <div className="p-4 border-b border-stone-700">
-          <h2 className="text-xl font-semibold text-stone-200 flex items-center gap-2">
-            Downloads
-          </h2>
-        </div>
-        <div className="p-4 bg-stone-700">
-          <div className="space-y-2">
-            {downloads.map((download, index) => (
-              <a
-                key={index}
-                href={download.href}
-                download
-                className="flex items-center gap-3 p-3 bg-stone-600 hover:bg-stone-500 rounded-lg transition-colors group"
-              >
-                <span className="text-stone-200 group-hover:text-white font-medium">
-                  {download.text || `Download ${index + 1}`}
-                </span>
-              </a>
-            ))}
+        ) : (
+          <div className="p-4 rounded-lg bg-stone-600">
+            <p className="text-stone-300">No downloads available</p>
           </div>
-        </div>
+        )}
       </div>
-    );
-  }
-
-  return (
-    <div className="mt-6 p-4 bg-red-900 border border-red-700 rounded-lg">
-      <p className="text-red-300">Invalid downloads format.</p>
     </div>
   );
 };

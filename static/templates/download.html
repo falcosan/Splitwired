@@ -1,7 +1,7 @@
 {% for file in files|sort(attribute='name') %}
-<li class="mb-2 md:mb-3 last:mb-0">
+<li>
   <a
-    class="flex flex-wrap p-3 md:p-4 bg-stone-600 hover:bg-emerald-600 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md gap-2 sm:gap-3"
+    class="flex flex-wrap p-3 md:p-4 bg-stone-600 hover:bg-emerald-700 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md gap-2 sm:gap-3"
     href="{{ url_for('download_file', filename=file.path) }}"
   >
     <div class="flex flex-auto items-center gap-2">
