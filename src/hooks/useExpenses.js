@@ -198,10 +198,12 @@ export const useExpenses = () => {
       personal: searchParams.personal || false,
       month: searchParams.month || null,
       year: searchParams.year || null,
-      group: searchParams.group || null,
       chart: searchParams.chart || ["pie", "bar"],
       category: searchParams.category || null,
       csv: searchParams.csv || false,
+      group: /^(home|personal)$/.test(searchParams.group)
+        ? null
+        : searchParams.group || null,
     };
   }, []);
 
