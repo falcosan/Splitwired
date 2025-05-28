@@ -109,13 +109,13 @@ export const useExpenses = () => {
 
   const summaryInfo = useMemo(() => {
     if (data.data.length > 0) {
-      const isPersonal = parameters.personal;
+      const isPersonal = currentState.current.personal;
       const costKey = isPersonal ? "user_cost" : "cost";
 
       let filteredData = data.data;
-      if (parameters.category) {
+      if (currentState.current.category) {
         const found = categories.find(
-          (item) => String(item.id) === String(parameters.category)
+          (item) => String(item.id) === String(currentState.current.category)
         );
         if (found) {
           filteredData = data.data.filter(
@@ -135,9 +135,9 @@ export const useExpenses = () => {
         return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
       };
 
-      if (parameters.year && parameters.month) {
-        const selectedYear = parameters.year;
-        const selectedMonth = parameters.month;
+      if (currentState.current.year && currentState.current.month) {
+        const selectedYear = currentState.current.year;
+        const selectedMonth = currentState.current.month;
 
         if (
           selectedYear === currentDate.getFullYear() &&
@@ -152,8 +152,8 @@ export const useExpenses = () => {
           ).getDate();
           averageDivider = daysInMonth;
         }
-      } else if (parameters.year && !parameters.month) {
-        averageDivider = isLeapYear(parameters.year) ? 366 : 365;
+      } else if (currentState.current.year && !currentState.current.month) {
+        averageDivider = isLeapYear(currentState.current.year) ? 366 : 365;
       } else {
         if (filteredData.length > 0 && data.table.length > 0) {
           const tableData = data.table;
@@ -191,15 +191,7 @@ export const useExpenses = () => {
       };
     }
     return null;
-  }, [
-    data.data,
-    data.groups,
-    parameters.personal,
-    parameters.category,
-    parameters.month,
-    parameters.year,
-    categories,
-  ]);
+  }, [data.data, data.table, categories]);
 
   const buildApiPayload = useCallback((searchParams) => {
     return {
