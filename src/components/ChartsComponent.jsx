@@ -37,11 +37,8 @@ const ChartsComponent = ({ chart, status, expenses = [] }) => {
               }}
               useResizeHandler
               className="w-full"
-              style={{ height: "300px", minHeight: "250px" }}
-              config={{
-                displayModeBar: false,
-                responsive: true,
-              }}
+              style={{ minHeight: "250px" }}
+              config={{ responsive: true, displayModeBar: false }}
             />
           </div>
         ))}
