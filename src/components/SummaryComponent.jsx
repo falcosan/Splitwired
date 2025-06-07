@@ -1,5 +1,3 @@
-import React from "react";
-
 const SummaryComponent = ({ info }) => {
   if (!info) {
     return null;
