@@ -149,7 +149,7 @@ const Home = () => {
           max={max}
         />
       </div>
-      <div className="bg-stone-800 rounded-lg p-4 md:p-6 border border-stone-700 mb-6">
+      <div className="bg-stone-800 rounded-lg p-4 md:p-6 border border-stone-700 mt-6">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-xs md:text-sm font-medium text-stone-400 uppercase tracking-wide">
             Current Filter
