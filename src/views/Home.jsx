@@ -5,7 +5,7 @@ import { buildQueryString } from "@/utils/queryBuilder";
 import { useExpenses, useRemovesNullClass } from "@/hooks";
 import ChartsComponent from "@/components/ChartsComponent";
 import DownloadsComponent from "@/components/DownloadsComponent";
-import { useLayoutEffect, useCallback, useMemo, memo } from "react";
+import React, { useLayoutEffect, useCallback, useMemo, memo } from "react";
 import MemoizedSummaryComponent from "@/components/MemoizedSummaryComponent";
 
 const Header = memo(({ onLogout }) => (
@@ -137,6 +137,16 @@ const Home = () => {
       <Header onLogout={handleLogout} />
       <DownloadsComponent downloads={downloads} loading={loading} />
       <div className="mt-6">
+        <div className="bg-stone-800 rounded-lg p-4 md:p-6 border border-stone-700 mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs md:text-sm font-medium text-stone-400 uppercase tracking-wide">
+              Current Filter
+            </span>
+          </div>
+          <span className="block text-base md:text-lg font-semibold text-stone-200 break-words">
+            {queryStrings.current}
+          </span>
+        </div>
         <FormComponent
           parameters={parameters}
           onParameterChange={handleParameterChange}
@@ -148,16 +158,6 @@ const Home = () => {
           min={min}
           max={max}
         />
-      </div>
-      <div className="bg-stone-800 rounded-lg p-4 md:p-6 border border-stone-700 mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-xs md:text-sm font-medium text-stone-400 uppercase tracking-wide">
-            Current Filter
-          </span>
-        </div>
-        <span className="block text-base md:text-lg font-semibold text-stone-200 break-words">
-          {queryStrings.current}
-        </span>
       </div>
       <MemoizedSummaryComponent info={summaryInfo} />
       <StatusDisplay status={status} query={queryStrings.current} />

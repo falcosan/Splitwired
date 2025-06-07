@@ -1,3 +1,5 @@
+import React from "react";
+
 const DownloadsComponent = ({ downloads, loading }) => {
   return (
     <div className="mt-6 bg-stone-800 rounded-lg shadow-lg overflow-hidden">

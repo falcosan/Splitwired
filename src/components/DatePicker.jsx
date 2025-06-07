@@ -1,3 +1,5 @@
+import React from "react";
+
 const DatePicker = ({
   value,
   onChange,
@@ -6,6 +8,7 @@ const DatePicker = ({
   maxYear = new Date().getFullYear(),
   className = "",
 }) => {
+  const currentDate = new Date();
   const selectedMonth = value?.month || "";
   const selectedYear = value?.year || "";
 
