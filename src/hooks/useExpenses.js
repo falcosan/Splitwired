@@ -113,9 +113,9 @@ export const useExpenses = () => {
       const costKey = isPersonal ? "user_cost" : "cost";
 
       let filteredData = data.data;
-      if (currentState.current.category) {
+      if (parameters.category) {
         const found = categories.find(
-          (item) => String(item.id) === String(currentState.current.category)
+          (item) => String(item.id) === String(parameters.category)
         );
         if (found) {
           filteredData = data.data.filter(
@@ -191,7 +191,7 @@ export const useExpenses = () => {
       };
     }
     return null;
-  }, [data.data, data.table, categories]);
+  }, [data.data, data.table, categories, parameters.category]);
 
   const buildApiPayload = useCallback((searchParams) => {
     return {
