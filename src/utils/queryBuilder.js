@@ -20,7 +20,7 @@ export const buildQueryString = (
   const getCategoryName = () => {
     if (category) {
       const found = categories.find((c) => String(c.id) === String(category));
-      return found ? ` - ${found.name}` : "";
+      return found ? ` | ${found.name}` : "";
     }
     return "";
   };
@@ -39,10 +39,10 @@ export const buildQueryString = (
     ) {
       const date = new Date();
       date.setMonth(month - 1);
-      return ` - ${date.toLocaleString("en", { month: "long" })}`;
+      return ` | ${date.toLocaleString("en", { month: "long" })}`;
     }
     if (month === null || month === "" || !month) {
-      return " - All months";
+      return " | All months";
     }
     return "";
   };
@@ -55,10 +55,10 @@ export const buildQueryString = (
       +year >= min.year &&
       +year <= max.year
     ) {
-      return ` - ${year}`;
+      return ` | ${year}`;
     }
     if (year === null || year === "" || !year) {
-      return " - All time";
+      return " | All time";
     }
     return "";
   };

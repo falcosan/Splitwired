@@ -28,7 +28,7 @@ const Header = memo(({ onLogout }) => (
 
 Header.displayName = "Header";
 
-const StatusDisplay = memo(({ status, query }) => {
+const StatusDisplay = memo(({ status }) => {
   if (!status || status === "Loading" || status === "Ready") return null;
 
   return (
