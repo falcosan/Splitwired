@@ -1,6 +1,6 @@
 #!/bin/bash
 
-STATIC_PACKAGES=("yfinance")
+STATIC_PACKAGES=()
 
 rm -rf .venv
 uv venv
