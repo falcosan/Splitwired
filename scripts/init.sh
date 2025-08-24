@@ -1,5 +1,7 @@
 #!/bin/bash
 
+STATIC_PACKAGES=("yfinance")
+
 rm -rf .venv
 uv venv
 source .venv/bin/activate
@@ -27,8 +29,12 @@ while IFS= read -r line; do
     else
         package_name=$(echo "$line" | sed 's/[<>=!].*//' | xargs)
         if [[ -n "$package_name" ]]; then
-            version_line=$(echo "$installed_packages" | grep "^${package_name}==")
-            echo "${version_line:-$line}" >> "$final_temp"
+            if [[ " ${STATIC_PACKAGES[@]} " =~ " ${package_name} " ]]; then
+                echo "$line" >> "$final_temp"
+            else
+                version_line=$(echo "$installed_packages" | grep "^${package_name}==")
+                echo "${version_line:-$line}" >> "$final_temp"
+            fi
         fi
     fi
 done < requirements.txt
