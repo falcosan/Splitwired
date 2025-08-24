@@ -15,14 +15,12 @@ info() { echo -e "${GREEN}[INFO]${NC} $1"; }
 [[ -f "requirements.txt" ]] || error "requirements.txt not found"
 
 if command -v npm >/dev/null 2>&1; then
-    info "Building frontend..."
     npm install --silent
     npm run build --silent
 else
     error "npm not found. Please install Node.js/npm first"
 fi
 
-info "Setting up Python environment."
 pip install --upgrade pip --quiet
 pip install -r requirements.txt --quiet
 
