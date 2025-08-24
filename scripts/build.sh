@@ -1,51 +1,29 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
-set -o pipefail
+set -euo pipefail
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+error() { echo -e "${RED}[ERROR]${NC} $1" >&2; exit 1; }
+warn() { echo -e "${YELLOW}[WARN]${NC} $1" >&2; }
+info() { echo -e "${GREEN}[INFO]${NC} $1"; }
 
-print_status() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
+[[ -f "package.json" ]] || error "package.json not found"
+[[ -f "requirements.txt" ]] || error "requirements.txt not found"
 
-print_warning() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-if [[ ! -f "package.json" ]]; then
-    print_error "package.json not found. Are you in the correct directory?"
-    exit 1
-fi
-
-if [[ ! -f "requirements.txt" ]]; then
-    print_error "requirements.txt not found. Are you in the correct directory?"
-    exit 1
-fi
-
-print_status "Installing frontend dependencies..."
-if command -v npm &> /dev/null; then
-    npm install
-    print_status "Building frontend assets..."
-    npm run build
+if command -v npm >/dev/null 2>&1; then
+    info "Building frontend..."
+    npm install --silent
+    npm run build --silent
 else
-    print_error "npm is not installed. Please install npm first."
-    exit 1
+    error "npm not found. Please install Node.js/npm first"
 fi
 
-print_status "Upgrading pip..."
-pip install --upgrade pip
+info "Setting up Python environment."
+pip install --upgrade pip --quiet
+pip install -r requirements.txt --quiet
 
-print_status "Installing Python dependencies..."
-pip install -r requirements.txt
-
-print_status "Build completed successfully!"
+info "Build completed!"
