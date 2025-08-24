@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --config webpack.config.js --watch",
+    "init": "./scripts/init.sh",
+    "postinstall": "npm run build",
     "build": "webpack --mode production",
-    "server": "flask run",
-    "postinstall": "npm run build"
+    "server": "npm run init && flask run",
+    "dev": "webpack --config webpack.config.js --watch"
   },
   "repository": {
     "type": "git",
