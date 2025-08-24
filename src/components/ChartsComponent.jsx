@@ -3,7 +3,7 @@ import Plot from "react-plotly.js";
 
 const ChartsComponent = ({ chart, status, expenses = [] }) => {
   if (status === "Error") {
-    return <p className="text-red-400">Error loading chart data.</p>;
+    return <p className="mt-5 text-red-400">Error loading chart data.</p>;
   }
 
   if (!chart || chart.length === 0 || expenses.length === 0) {
