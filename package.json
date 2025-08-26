@@ -34,7 +34,7 @@
     "@babel/core": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-react": "^7.27.1",
-    "babel-loader": "^10.0.0",
+    "babel-loader": "^9.2.1",
     "css-loader": "^7.1.2",
     "dotenv-webpack": "^8.1.1",
     "image-minimizer-webpack-plugin": "^4.1.4",
