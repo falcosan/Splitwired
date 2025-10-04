@@ -3,7 +3,7 @@
 STATIC_PACKAGES=()
 
 rm -rf .venv
-uv venv
+python3 -m venv .venv
 source .venv/bin/activate
 
 temp_file=$(mktemp)
@@ -18,10 +18,10 @@ while IFS= read -r line; do
     fi
 done < requirements.txt
 
-uv pip install $(grep -v '^[[:space:]]*#' "$temp_file" | grep -v '^[[:space:]]*$' | tr '\n' ' ')
+pip install $(grep -v '^[[:space:]]*#' "$temp_file" | grep -v '^[[:space:]]*$' | tr '\n' ' ')
 
 final_temp=$(mktemp)
-installed_packages=$(uv pip freeze)
+installed_packages=$(pip freeze)
 
 while IFS= read -r line; do
     if [[ $line =~ ^[[:space:]]*# ]] || [[ -z "$line" ]]; then
@@ -40,5 +40,5 @@ while IFS= read -r line; do
 done < requirements.txt
 
 mv "$final_temp" requirements.txt
-uv pip install -r requirements.txt
+pip install -r requirements.txt
 rm -f "$temp_file"
