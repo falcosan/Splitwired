@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   flexRender,
   useReactTable,
@@ -6,28 +6,39 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 
-export default function Table(props) {
+const columnHelper = createColumnHelper();
+
+const Table = ({ data = [], className = "" }) => {
+  const columns = useMemo(() => {
+    if (!data.length) return [];
+
+    return Object.keys(data[0])
+      .filter((key) => key.toLowerCase() !== "id")
+      .map((key) =>
+        columnHelper.accessor(key, {
+          header: key,
+          cell: (info) => info.getValue(),
+        })
+      );
+  }, [data]);
+
   const table = useReactTable({
-    data: props.data,
-    columns: props.data.length
-      ? Object.keys(props.data[0])
-          .filter((key) => key.toLowerCase() !== "id")
-          .map((key) =>
-            createColumnHelper().accessor(key, {
-              cell: (info) => info.getValue(),
-            })
-          )
-      : [],
+    data,
+    columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  const headerGroups = table.getHeaderGroups();
+  const rows = table.getRowModel().rows;
+
+  if (!data.length) {
+    return null;
+  }
+
   return (
-    <table
-      className={`overflow-hidden rounded-lg shadow-lg ${
-        props.className ?? null
-      }`}
-    >
+    <table className={`overflow-hidden rounded-lg shadow-lg ${className}`}>
       <thead className="bg-stone-700 text-stone-200">
-        {table.getHeaderGroups().map((headerGroup) => (
+        {headerGroups.map((headerGroup) => (
           <tr key={headerGroup.id} className="border-b border-stone-600">
             {headerGroup.headers.map((header) => (
               <th
@@ -46,10 +57,10 @@ export default function Table(props) {
         ))}
       </thead>
       <tbody className="divide-y divide-stone-600">
-        {table.getRowModel().rows.map((row, index) => (
+        {rows.map((row, index) => (
           <tr
             key={row.id}
-            className={`hover:bg-stone-700 transition-colors ${
+            className={`hover:bg-stone-600 transition-colors ${
               index % 2 === 0 ? "bg-stone-800" : "bg-stone-700"
             }`}
           >
@@ -60,9 +71,7 @@ export default function Table(props) {
               >
                 <div
                   className="truncate max-w-[120px] md:max-w-none"
-                  title={String(
-                    flexRender(cell.column.columnDef.cell, cell.getContext())
-                  )}
+                  title={String(cell.getValue() ?? "")}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </div>
@@ -73,4 +82,6 @@ export default function Table(props) {
       </tbody>
     </table>
   );
-}
+};
+
+export default Table;
