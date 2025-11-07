@@ -23,17 +23,17 @@
   "homepage": "https://github.com/falcosan/Splitwired#readme",
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",
-    "isomorphic-dompurify": "^2.28.0",
-    "plotly.js": "^3.1.1",
+    "isomorphic-dompurify": "^2.31.0",
+    "plotly.js": "^3.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-plotly.js": "^2.6.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
-    "@babel/core": "^7.28.4",
-    "@babel/preset-env": "^7.28.3",
-    "@babel/preset-react": "^7.27.1",
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
     "babel-loader": "^10.0.0",
     "css-loader": "^7.1.2",
     "dotenv-webpack": "^8.1.1",
@@ -43,7 +43,7 @@
     "postcss-preset-env": "^10.4.0",
     "style-loader": "^4.0.0",
     "tailwindcss": "^3.4.17",
-    "webpack": "^5.102.0",
+    "webpack": "^5.102.1",
     "webpack-cli": "^6.0.1"
   }
 }
