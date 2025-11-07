@@ -61,10 +61,16 @@ export default function Table(props) {
                 <div
                   className="truncate max-w-[120px] md:max-w-none"
                   title={String(
-                    flexRender(cell.column.columnDef.cell, cell.getContext())
+                    flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext().getValue()
+                    )
                   )}
                 >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  {flexRender(
+                    cell.column.columnDef.cell,
+                    cell.getContext().getValue()
+                  )}
                 </div>
               </td>
             ))}
