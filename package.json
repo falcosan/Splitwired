@@ -6,6 +6,7 @@
   "scripts": {
     "init": "./scripts/init.sh",
     "postinstall": "npm run build",
+    "update": "./scripts/update.sh",
     "build": "webpack --mode production",
     "server": "npm run init && flask run",
     "dev": "webpack --config webpack.config.js --watch"
@@ -23,10 +24,10 @@
   "homepage": "https://github.com/falcosan/Splitwired#readme",
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",
-    "isomorphic-dompurify": "^2.31.0",
-    "plotly.js": "^3.2.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "isomorphic-dompurify": "^2.35.0",
+    "plotly.js": "^3.3.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "react-plotly.js": "^2.6.0"
   },
   "devDependencies": {
@@ -40,10 +41,10 @@
     "image-minimizer-webpack-plugin": "^4.1.4",
     "postcss": "^8.5.6",
     "postcss-loader": "^8.2.0",
-    "postcss-preset-env": "^10.4.0",
+    "postcss-preset-env": "^10.6.0",
     "style-loader": "^4.0.0",
     "tailwindcss": "^3.4.17",
-    "webpack": "^5.102.1",
+    "webpack": "^5.104.1",
     "webpack-cli": "^6.0.1"
   }
 }
