@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="manifest"
+      href="{{ url_for('static', filename='manifest.webmanifest') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='assets/style/style.css') }}"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='assets/icons/favicon.ico') }}"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Splitwired</title>
+  </head>
+  <body>
+    {% if current_user.is_authenticated %}
+    <main id="root">
+      <div class="container mx-auto max-w-7xl">
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 p-4 md:p-6 bg-stone-800 rounded-lg shadow-lg border border-stone-700"
+        >
+          <div class="flex items-center gap-3">
+            <h1 class="text-2xl md:text-3xl font-bold text-stone-200">
+              Splitwired
+            </h1>
+          </div>
+          <form action="/logout" method="POST" class="w-full md:w-auto">
+            <button
+              type="submit"
+              class="px-4 py-2 md:px-6 md:py-3 font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl flex items-center gap-2 w-full md:w-auto justify-center text-sm md:text-base"
+            >
+              Logout
+            </button>
+          </form>
+        </div>
+
+        <div class="mt-6 bg-stone-800 rounded-lg shadow-lg overflow-hidden">
+          <div class="p-4 border-b border-stone-700">
+            <h2
+              class="text-xl font-semibold text-stone-200 flex items-center gap-2"
+            >
+              Downloads
+            </h2>
+          </div>
+          <div class="p-4 bg-stone-700">
+            <div id="downloads-loading" class="p-4 rounded-lg bg-stone-800">
+              <p class="text-stone-400">Loading downloads...</p>
+            </div>
+            <ul
+              id="downloads-list"
+              class="space-y-2 md:space-y-3 hidden"
+            ></ul>
+            <div id="downloads-empty" class="p-4 rounded-lg bg-stone-600 hidden">
+              <p class="text-stone-300">No downloads available</p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="mt-6 bg-stone-800 rounded-lg p-4 md:p-6 shadow-lg border border-stone-700"
+        >
+          <h2
+            class="text-xl md:text-2xl font-semibold text-stone-200 mb-4 md:mb-6 flex items-center gap-2"
+          >
+            Parameters
+          </h2>
+          <form id="expense-form" class="space-y-4 md:space-y-6">
+            <div class="grid md:grid-cols-2 gap-4 md:gap-6">
+              <div class="flex flex-col gap-3">
+                <label class="text-stone-300 font-medium"
+                  >Select Month &amp; Year</label
+                >
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <select
+                    id="month-select"
+                    class="flex-1 rounded-lg px-3 py-2 md:px-4 md:py-3 border text-sm md:text-base transition-all duration-200 focus:outline-none bg-stone-700 border-stone-600 text-stone-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 cursor-pointer hover:border-stone-500 disabled:bg-stone-600 disabled:text-stone-400 disabled:cursor-not-allowed"
+                  >
+                    <option value="">All months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                  </select>
+                  <select
+                    id="year-select"
+                    class="sm:w-24 md:w-28 rounded-lg px-3 py-2 md:px-4 md:py-3 bg-stone-700 border border-stone-600 text-stone-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 focus:outline-none transition-all duration-200 cursor-pointer hover:border-stone-500 text-sm md:text-base"
+                  >
+                    <option value="">All time</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-3 h-fit">
+                <label class="text-stone-300 font-medium">Group</label>
+                <select
+                  id="group-select"
+                  class="rounded-lg px-3 py-2 md:px-4 md:py-3 bg-stone-700 border border-stone-600 text-stone-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 focus:outline-none transition-all duration-200 cursor-pointer hover:border-stone-500 text-sm md:text-base"
+                >
+                  <option value="personal" class="bg-stone-700 text-stone-200">
+                    Personal
+                  </option>
+                  <option value="home" class="bg-stone-700 text-stone-200">
+                    Home
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div id="category-wrapper" class="hidden">
+              <div class="flex flex-col gap-3">
+                <label class="text-stone-300 font-medium">Category</label>
+                <select
+                  id="category-select"
+                  class="rounded-lg px-3 py-2 md:px-4 md:py-3 bg-stone-700 border border-stone-600 text-stone-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 focus:outline-none transition-all duration-200 cursor-pointer hover:border-stone-500 text-sm md:text-base"
+                >
+                  <option value="" class="bg-stone-700 text-stone-400">
+                    - Select Category -
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4 md:gap-6">
+              <label
+                class="flex flex-row items-center gap-3 font-medium text-stone-300 cursor-pointer hover:text-stone-200"
+              >
+                <input
+                  type="checkbox"
+                  id="csv-checkbox"
+                  class="w-4 h-4 md:w-5 md:h-5 text-emerald-600 bg-stone-700 border-stone-600 focus:ring-emerald-500 focus:ring-2 cursor-pointer rounded-lg"
+                />
+                <span>Export to CSV</span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              id="submit-btn"
+              class="w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 transform bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-lg hover:shadow-xl"
+            >
+              Search Expenses
+            </button>
+          </form>
+        </div>
+
+        <div
+          class="bg-stone-800 rounded-lg p-4 md:p-6 border border-stone-700 mt-6"
+        >
+          <div class="flex items-center gap-2 mb-3">
+            <span
+              class="text-xs md:text-sm font-medium text-stone-400 uppercase tracking-wide"
+              >Current Filter</span
+            >
+          </div>
+          <span
+            id="current-filter-text"
+            class="block text-base md:text-lg font-semibold text-stone-200 break-words"
+          ></span>
+        </div>
+
+        <div
+          id="summary"
+          class="hidden mt-6 p-4 md:p-6 bg-stone-800 rounded-lg shadow-lg"
+        >
+          <h2
+            class="text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-stone-200"
+          >
+            Summary
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+            <div class="p-4 md:p-6 bg-stone-700 rounded-lg shadow">
+              <p class="text-sm md:text-lg font-medium text-stone-300 mb-2">
+                Total Expenses:
+              </p>
+              <p
+                id="summary-total"
+                class="text-2xl md:text-3xl font-bold text-red-400 break-all"
+              ></p>
+            </div>
+            <div class="p-4 md:p-6 bg-stone-700 rounded-lg shadow">
+              <p class="text-sm md:text-lg font-medium text-stone-300 mb-2">
+                Average Expense:
+              </p>
+              <p
+                id="summary-average"
+                class="text-2xl md:text-3xl font-bold text-blue-400 break-all"
+              ></p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="status-display"
+          class="hidden mt-6 p-4 rounded-lg bg-stone-800"
+        >
+          <p
+            id="status-text"
+            class="text-center text-lg font-semibold text-stone-300"
+          ></p>
+        </div>
+
+        <div
+          id="expenses-table"
+          class="hidden mt-6 bg-stone-800 rounded-lg p-4 md:p-6 shadow-lg overflow-hidden"
+        >
+          <h3
+            class="text-lg md:text-xl font-semibold text-stone-200 mb-4 md:mb-6"
+          >
+            Expenses
+          </h3>
+          <div class="overflow-x-auto -mx-4 md:mx-0">
+            <div class="inline-block min-w-full align-middle">
+              <table
+                class="w-full min-w-[600px] overflow-hidden rounded-lg shadow-lg"
+              >
+                <thead
+                  id="table-head"
+                  class="bg-stone-700 text-stone-200"
+                ></thead>
+                <tbody
+                  id="table-body"
+                  class="divide-y divide-stone-600"
+                ></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="charts-section"
+          class="hidden mt-6 bg-stone-800 rounded-lg p-4 md:p-6 shadow-lg"
+        >
+          <h3
+            class="text-lg md:text-xl font-semibold text-stone-200 mb-4 md:mb-6"
+          >
+            Charts
+          </h3>
+          <div id="charts-container" class="grid gap-4 md:gap-6"></div>
+        </div>
+      </div>
+    </main>
+    <script>
+      window.__DOWNLOAD_SECRET__ = {{ download_secret|tojson }};
+    </script>
+    <script
+      src="https://cdn.plot.ly/plotly-2.35.2.min.js"
+      charset="utf-8"
+    ></script>
+    <script
+      src="{{ url_for('static', filename='js/app.js') }}"
+    ></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("../sw.js");
+      }
+    </script>
+    {% else %}
+    <main id="login">
+      <form action="login" method="POST">
+        <label>
+          Username
+          <input type="text" name="username" id="username" required />
+        </label>
+        <label>
+          Password
+          <input type="password" name="password" id="password" required />
+        </label>
+        <input type="submit" name="submit" value="Login" />
+      </form>
+    </main>
+    {% endif %}
+  </body>
+</html>

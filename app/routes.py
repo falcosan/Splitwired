@@ -11,7 +11,6 @@ from flask import (
     request,
     url_for,
     redirect,
-    make_response,
     render_template,
     send_from_directory,
 )
@@ -24,7 +23,11 @@ secret_download_value = enums_headers.get_header_prop("download_secret", "value"
 @flask_app.route("/")
 @cross_origin()
 def index():
-    return render_template("index.html", environment=cf.environment)
+    return render_template(
+        "index.jinja",
+        environment=cf.environment,
+        download_secret=secret_download_value,
+    )
 
 
 @flask_app.route("/login", methods=["POST"])
@@ -43,9 +46,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    response = make_response("", 204)
-    response.headers["Refresh"] = "0; url=/"
-    return response
+    return redirect(url_for("index"))
 
 
 @flask_app.route("/sw.js")
@@ -94,7 +95,7 @@ def download():
     raw_files = os.listdir(path)
     csv_files = [f for f in raw_files if "_downloaded_" in f]
     files = [f for f in set_files(csv_files) if f["extension"] == "csv"]
-    response = render_template("templates/download.html", files=files)
+    response = render_template("templates/download.jinja", files=files)
     return responser(
         request=request,
         response=response,
