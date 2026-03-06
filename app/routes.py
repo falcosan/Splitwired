@@ -90,11 +90,12 @@ def expenses():
 @cross_origin()
 @login_required
 def download():
-    path = os.path.join(os.getcwd(), output_folder)
-    os.makedirs(path, exist_ok=True)
-    raw_files = os.listdir(path)
-    csv_files = [f for f in raw_files if f.endswith(".csv") and "_downloaded_" in f]
-    files = set_files(csv_files)
+    if os.path.isdir(output_folder):
+        raw_files = os.listdir(output_folder)
+        csv_files = [f for f in raw_files if f.endswith(".csv") and "_downloaded_" in f]
+        files = set_files(csv_files)
+    else:
+        files = []
     response = render_template("templates/download.jinja", files=files)
     return responser(
         request=request,
@@ -108,4 +109,4 @@ def download():
 @cross_origin()
 @login_required
 def download_file(filename):
-    return send_from_directory(f"../{output_folder}", filename)
+    return send_from_directory(output_folder, filename)

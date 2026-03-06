@@ -1,3 +1,5 @@
+import os
+import tempfile
 from decouple import config
 from .patterns import Singleton
 
@@ -57,7 +59,14 @@ class Headers(metaclass=Singleton):
 
 class Folders(metaclass=Singleton):
     def __init__(self):
-        self.output = {"value": "output"}
+        default_output = os.path.join(os.getcwd(), "output")
+        try:
+            os.makedirs(default_output, exist_ok=True)
+            output_path = default_output
+        except OSError:
+            output_path = os.path.join(tempfile.gettempdir(), "output")
+            os.makedirs(output_path, exist_ok=True)
+        self.output = {"value": output_path}
 
     def get_folder_prop(self, group: str, key: str):
         dict_value = getattr(self, group, None)
