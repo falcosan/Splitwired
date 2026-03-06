@@ -14,12 +14,14 @@ info() { echo -e "${GREEN}[INFO]${NC} $1"; }
 [[ -f "package.json" ]] || error "package.json not found"
 [[ -f "requirements.txt" ]] || error "requirements.txt not found"
 
-if command -v npm >/dev/null 2>&1; then
-    npm install --silent
-    npm run build --silent
-else
-    error "npm not found. Please install Node.js/npm first"
+if ! command -v npm >/dev/null 2>&1; then
+    info "Installing Node.js..."
+    apt-get update -qq && apt-get install -y -qq nodejs npm >/dev/null 2>&1
+    command -v npm >/dev/null 2>&1 || error "Failed to install Node.js/npm"
 fi
+
+npm install --silent
+npm run build --silent
 
 pip install --upgrade pip --quiet
 pip install -r requirements.txt --quiet
