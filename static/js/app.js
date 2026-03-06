@@ -16,6 +16,7 @@
   };
 
   const appData = { data: [], table: [], chart: [], groups: [] };
+
   let searchState = {
     year: params.year,
     month: params.month,
@@ -23,6 +24,8 @@
     category: null,
     personal: true,
   };
+
+  const chartInstances = [];
 
   const $ = (id) => document.getElementById(id);
   const show = (el) => el.classList.remove("hidden");
@@ -33,7 +36,6 @@
       .replace(/"/g, "&quot;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
-
 
   async function apiGetGroups() {
     const r = await fetch("/groups");
@@ -56,9 +58,9 @@
     return r.json();
   }
 
-
   function findProperties() {
     let idKey, totalKey, numberKey;
+
     for (const item of appData.table) {
       for (const prop in item) {
         const lp = prop.toLowerCase();
@@ -67,6 +69,7 @@
         if (lp.includes("number")) numberKey = prop;
       }
     }
+
     return {
       id: idKey,
       total: totalKey || "Total",
@@ -91,6 +94,7 @@
         })
         .sort((a, b) => a.name.localeCompare(b.name));
     }
+
     return [];
   }
 
@@ -113,8 +117,9 @@
 
     const categories = getCategories();
     const found = categories.find(
-      (c) => String(c.id) === String(params.category)
+      (c) => String(c.id) === String(params.category),
     );
+
     const filters = found
       ? appData.data.filter((item) => item.category.name === found.name)
       : appData.data;
@@ -145,18 +150,18 @@
     let filteredData = appData.data;
     if (params.category) {
       const found = categories.find(
-        (c) => String(c.id) === String(params.category)
+        (c) => String(c.id) === String(params.category),
       );
       if (found) {
         filteredData = appData.data.filter(
-          (item) => item.category.name === found.name
+          (item) => item.category.name === found.name,
         );
       }
     }
 
     const total = filteredData.reduce(
       (acc, item) => acc + Number(item[costKey] || 0),
-      0
+      0,
     );
 
     let avgDiv;
@@ -172,8 +177,7 @@
         avgDiv = new Date(searchState.year, searchState.month, 0).getDate();
       }
     } else if (searchState.year && !searchState.month) {
-      const isLeap = (y) =>
-        (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+      const isLeap = (y) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
       avgDiv = isLeap(searchState.year) ? 366 : 365;
     } else {
       if (
@@ -183,12 +187,12 @@
       ) {
         const startYear = new Date(appData.table[0].Date).getFullYear();
         const endYear = new Date(
-          appData.table[appData.table.length - 1].Date
+          appData.table[appData.table.length - 1].Date,
         ).getFullYear();
         const startDate = new Date(startYear, 0, 1);
         const endDate = new Date(endYear, 11, 31);
         avgDiv = Math.ceil(
-          (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
+          (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24),
         );
       } else {
         avgDiv = filteredData.length || 1;
@@ -209,7 +213,7 @@
       if (group === "home") return "Home";
       if (group) {
         const found = appData.groups.find(
-          (g) => String(g.id) === String(group)
+          (g) => String(g.id) === String(group),
         );
         return found ? found.name : "";
       }
@@ -218,9 +222,7 @@
 
     const catName = (() => {
       if (category) {
-        const found = categories.find(
-          (c) => String(c.id) === String(category)
-        );
+        const found = categories.find((c) => String(c.id) === String(category));
         return found ? " | " + found.name : "";
       }
       return "";
@@ -238,15 +240,15 @@
     })();
 
     const yearStr = (() => {
-      if (year && +year >= MIN_YEAR && +year <= MAX_YEAR)
+      if (year && +year >= MIN_YEAR && +year <= MAX_YEAR) {
         return " | " + year;
+      }
       if (!year) return " | All time";
       return "";
     })();
 
     return (groupName + catName + monthName + yearStr).trim();
   }
-
 
   function renderDownloads(html) {
     const loading = $("downloads-loading");
@@ -276,7 +278,7 @@
     }
 
     const keys = Object.keys(expenses[0]).filter(
-      (k) => k.toLowerCase() !== "id"
+      (k) => k.toLowerCase() !== "id",
     );
 
     thead.innerHTML =
@@ -286,7 +288,7 @@
           (k) =>
             '<th class="px-2 py-2 md:px-4 md:py-3 align-baseline whitespace-nowrap text-left font-semibold uppercase tracking-wide text-xs md:text-sm">' +
             escAttr(k) +
-            "</th>"
+            "</th>",
         )
         .join("") +
       "</tr>";
@@ -318,38 +320,118 @@
     show(container);
   }
 
+  function cleanupCharts() {
+    chartInstances.forEach(({ plotDiv, observer, resizeHandler }) => {
+      try {
+        if (observer) observer.disconnect();
+      } catch (_) {}
+
+      try {
+        if (resizeHandler) {
+          window.removeEventListener("resize", resizeHandler);
+        }
+      } catch (_) {}
+
+      try {
+        if (plotDiv) Plotly.purge(plotDiv);
+      } catch (_) {}
+    });
+
+    chartInstances.length = 0;
+  }
+
   function renderCharts(charts) {
     const section = $("charts-section");
     const container = $("charts-container");
+
+    cleanupCharts();
+    container.innerHTML = "";
+
+    container.style.minWidth = "0";
+    section.style.minWidth = "0";
+    container.classList.add("min-w-0");
 
     if (!charts || !charts.length) {
       hide(section);
       return;
     }
 
-    container.innerHTML = "";
     charts.forEach((figure, i) => {
+      const isMobile = window.matchMedia("(max-width: 640px)").matches;
+
       const wrapper = document.createElement("div");
-      wrapper.className = "p-3 md:p-4 bg-stone-700 rounded-lg shadow min-h-0";
+      wrapper.className =
+        "w-full min-w-0 overflow-hidden p-3 md:p-4 bg-stone-700 rounded-lg shadow";
+      wrapper.style.width = "100%";
+      wrapper.style.minWidth = "0";
+      wrapper.style.overflow = "hidden";
+
       const plotDiv = document.createElement("div");
       plotDiv.id = "chart-" + i;
-      plotDiv.style.minHeight = "250px";
+      plotDiv.style.width = "100%";
+      plotDiv.style.maxWidth = "100%";
+      plotDiv.style.minWidth = "0";
+      plotDiv.style.height = isMobile ? "320px" : "420px";
+
       wrapper.appendChild(plotDiv);
       container.appendChild(wrapper);
 
-      Plotly.newPlot(
-        plotDiv,
-        figure.data,
-        {
-          ...figure.layout,
-          paper_bgcolor: "rgba(0,0,0,0)",
-          plot_bgcolor: "rgba(0,0,0,0)",
-          font: { color: "#e2e8f0" },
-          margin: { l: 40, r: 20, t: 40, b: 40 },
-          autosize: true,
+      const layout = {
+        ...figure.layout,
+        autosize: true,
+        width: undefined,
+        height: undefined,
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: "rgba(0,0,0,0)",
+        font: {
+          ...(figure.layout?.font || {}),
+          color: "#e2e8f0",
         },
-        { responsive: true, displayModeBar: false }
-      );
+        margin: isMobile
+          ? { l: 16, r: 16, t: 40, b: 72 }
+          : { l: 40, r: 20, t: 40, b: 40 },
+        legend: isMobile
+          ? {
+              ...(figure.layout?.legend || {}),
+              orientation: "h",
+              x: 0.5,
+              xanchor: "center",
+              y: -0.18,
+            }
+          : figure.layout?.legend,
+      };
+
+      Plotly.newPlot(plotDiv, figure.data, layout, {
+        responsive: true,
+        displayModeBar: false,
+      }).then(() => {
+        try {
+          Plotly.Plots.resize(plotDiv);
+        } catch (_) {}
+      });
+
+      let observer = null;
+      let resizeHandler = null;
+
+      if (typeof ResizeObserver !== "undefined") {
+        observer = new ResizeObserver(() => {
+          requestAnimationFrame(() => {
+            try {
+              Plotly.Plots.resize(plotDiv);
+            } catch (_) {}
+          });
+        });
+        observer.observe(wrapper);
+      } else {
+        resizeHandler = () => {
+          try {
+            Plotly.Plots.resize(plotDiv);
+          } catch (_) {}
+        };
+        window.addEventListener("resize", resizeHandler);
+      }
+
+      chartInstances.push({ plotDiv, observer, resizeHandler });
     });
 
     show(section);
@@ -361,6 +443,7 @@
       hide(section);
       return;
     }
+
     $("summary-total").textContent = "\u20AC" + info.total;
     $("summary-average").textContent = "\u20AC" + info.average;
     show(section);
@@ -382,6 +465,7 @@
 
   function setSubmitLoading(isLoading) {
     const btn = $("submit-btn");
+
     if (isLoading) {
       btn.disabled = true;
       btn.textContent = "Searching...";
@@ -394,7 +478,6 @@
         "w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 transform bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-lg hover:shadow-xl";
     }
   }
-
 
   function updateCategorySelect() {
     const categories = getCategories();
@@ -409,6 +492,7 @@
 
     select.innerHTML =
       '<option value="" class="bg-stone-700 text-stone-400">- Select Category -</option>';
+
     categories.forEach((cat) => {
       const opt = document.createElement("option");
       opt.value = cat.id;
@@ -424,9 +508,9 @@
     show(wrapper);
   }
 
-
   function populateGroups(groups) {
     const select = $("group-select");
+
     groups.forEach((g) => {
       const opt = document.createElement("option");
       opt.value = g.id;
@@ -436,9 +520,9 @@
     });
   }
 
-
   function populateYears() {
     const select = $("year-select");
+
     for (let y = MIN_YEAR; y <= MAX_YEAR; y++) {
       const opt = document.createElement("option");
       opt.value = y;
@@ -446,9 +530,9 @@
       opt.className = "bg-stone-700 text-stone-200";
       select.appendChild(opt);
     }
+
     select.value = params.year;
   }
-
 
   function buildApiPayload() {
     return {
@@ -464,9 +548,9 @@
     };
   }
 
-
   function onGroupChange() {
     const val = $("group-select").value;
+
     if (val === "personal") {
       params.group = null;
       params.personal = true;
@@ -477,13 +561,14 @@
       params.group = val;
       params.personal = false;
     }
+
     updateCategorySelect();
     updateFilterDisplay();
   }
 
   function onYearChange() {
     const val = $("year-select").value;
-    params.year = val ? parseInt(val) : null;
+    params.year = val ? parseInt(val, 10) : null;
 
     const monthSelect = $("month-select");
     if (!val) {
@@ -500,7 +585,7 @@
 
   function onMonthChange() {
     const val = $("month-select").value;
-    params.month = val ? parseInt(val) : null;
+    params.month = val ? parseInt(val, 10) : null;
     updateCategorySelect();
     updateFilterDisplay();
   }
@@ -532,6 +617,7 @@
     appData.data = [];
     appData.table = [];
     appData.chart = [];
+
     renderTable([]);
     renderCharts([]);
     renderSummary(null);
@@ -582,7 +668,6 @@
     }
   }
 
-
   async function init() {
     populateYears();
 
@@ -598,6 +683,8 @@
       params.csv = e.target.checked;
     });
 
+    window.addEventListener("beforeunload", cleanupCharts);
+
     updateFilterDisplay();
 
     try {
@@ -605,6 +692,7 @@
         apiGetGroups(),
         apiGetDownloads(),
       ]);
+
       appData.groups = groups;
       populateGroups(groups);
       renderDownloads(downloads);
